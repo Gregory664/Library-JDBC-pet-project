@@ -22,6 +22,10 @@ public class Reader {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getFio() {
         return fio;
     }

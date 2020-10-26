@@ -1,7 +1,6 @@
 package org.library.entity;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Objects;
 
 public class BookRent {
@@ -22,20 +21,40 @@ public class BookRent {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public Reader getReader() {
         return reader;
+    }
+
+    public void setReader(Reader reader) {
+        this.reader = reader;
     }
 
     public Book getBook() {
         return book;
     }
 
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
     public LocalDate getStartDate() {
         return startDate;
     }
 
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
     public LocalDate getEndDate() {
         return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     @Override

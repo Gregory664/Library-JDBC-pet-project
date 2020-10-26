@@ -3,7 +3,7 @@ package org.library.entity;
 import java.util.Objects;
 
 public class Genre {
-    private final String title;
+    private String title;
     private int id;
 
     public Genre(String title) {
@@ -14,8 +14,16 @@ public class Genre {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Override

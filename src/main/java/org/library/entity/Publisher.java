@@ -3,8 +3,8 @@ package org.library.entity;
 import java.util.Objects;
 
 public class Publisher {
-    private final int id;
-    private final String title;
+    private int id;
+    private String title;
 
     public Publisher(int id, String title) {
         this.id = id;
@@ -15,8 +15,16 @@ public class Publisher {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Override

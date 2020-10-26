@@ -3,8 +3,8 @@ package org.library.entity;
 import java.util.Objects;
 
 public class Shelf {
-    private final int id;
-    private final String inventNum;
+    private int id;
+    private String inventNum;
 
     public Shelf(int id, String inventNum) {
         this.id = id;
@@ -15,8 +15,16 @@ public class Shelf {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getInventNum() {
         return inventNum;
+    }
+
+    public void setInventNum(String inventNum) {
+        this.inventNum = inventNum;
     }
 
     @Override

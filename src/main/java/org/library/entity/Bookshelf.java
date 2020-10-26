@@ -16,12 +16,24 @@ public class Bookshelf {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public Shelf getShelf() {
         return shelf;
     }
 
+    public void setShelf(Shelf shelf) {
+        this.shelf = shelf;
+    }
+
     public Book getBook() {
         return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
     }
 
     @Override
