@@ -23,13 +23,13 @@ DROP TABLE IF EXISTS book;
 CREATE TABLE IF NOT EXISTS book (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(50) NOT NULL,
-    author_id INT NOT NULL,
-    publisher_id INT NOT NULL,
-    genre_id INT NOT NULL,
+    author_id INT NULL,
+    publisher_id INT NULL,
+    genre_id INT NULL,
     length INT NOT NULL,
-    CONSTRAINT book_author_fk FOREIGN KEY (author_id) REFERENCES author(id),
-    CONSTRAINT book_publisher_fk FOREIGN KEY (publisher_id) REFERENCES publisher(id),
-    CONSTRAINT book_genre_fk FOREIGN KEY (genre_id) REFERENCES genre(id)
+    CONSTRAINT book_author_fk FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE SET NULL,
+    CONSTRAINT book_publisher_fk FOREIGN KEY (publisher_id) REFERENCES publisher(id) ON DELETE SET NULL,
+    CONSTRAINT book_genre_fk FOREIGN KEY (genre_id) REFERENCES genre(id) ON DELETE SET NULL
 );
 
 DROP TABLE IF EXISTS shelf;
@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS bookshelf (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     shelf_id INT NOT NULL,
     book_id INT NOT NULL,
-    CONSTRAINT bookshelf_shelf_fk FOREIGN KEY (shelf_id) REFERENCES shelf(id),
-    CONSTRAINT bookshelf_book_fk FOREIGN KEY (book_id) REFERENCES book(id)
+    CONSTRAINT bookshelf_shelf_fk FOREIGN KEY (shelf_id) REFERENCES shelf(id) ON DELETE CASCADE,
+    CONSTRAINT bookshelf_book_fk FOREIGN KEY (book_id) REFERENCES book(id) ON DELETE CASCADE
 ); 
 
 DROP TABLE IF EXISTS reader;
@@ -64,6 +64,6 @@ CREATE TABLE IF NOT EXISTS book_rent (
     book_id INT NOT NULL,
     start_date DATE NOT NULL,
     end_date date NOT NULL,
-    CONSTRAINT book_rent_reader_fk FOREIGN KEY (reader_id) REFERENCES reader(id),
-    CONSTRAINT book_rent_book_fk FOREIGN KEY (book_id) REFERENCES book(id)
+    CONSTRAINT book_rent_reader_fk FOREIGN KEY (reader_id) REFERENCES reader(id) ON DELETE CASCADE,
+    CONSTRAINT book_rent_book_fk FOREIGN KEY (book_id) REFERENCES book(id) ON DELETE CASCADE
 );

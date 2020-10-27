@@ -15,4 +15,6 @@ public interface JDBCRepository<T, ID> {
     void deleteById(ID id);
 
     boolean save(T entity);
+
+    long count();
 }
