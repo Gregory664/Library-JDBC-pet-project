@@ -74,7 +74,8 @@ class AuthorServiceTest {
 
         List<Author> authors = service.findAll();
         Optional<Author> optionalAuthor = authors.stream().
-                filter(author -> author.getName().equals(newAuthor.getName())).findFirst();
+                filter(author -> author.getName().equals(newAuthor.getName()))
+                .findFirst();
 
         assertTrue(optionalAuthor.isPresent());
         service.deleteById(optionalAuthor.get().getId());
