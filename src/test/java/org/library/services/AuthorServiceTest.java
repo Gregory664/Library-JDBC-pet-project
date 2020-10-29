@@ -1,5 +1,6 @@
 package org.library.services;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.library.entity.Author;
 
@@ -10,6 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AuthorServiceTest {
     AuthorService service = new AuthorService();
+    Author author = null;
+
+    @BeforeEach
+    void setUpAuthor() {
+        author = new Author();
+        author.setName("test author");
+    }
 
     @Test
     void findAll() {
@@ -50,8 +58,6 @@ class AuthorServiceTest {
     @Test
     void deleteById() {
         long beforeAdd = service.count();
-        Author author = new Author();
-        author.setName("test author");
         service.save(author);
         long afterADD = service.count();
         assertEquals(beforeAdd + 1, afterADD);
@@ -65,16 +71,14 @@ class AuthorServiceTest {
 
     @Test
     void save() {
-        Author newAuthor = new Author();
-        newAuthor.setName("test author");
         long beforeAdd = service.count();
-        assertTrue(service.save(newAuthor));
+        assertTrue(service.save(author));
         long afterAdd = service.count();
         assertEquals(beforeAdd + 1, afterAdd);
 
         List<Author> authors = service.findAll();
         Optional<Author> optionalAuthor = authors.stream().
-                filter(author -> author.getName().equals(newAuthor.getName()))
+                filter(author1 -> author1.getName().equals(author.getName()))
                 .findFirst();
 
         assertTrue(optionalAuthor.isPresent());
