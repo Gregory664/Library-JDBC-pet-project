@@ -31,6 +31,7 @@ class BookServiceTest {
     void findAll() {
         List<Book> books = service.findAll();
         assertNotNull(books);
+        books.forEach(book1 -> assertNotNull(book1.getCountOfBookInShelf()));
     }
 
     @Test
@@ -43,6 +44,7 @@ class BookServiceTest {
         assertNotNull(book.getAuthor());
         assertNotNull(book.getPublisher());
         assertNotNull(book.getGenre());
+        assertNotNull(book.getCountOfBookInShelf());
         assertNotEquals(0, book.getLength());
     }
 

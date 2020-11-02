@@ -7,7 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Shelf {
+public class Shelf implements Comparable<Shelf> {
     private int id;
     private String inventNum;
+
+    @Override
+    public int compareTo(Shelf shelf) {
+        return Integer.compare(this.id, shelf.getId());
+    }
 }

@@ -1,9 +1,6 @@
 package org.library.services;
 
-import org.library.entity.Author;
-import org.library.entity.Book;
-import org.library.entity.Genre;
-import org.library.entity.Publisher;
+import org.library.entity.*;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.repositories.IBook;
 import org.library.utils.ConnectionUtils;
@@ -11,9 +8,12 @@ import org.library.utils.ConnectionUtils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class BookService implements IBook {
+    BookShelfService bookShelfService = new BookShelfService();
+
     @Override
     public List<Book> findAll() {
         String query = "SELECT b.id, b.title, b.length, " +
@@ -46,7 +46,9 @@ public class BookService implements IBook {
                 String genreTitle = resultSet.getString("genre_title");
                 Genre genre = new Genre(genreId, genreTitle);
 
-                books.add(new Book(id, title, author, publisher, genre, length));
+                Map<Shelf, Integer> countOfBookOnShelfByBookIdMap = bookShelfService.getCountOfBookOnShelfByBookId(id);
+
+                books.add(new Book(id, title, author, publisher, genre, length, countOfBookOnShelfByBookIdMap));
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -88,7 +90,9 @@ public class BookService implements IBook {
                     String genreTitle = resultSet.getString("genre_title");
                     Genre genre = new Genre(genreId, genreTitle);
 
-                    book = new Book(newId, title, author, publisher, genre, length);
+                    Map<Shelf, Integer> countOfBookOnShelfByBookIdMap = bookShelfService.getCountOfBookOnShelfByBookId(id);
+
+                    book = new Book(newId, title, author, publisher, genre, length, countOfBookOnShelfByBookIdMap);
                 }
             }
         } catch (SQLException e) {
@@ -210,7 +214,9 @@ public class BookService implements IBook {
                     String genreTitle = resultSet.getString("genre_title");
                     Genre genre = new Genre(genreId, genreTitle);
 
-                    books.add(new Book(id, title, newAuthor, publisher, genre, length));
+                    Map<Shelf, Integer> countOfBookOnShelfByBookIdMap = bookShelfService.getCountOfBookOnShelfByBookId(id);
+
+                    books.add(new Book(id, title, newAuthor, publisher, genre, length, countOfBookOnShelfByBookIdMap));
                 }
             }
         } catch (SQLException e) {
@@ -253,7 +259,9 @@ public class BookService implements IBook {
                     String genreTitle = resultSet.getString("genre_title");
                     Genre genre = new Genre(genreId, genreTitle);
 
-                    books.add(new Book(id, title, author, newPublisher, genre, length));
+                    Map<Shelf, Integer> countOfBookOnShelfByBookIdMap = bookShelfService.getCountOfBookOnShelfByBookId(id);
+
+                    books.add(new Book(id, title, author, newPublisher, genre, length, countOfBookOnShelfByBookIdMap));
                 }
             }
         } catch (SQLException e) {
@@ -296,7 +304,9 @@ public class BookService implements IBook {
                     String genreTitle = resultSet.getString("genre_title");
                     Genre newGenre = new Genre(genreId, genreTitle);
 
-                    books.add(new Book(id, title, author, publisher, newGenre, length));
+                    Map<Shelf, Integer> countOfBookOnShelfByBookIdMap = bookShelfService.getCountOfBookOnShelfByBookId(id);
+
+                    books.add(new Book(id, title, author, publisher, newGenre, length, countOfBookOnShelfByBookIdMap));
                 }
             }
         } catch (SQLException e) {
@@ -339,7 +349,9 @@ public class BookService implements IBook {
                     String genreTitle = resultSet.getString("genre_title");
                     Genre genre = new Genre(genreId, genreTitle);
 
-                    book = new Book(newId, newTitle, author, publisher, genre, length);
+                    Map<Shelf, Integer> bookOnShelfByBookId = new BookShelfService().getCountOfBookOnShelfByBookId(newId);
+
+                    book = new Book(newId, newTitle, author, publisher, genre, length, bookOnShelfByBookId);
                 }
             }
         } catch (SQLException e) {

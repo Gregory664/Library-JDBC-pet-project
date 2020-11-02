@@ -30,10 +30,8 @@ VALUES
 
 INSERT INTO book (title, author_id, publisher_id, genre_id, length)
 VALUES
-('book 1', 1, 1, 1, 350),
 ('book 1', 1, 2, 1, 532),
 ('book 2', 2, 1, 1, 124),
-('book 2', 2, 2, 1, 783),
 ('book 3', 1, 5, 2, 1432),
 ('book 4', 2, 4, 2, 1542),
 ('book 5', 3, 6, 2, 765),
