@@ -1,15 +1,16 @@
 package org.library.repositories;
 
-import org.library.entity.BookRent;
+import org.library.entity.Book;
+import org.library.entity.Period;
 import org.library.entity.Reader;
-import org.library.utils.JDBCRepository;
+import org.library.entity.Shelf;
 
-import java.util.List;
+import java.util.Map;
 
-public interface IBookRent extends JDBCRepository<BookRent, Integer> {
-    List<BookRent> findByReader(Reader reader);
+public interface IBookRent {
+    Map<Book, Period>  getRentBooksByReaderId(int readerId);
 
-    long countByReader(Reader reader);
+    boolean deleteRentBookFromReader(Reader reader, Book book, Shelf shelf);
 
-    List<BookRent> findByExpiredDate();
+    boolean addRentBookToReader(Reader reader, Book book, Period period, Shelf shelf);
 }

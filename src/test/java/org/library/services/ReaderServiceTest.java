@@ -55,7 +55,7 @@ class ReaderServiceTest {
 
     @Test
     void findById() {
-        Optional<Reader> optionalReader = service.findById(25);
+        Optional<Reader> optionalReader = service.findById(1);
         assertTrue(optionalReader.isPresent());
         Reader reader = optionalReader.get();
         assertNotEquals(0, reader.getId());

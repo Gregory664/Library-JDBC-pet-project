@@ -46,7 +46,7 @@ public class BookShelfService implements IBookshelf {
     public boolean deleteBookFromShelf(Book book, Shelf shelf) {
         String query = "DELETE from bookshelf WHERE shelf_id = ? AND book_id = ? LIMIT 1;";
         Map<Shelf, Integer> countOfBookInShelf = book.getCountOfBookInShelf();
-        boolean result = false;
+        boolean result;
 
         if (!countOfBookInShelf.containsKey(shelf)) {
             throw new BookNotFoundOnShelfException(book.getId(), shelf.getId());
@@ -62,9 +62,28 @@ public class BookShelfService implements IBookshelf {
             statement.setInt(2, book.getId());
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new SQLExceptionWrapper(e);
         }
 
+        return result;
+    }
+
+    @Override
+    public boolean addBookToShelf(Book book, Shelf shelf) {
+        String query = "INSERT INTO bookshelf (book_id, shelf_id) VALUES (?, ?);";
+        book.getCountOfBookInShelf().computeIfPresent(shelf, (s, i) -> i++);
+        book.getCountOfBookInShelf().putIfAbsent(shelf, 1);
+
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, book.getId());
+            statement.setInt(2, shelf.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
         return result;
     }
 }

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Book {
+public class Book implements Comparable<Book>{
     private int id;
     private String title;
     private Author author;
@@ -18,4 +18,9 @@ public class Book {
     private Genre genre;
     private int length;
     private Map<Shelf, Integer> countOfBookInShelf = new TreeMap<>();
+
+    @Override
+    public int compareTo(Book book) {
+        return Integer.compare(this.id, book.id);
+    }
 }

@@ -15,9 +15,11 @@ class BookShelfServiceTest {
 
     @Test
     void deleteBookFromShelf() {
-        Book book = bookService.findById(1).get();
-        Shelf shelf = shelfService.findById(5).get();
-        bookShelfService.deleteBookFromShelf(book, shelf);
-        System.out.println(book);
+        Book book = bookService.findById(1).orElseThrow(() -> new RuntimeException("book not found"));
+        Shelf shelf = shelfService.findById(5).orElseThrow(() -> new RuntimeException("shelf not found"));
+        int beforeDelete = book.getCountOfBookInShelf().size();
+        assertTrue(bookShelfService.deleteBookFromShelf(book, shelf));
+        int afterDelete = book.getCountOfBookInShelf().size();
+        assertNotEquals(beforeDelete, afterDelete);
     }
 }

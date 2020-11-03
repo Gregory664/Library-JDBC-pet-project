@@ -1,5 +1,7 @@
 package org.library.services;
 
+import org.library.entity.Book;
+import org.library.entity.Period;
 import org.library.entity.Reader;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.repositories.IReader;
@@ -11,9 +13,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ReaderService implements IReader {
+    BookRentService bookRentService = new BookRentService();
+
     @Override
     public boolean existsByPassport(String passport) {
         String query = "SELECT COUNT(*) FROM reader WHERE passport = ?;";
@@ -48,7 +53,9 @@ public class ReaderService implements IReader {
                     String address = resultSet.getString(4);
                     String phone = resultSet.getString(5);
                     String passport = resultSet.getString(6);
-                    readers.add(new Reader(id, fio, age, address, phone, passport));
+
+                    Map<Book, Period> rentBooksByReader = bookRentService.getRentBooksByReaderId(id);
+                    readers.add(new Reader(id, fio, age, address, phone, passport, rentBooksByReader));
                 }
             }
         } catch (SQLException e) {
@@ -72,7 +79,9 @@ public class ReaderService implements IReader {
                 String address = resultSet.getString(4);
                 String phone = resultSet.getString(5);
                 String passport = resultSet.getString(6);
-                readers.add(new Reader(id, fio, age, address, phone, passport));
+
+                Map<Book, Period> rentBooksByReader = bookRentService.getRentBooksByReaderId(id);
+                readers.add(new Reader(id, fio, age, address, phone, passport, rentBooksByReader));
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -96,7 +105,9 @@ public class ReaderService implements IReader {
                     String address = resultSet.getString(4);
                     String phone = resultSet.getString(5);
                     String passport = resultSet.getString(6);
-                    reader = new Reader(newId, fio, age, address, phone, passport);
+
+                    Map<Book, Period> rentBooksByReader = bookRentService.getRentBooksByReaderId(id);
+                    reader = new Reader(newId, fio, age, address, phone, passport, rentBooksByReader);
                 }
             }
         } catch (SQLException e) {
