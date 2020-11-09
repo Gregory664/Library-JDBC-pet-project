@@ -34,31 +34,26 @@ VALUES
 ('book 2', 2, 1, 1, 124),
 ('book 3', 1, 5, 2, 1432),
 ('book 4', 2, 4, 2, 1542),
-('book 5', 3, 6, 2, 765),
-('book 6', 3, 1, 2, 356),
-('book 7', 4, 2, 3, 876),
-('book 8', 4, 3, 3, 356),
-('book 9', 5, 3, 3, 784),
-('book 10', 5, 4, 3, 824),
-('book 11', 6, 5, 4, 128),
-('book 12', 1, 6, 4, 824),
-('book 13', 3, 7, 4, 145),
-('book 14', 2, 3, 4, 562),
-('book 15', 1, 6, 5, 632),
-('book 16', 2, 4, 5, 1154),
-('book 17', 3, 2, 5, 1673),
-('book 18', 4, 5, 5, 956);
+('book 5', 3, 6, 2, 765);
+
+INSERT INTO bookCopy (book_id)
+VALUES 
+(1),(1),
+(2),(2),
+(3),(3),
+(4),(4),
+(5),(5);
 
 INSERT INTO shelf (invent_num)
 VALUES ('Z10'),('Z20'),('Z30'),('Z40'),('Z50');
 
-INSERT INTO bookshelf(shelf_id, book_id)
+INSERT INTO bookshelf(shelf_id, bookCopy_id)
 VALUES 
-(1, 1), (1, 1), (1, 1), (1, 2), (1, 3), (1, 4), 
-(2, 6), (2, 5), (2, 1), (2, 8), (2, 9), (2, 10), (2, 4), (2, 7), 
-(3, 6), (3, 5), (3, 1), (3, 8), (3, 9), (3, 10), (3, 4), (3, 7), 
-(4, 13), (4, 15), (4, 10), (4, 13), (4, 7), (4, 2), (4, 2), (4, 16),
-(5, 13), (5, 15), (5, 10), (5, 13), (5, 7), (5, 2), (5, 2), (5, 16);
+(1,1), (1,2), (1,3), 
+(2,4),
+(3,5), (3,6), 
+(4,7), (4,8), 
+(5,9), (5,10);
 
 INSERT INTO reader (fio, age, phone, passport, address)
 VALUES
@@ -68,13 +63,10 @@ VALUES
 ('Семёнов, Александр Александрович',   16,'88005552233', '2013444444', 'г. Воронеж, ул. Мира'),
 ('Щербаков, Александр Александрович ', 8, '88004322233', '2013222222', 'г. Воронеж, ул. Мира');
 
-INSERT INTO book_rent (reader_id, book_id, start_date, end_date) 
+INSERT INTO book_rent (reader_id, bookCopy_id, start_date, end_date) 
 VALUES
-(1, 4, now(), now() + INTERVAL 10 DAY),
-(2, 2, now(), now() + INTERVAL 20 DAY),
+(1, 1, now(), now() + INTERVAL 10 DAY),
+(2, 3, now(), now() + INTERVAL 20 DAY),
 (3, 5, now(), now() + INTERVAL 2 DAY),
 (4, 7, now(), now() + INTERVAL 30 DAY),
-(5, 2, now() - INTERVAL 10 DAY, now() + INTERVAL 60 DAY),
-(1, 2, now() - INTERVAL 20 DAY, now() + INTERVAL 14 DAY),
-(2, 2, now() - INTERVAL 60 DAY, now() - INTERVAL 7 DAY),
-(3, 9, '2020-09-24', now() - INTERVAL 10 DAY);
+(5, 9, now() - INTERVAL 10 DAY, now() + INTERVAL 60 DAY);
