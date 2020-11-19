@@ -17,5 +17,5 @@ public class Reader {
     private String address;
     private String phone;
     private String passport;
-    private Map<Book, Period> rentBooks = new TreeMap<>();
+    private Map<BookCopy, Period> rentBookCopies = new TreeMap<>();
 }

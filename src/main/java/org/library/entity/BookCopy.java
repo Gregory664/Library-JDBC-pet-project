@@ -1,6 +1,9 @@
 package org.library.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -8,9 +11,9 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookCopy {
-    int id;
-    Book book;
+public class BookCopy implements Comparable<BookCopy> {
+    private int id;
+    private Book book;
 
     @Override
     public boolean equals(Object o) {
@@ -23,5 +26,10 @@ public class BookCopy {
     @Override
     public int hashCode() {
         return Objects.hash(book);
+    }
+
+    @Override
+    public int compareTo(BookCopy bookCopy) {
+        return Integer.compare(id, bookCopy.getId());
     }
 }

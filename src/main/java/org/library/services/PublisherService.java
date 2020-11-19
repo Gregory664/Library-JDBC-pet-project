@@ -82,16 +82,19 @@ public class PublisherService implements IPublisher {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public boolean deleteById(Integer id) {
+        boolean result;
         String query = "DELETE FROM publisher WHERE id = ?";
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
-            statement.executeUpdate();
+            result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+
+        return result;
     }
 
     @Override

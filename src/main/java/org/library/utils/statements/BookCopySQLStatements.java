@@ -1,6 +1,6 @@
 package org.library.utils.statements;
 
-public class BookCopySQLStatement {
+public class BookCopySQLStatements {
     public static final String FIND_ALL = "SELECT id, book_id FROM book_copy ";
 
     public static final String FIND_BY_ID = FIND_ALL + "WHERE id = ?";

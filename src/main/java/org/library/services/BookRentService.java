@@ -1,9 +1,10 @@
 package org.library.services;
 
-import org.library.entity.Book;
+import org.library.entity.BookCopy;
 import org.library.entity.Period;
 import org.library.entity.Reader;
 import org.library.entity.Shelf;
+import org.library.exceptions.BookIsExistsInReaderException;
 import org.library.exceptions.RentBookNotFoundInReader;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.repositories.IBookRent;
@@ -13,29 +14,26 @@ import java.sql.*;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.library.utils.statements.BookRentSQLStatements.*;
+
 public class BookRentService implements IBookRent {
-    BookService bookService = new BookService();
-    BookShelfService bookShelfService = new BookShelfService();
+    private final BookCopyService bookCopyService = new BookCopyService();
+    private final BookShelfService bookShelfService = new BookShelfService();
 
     @Override
-    public Map<Book, Period> getRentBooksByReaderId(int readerId) {
-        String rentBooksByReaderIdQuery = "" +
-                "SELECT book_id, start_date, end_date " +
-                "FROM   book_rent " +
-                "WHERE  reader_id = ?;";
-
-        Map<Book, Period> rentBooksByReaderIdMap = new TreeMap<>();
+    public Map<BookCopy, Period> getRentBookCopiesByReaderId(int readerId) {
+        Map<BookCopy, Period> rentBooksByReaderIdMap = new TreeMap<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(rentBooksByReaderIdQuery)) {
+             PreparedStatement statement = connection.prepareStatement(GET_RENT_BOOK_COPY_BY_READER_ID)) {
             statement.setInt(1, readerId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    int bookId = resultSet.getInt(1);
+                    int bookCopyId = resultSet.getInt(1);
                     Date startDate = resultSet.getDate(2);
                     Date endDate = resultSet.getDate(3);
-                    Book book = bookService.findById(bookId).orElseThrow(SQLException::new);
-                    rentBooksByReaderIdMap.put(book, new Period(startDate.toLocalDate(), endDate.toLocalDate()));
+                    BookCopy bookCopy = bookCopyService.findById(bookCopyId).orElseThrow(SQLException::new);
+                    rentBooksByReaderIdMap.put(bookCopy, new Period(startDate.toLocalDate(), endDate.toLocalDate()));
                 }
             }
 
@@ -46,21 +44,20 @@ public class BookRentService implements IBookRent {
     }
 
     @Override
-    public boolean deleteRentBookFromReader(Reader reader, Book book, Shelf shelf) {
-        String query = "DELETE FROM book_rent WHERE reader_id = ? AND book_id = ?;";
-        Map<Book, Period> rentBooks = reader.getRentBooks();
+    public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy, Shelf shelf) {
+        Map<BookCopy, Period> rentBookCopies = reader.getRentBookCopies();
         boolean result;
 
-        if (!rentBooks.containsKey(book)) {
-            throw new RentBookNotFoundInReader(reader.getId(), book.getId());
+        if (!rentBookCopies.containsKey(bookCopy)) {
+            throw new RentBookNotFoundInReader(reader.getId(), bookCopy.getId());
         }
-        rentBooks.remove(book);
-        bookShelfService.addBookToShelf(book, shelf);
+        rentBookCopies.remove(bookCopy);
+        bookShelfService.addBookCopyToShelf(bookCopy, shelf);
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_RENT_BOOK_COPY)) {
             statement.setInt(1, reader.getId());
-            statement.setInt(2, book.getId());
+            statement.setInt(2, bookCopy.getId());
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -70,16 +67,18 @@ public class BookRentService implements IBookRent {
     }
 
     @Override
-    public boolean addRentBookToReader(Reader reader, Book book, Period period, Shelf shelf) {
-        String query = "INSERT INTO book_rent (reader_id, book_id, start_date, end_date) VALUES(?, ?, ?, ?)";
-        bookShelfService.deleteBookFromShelf(book, shelf);
-        reader.getRentBooks().put(book, period);
+    public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) {
+        if (reader.getRentBookCopies().containsKey(bookCopy)) {
+            throw new BookIsExistsInReaderException(bookCopy.getId(), reader.getId());
+        }
+        bookShelfService.deleteBookCopyFromShelf(bookCopy, shelf);
+        reader.getRentBookCopies().put(bookCopy, period);
         boolean result;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(ADD_RENT_BOOK_COPY_TO_READER)) {
             statement.setInt(1, reader.getId());
-            statement.setInt(2, book.getId());
+            statement.setInt(2, bookCopy.getId());
             statement.setDate(3, Date.valueOf(period.getStartDate()));
             statement.setDate(4, Date.valueOf(period.getEndDate()));
             result = statement.executeUpdate() == 1;

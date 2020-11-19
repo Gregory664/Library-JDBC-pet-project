@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.library.utils.statements.BookCopySQLStatement.*;
+import static org.library.utils.statements.BookCopySQLStatements.*;
 
 public class BookCopyService implements IBookCopy {
-    BookService bookService = new BookService();
+    private final BookService bookService = new BookService();
 
     @Override
     public List<BookCopy> findAll() {
@@ -45,7 +45,7 @@ public class BookCopyService implements IBookCopy {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int bookCopyId = resultSet.getInt("id");
-                    int bookId = resultSet.getInt("copyId");
+                    int bookId = resultSet.getInt("book_id");
                     bookCopy = new BookCopy(bookCopyId, bookService.findById(bookId).orElseThrow(BookNotFound::new));
                 }
             }
@@ -81,14 +81,17 @@ public class BookCopyService implements IBookCopy {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public boolean deleteById(Integer id) {
+        boolean result;
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
-            statement.executeUpdate();
+            result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+
+        return result;
     }
 
     @Override

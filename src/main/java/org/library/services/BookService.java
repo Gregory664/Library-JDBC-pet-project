@@ -14,7 +14,7 @@ import java.util.Optional;
 import static org.library.utils.statements.BookSQLStatements.*;
 
 public class BookService implements IBook {
-    BookShelfService bookShelfService = new BookShelfService();
+    private final BookShelfService bookShelfService = new BookShelfService();
 
     private Book getBookFromResultSet(ResultSet resultSet) {
         try {
@@ -105,14 +105,17 @@ public class BookService implements IBook {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public boolean deleteById(Integer id) {
+        boolean result;
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
-            statement.executeUpdate();
+            result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+
+        return result;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.library.utils.statements;
 
-public class BookShelfStatements {
+public class BookShelfSQLStatements {
     public static final String BOOK_COPY_AND_SHELF = "" +
             "SELECT bh.bookCopy_id, s.id, s.invent_num \n" +
             "FROM   bookshelf bh \n" +

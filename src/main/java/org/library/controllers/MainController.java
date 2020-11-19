@@ -1,5 +1,7 @@
 package org.library.controllers;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,10 +16,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.library.App;
-import org.library.entity.Book;
-import org.library.entity.Period;
-import org.library.entity.Reader;
-import org.library.entity.Shelf;
+import org.library.entity.*;
+import org.library.exceptions.BookCopyNotFoundException;
+import org.library.services.BookCopyService;
 import org.library.services.BookRentService;
 import org.library.services.BookService;
 import org.library.services.ReaderService;
@@ -29,11 +30,14 @@ import java.util.Map;
 import java.util.Optional;
 
 public class MainController {
-    public TableView<Map.Entry<Shelf, Integer>> shelfView;
-    public TableColumn<Map.Entry<Shelf, Integer>, String> shelfViewName;
-    public TableColumn shelfViewBookCopyId;
+    private final BookService bookService = new BookService();
+    private final BookRentService bookRentService = new BookRentService();
+    private final ReaderService readerService = new ReaderService();
+    private final BookCopyService bookCopyService = new BookCopyService();
 
-
+    public TableView<Map.Entry<Integer, Shelf>> shelfView;
+    public TableColumn<Map.Entry<Integer, Shelf>, String> shelfViewName;
+    public TableColumn<Map.Entry<Integer, Shelf>, Integer> shelfViewBookCopyId;
     public ContextMenu shelfViewContextMenu = new ContextMenu();
     public MenuItem getBookFromShelfMenuItem = new MenuItem();
     public TableView<Book> booksView = new TableView<>();
@@ -60,15 +64,6 @@ public class MainController {
     public TableColumn<Map.Entry<Book, Period>, Date> rentBookViewStartDate = new TableColumn<>();
     public TableColumn<Map.Entry<Book, Period>, Date> rentBookViewEndDate = new TableColumn<>();
 
-
-    BookService bookService = new BookService();
-    BookRentService bookRentService = new BookRentService();
-    ReaderService readerService = new ReaderService();
-    private ObservableList<Book> books = null;
-    private final ObservableList<Map.Entry<Shelf, Integer>> bookShelfCount = null;
-    private final ObservableList<Reader> readers = null;
-    private final ObservableList<Map.Entry<Book, Period>> rentBooks = null;
-
     public MainController() {
     }
 
@@ -79,8 +74,8 @@ public class MainController {
         getBookFromShelfMenuItem.setDisable(true);
         initListeners();
 
-        books = FXCollections.observableList(bookService.findAll());
-        booksView.setItems(books);
+        ObservableList<Book> booksList = FXCollections.observableList(bookService.findAll());
+        booksView.setItems(booksList);
 
 //        readers = FXCollections.observableList(readerService.findAll());
 //        readerView.setItems(readers);
@@ -126,7 +121,12 @@ public class MainController {
             }
         });
         booksViewLength.setCellValueFactory(new PropertyValueFactory<>("length"));
-        booksViewCount.setCellValueFactory(new PropertyValueFactory<>("countOfCopy"));
+        booksViewCount.setCellValueFactory(param -> new ObservableValueBase<>() {
+            @Override
+            public Integer getValue() {
+                return param.getValue().getBookCopyIdAndShelf().size();
+            }
+        });
         booksViewTitle.setMaxWidth(1f * Integer.MAX_VALUE * 25);
         booksViewAuthor.setMaxWidth(1f * Integer.MAX_VALUE * 25);
         booksViewPublisher.setMaxWidth(1f * Integer.MAX_VALUE * 25);
@@ -147,11 +147,11 @@ public class MainController {
 
 
     private void fillShelfView() {
-//        Book selectedBook = booksView.getSelectionModel().getSelectedItem();
-//        shelfViewName.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getKey().getInventNum()));
-//        shelfViewCount.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getValue()));
-////        bookShelfCount = FXCollections.observableArrayList(selectedBook.getCountOfBookInShelf().entrySet());
-//        shelfView.setItems(bookShelfCount);
+        Book selectedBook = booksView.getSelectionModel().getSelectedItem();
+        shelfViewName.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getValue().getInventNum()));
+        shelfViewBookCopyId.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey()));
+        ObservableList<Map.Entry<Integer, Shelf>> bookCopyShelfList = FXCollections.observableArrayList(selectedBook.getBookCopyIdAndShelf().entrySet());
+        shelfView.setItems(bookCopyShelfList);
     }
 
     private void fillRentBookView() {
@@ -182,11 +182,15 @@ public class MainController {
 
             Optional<Reader> optionalReader = rentController.getSelectedReader();
             if (optionalReader.isPresent()) {
-                Book selectedBook = booksView.getSelectionModel().getSelectedItem();
-                Shelf shelf = shelfView.getSelectionModel().getSelectedItem().getKey();
+                int selectedBookCopyId = shelfView.getSelectionModel().getSelectedItem().getKey();
+
+                BookCopy bookCopy = bookCopyService.findById(selectedBookCopyId).orElseThrow(() -> new BookCopyNotFoundException(selectedBookCopyId));
+                Shelf shelf = shelfView.getSelectionModel().getSelectedItem().getValue();
                 Reader reader = optionalReader.get();
                 Period period = rentController.getPeriod();
-                bookRentService.addRentBookToReader(reader, selectedBook, period, shelf);
+                bookRentService.addRentBookCopiesToReader(reader, bookCopy, period, shelf);
+
+                booksView.getSelectionModel().getSelectedItem().getBookCopyIdAndShelf().remove(selectedBookCopyId);
 
                 fillShelfView();
                 booksView.refresh();
@@ -197,6 +201,8 @@ public class MainController {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (BookCopyNotFoundException e) {
+            MessageBox.WarningBox(e.getMessage());
         }
     }
 }

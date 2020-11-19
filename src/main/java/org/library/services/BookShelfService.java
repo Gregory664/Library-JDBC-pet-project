@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.library.utils.statements.BookShelfStatements.*;
+import static org.library.utils.statements.BookShelfSQLStatements.*;
 
 public class BookShelfService implements IBookshelf {
     @Override

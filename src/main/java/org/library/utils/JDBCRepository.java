@@ -12,7 +12,7 @@ public interface JDBCRepository<T, ID> {
 
     void deleteAll();
 
-    void deleteById(ID id);
+    boolean deleteById(ID id);
 
     boolean save(T entity);
 

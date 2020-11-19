@@ -1,6 +1,6 @@
 package org.library.services;
 
-import org.library.entity.Book;
+import org.library.entity.BookCopy;
 import org.library.entity.Period;
 import org.library.entity.Reader;
 import org.library.exceptions.SQLExceptionWrapper;
@@ -16,20 +16,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.library.utils.statements.ReaderSQLStatements.*;
+
 public class ReaderService implements IReader {
-    BookRentService bookRentService = new BookRentService();
+    private final BookRentService bookRentService = new BookRentService();
+
+    private Reader getReaderFromResultSet(ResultSet resultSet) {
+        try {
+            int id = resultSet.getInt(1);
+            String fio = resultSet.getString(2);
+            int age = resultSet.getInt(3);
+            String address = resultSet.getString(4);
+            String phone = resultSet.getString(5);
+            String passport = resultSet.getString(6);
+
+            Map<BookCopy, Period> rentBooksByReader = bookRentService.getRentBookCopiesByReaderId(id);
+            return new Reader(id, fio, age, address, phone, passport, rentBooksByReader);
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+    }
 
     @Override
     public boolean existsByPassport(String passport) {
-        String query = "SELECT COUNT(*) FROM reader WHERE passport = ?;";
-        boolean isExists;
+        boolean isExists = false;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_PASSPORT)) {
             statement.setString(1, passport);
             try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.next();
-                isExists = resultSet.getInt(1) == 1;
+                while (resultSet.next()) {
+                    isExists = resultSet.getInt(1) == 1;
+                }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -39,23 +57,14 @@ public class ReaderService implements IReader {
 
     @Override
     public List<Reader> findByFioLike(String searchFio) {
-        String query = "SELECT * FROM reader WHERE fio LIKE ?;";
         List<Reader> readers = new ArrayList<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_FIO_LIKE)) {
             statement.setString(1, "%" + searchFio + "%");
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    int id = resultSet.getInt(1);
-                    String fio = resultSet.getString(2);
-                    int age = resultSet.getInt(3);
-                    String address = resultSet.getString(4);
-                    String phone = resultSet.getString(5);
-                    String passport = resultSet.getString(6);
-
-                    Map<Book, Period> rentBooksByReader = bookRentService.getRentBooksByReaderId(id);
-                    readers.add(new Reader(id, fio, age, address, phone, passport, rentBooksByReader));
+                    readers.add(getReaderFromResultSet(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -66,22 +75,13 @@ public class ReaderService implements IReader {
 
     @Override
     public List<Reader> findAll() {
-        String query = "SELECT * FROM reader;";
         List<Reader> readers = new ArrayList<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                int id = resultSet.getInt(1);
-                String fio = resultSet.getString(2);
-                int age = resultSet.getInt(3);
-                String address = resultSet.getString(4);
-                String phone = resultSet.getString(5);
-                String passport = resultSet.getString(6);
-
-                Map<Book, Period> rentBooksByReader = bookRentService.getRentBooksByReaderId(id);
-                readers.add(new Reader(id, fio, age, address, phone, passport, rentBooksByReader));
+                readers.add(getReaderFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -91,23 +91,14 @@ public class ReaderService implements IReader {
 
     @Override
     public Optional<Reader> findById(Integer id) {
-        String query = "SELECT * FROM reader WHERE id = ?;";
         Reader reader = null;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    int newId = resultSet.getInt(1);
-                    String fio = resultSet.getString(2);
-                    int age = resultSet.getInt(3);
-                    String address = resultSet.getString(4);
-                    String phone = resultSet.getString(5);
-                    String passport = resultSet.getString(6);
-
-                    Map<Book, Period> rentBooksByReader = bookRentService.getRentBooksByReaderId(id);
-                    reader = new Reader(newId, fio, age, address, phone, passport, rentBooksByReader);
+                    reader = getReaderFromResultSet(resultSet);
                 }
             }
         } catch (SQLException e) {
@@ -118,15 +109,15 @@ public class ReaderService implements IReader {
 
     @Override
     public boolean existsById(Integer id) {
-        String query = "SELECT COUNT(*) FROM reader WHERE id = ?;";
-        boolean isExists;
+        boolean isExists = false;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.next();
-                isExists = resultSet.getInt(1) == 1;
+                while (resultSet.next()) {
+                    isExists = resultSet.getInt(1) == 1;
+                }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -136,10 +127,8 @@ public class ReaderService implements IReader {
 
     @Override
     public void deleteAll() {
-        String query = "DELETE FROM reader;";
-
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_ALL)) {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -147,25 +136,26 @@ public class ReaderService implements IReader {
     }
 
     @Override
-    public void deleteById(Integer id) {
-        String query = "DELETE FROM reader WHERE id = ?";
+    public boolean deleteById(Integer id) {
+        boolean result;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
-            statement.executeUpdate();
+            result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+
+        return result;
     }
 
     @Override
     public boolean save(Reader reader) {
-        String query = "INSERT INTO reader (fio, age, address, phone, passport) VALUES (?, ?, ?, ?, ?);";
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE)) {
             statement.setString(1, reader.getFio());
             statement.setInt(2, reader.getAge());
             statement.setString(3, reader.getAddress());
@@ -181,14 +171,14 @@ public class ReaderService implements IReader {
 
     @Override
     public long count() {
-        String query = "SELECT COUNT(*) FROM reader;";
-        long result;
+        long result = 0;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
+             PreparedStatement statement = connection.prepareStatement(COUNT);
              ResultSet resultSet = statement.executeQuery()) {
-            resultSet.next();
-            result = resultSet.getInt(1);
+            while (resultSet.next()) {
+                result = resultSet.getInt(1);
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
