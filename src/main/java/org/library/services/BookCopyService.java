@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.library.utils.BookCopySQLStatement.*;
+import static org.library.utils.statements.BookCopySQLStatement.*;
 
 public class BookCopyService implements IBookCopy {
     BookService bookService = new BookService();

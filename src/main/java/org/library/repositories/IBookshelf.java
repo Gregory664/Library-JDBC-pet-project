@@ -1,14 +1,15 @@
 package org.library.repositories;
 
 import org.library.entity.Book;
+import org.library.entity.BookCopy;
 import org.library.entity.Shelf;
 
 import java.util.Map;
 
 public interface IBookshelf {
-    Map<Shelf, Integer> getCountOfBookOnShelfByBookId(int bookId);
+    Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId);
 
-    boolean deleteBookFromShelf(Book book, Shelf shelf);
+    boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf);
 
-    boolean addBookToShelf(Book book, Shelf shelf);
+    boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf);
 }

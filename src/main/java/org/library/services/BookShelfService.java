@@ -1,7 +1,8 @@
 package org.library.services;
 
-import org.library.entity.Book;
+import org.library.entity.BookCopy;
 import org.library.entity.Shelf;
+import org.library.exceptions.BookIsExistsInShelfException;
 import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.repositories.IBookshelf;
@@ -14,52 +15,44 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.library.utils.statements.BookShelfStatements.*;
+
 public class BookShelfService implements IBookshelf {
     @Override
-    public Map<Shelf, Integer> getCountOfBookOnShelfByBookId(int bookId) {
-        String getCountOfBookOnShelfQuery = "" +
-                "SELECT s.id, s.invent_num, COUNT(bh.book_id) as 'count'" +
-                "FROM   bookshelf bh " +
-                "JOIN   shelf s ON bh.shelf_id = s.id " +
-                "WHERE  bh.book_id = ? " +
-                "GROUP  BY (s.id); ";
-        Map<Shelf, Integer> countOfBookOnShelf = new TreeMap<>();
+    public Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId) {
+        Map<Integer, Shelf> bookCopyIdAndShelf = new TreeMap<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(getCountOfBookOnShelfQuery)) {
+             PreparedStatement statement = connection.prepareStatement(BOOK_COPY_AND_SHELF)) {
             statement.setInt(1, bookId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    int shelfId = resultSet.getInt(1);
-                    String inventNum = resultSet.getString(2);
-                    int count = resultSet.getInt(3);
-                    countOfBookOnShelf.put(new Shelf(shelfId, inventNum), count);
+                    int bookCopyId = resultSet.getInt(1);
+                    int shelfId = resultSet.getInt(2);
+                    String shelfInventNum = resultSet.getString(3);
+                    bookCopyIdAndShelf.put(bookCopyId, new Shelf(shelfId, shelfInventNum));
                 }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return countOfBookOnShelf;
+        return bookCopyIdAndShelf;
     }
 
     @Override
-    public boolean deleteBookFromShelf(Book book, Shelf shelf) {
-        String query = "DELETE from bookshelf WHERE shelf_id = ? AND book_id = ? LIMIT 1;";
-        Map<Shelf, Integer> countOfBookInShelf = book.getCountOfBookInShelf();
+    public boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf) {
+        Map<Integer, Shelf> bookCopyIdAndShelf = bookCopy.getBook().getBookCopyIdAndShelf();
         boolean result;
 
-        if (!countOfBookInShelf.containsKey(shelf)) {
-            throw new BookNotFoundOnShelfException(book.getId(), shelf.getId());
+        if (!bookCopyIdAndShelf.containsKey(bookCopy.getId())) {
+            throw new BookNotFoundOnShelfException(bookCopy.getId(), shelf.getId());
         }
-        countOfBookInShelf.compute(shelf, (shelf1, integer) -> integer - 1);
-        if (countOfBookInShelf.get(shelf) == 0) {
-            countOfBookInShelf.remove(shelf);
-        }
+        bookCopyIdAndShelf.remove(bookCopy.getId());
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_FROM_BOOK_SHELF)) {
             statement.setInt(1, shelf.getId());
-            statement.setInt(2, book.getId());
+            statement.setInt(2, bookCopy.getId());
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -69,16 +62,15 @@ public class BookShelfService implements IBookshelf {
     }
 
     @Override
-    public boolean addBookToShelf(Book book, Shelf shelf) {
-        String query = "INSERT INTO bookshelf (book_id, shelf_id) VALUES (?, ?);";
-        book.getCountOfBookInShelf().computeIfPresent(shelf, (s, i) -> i++);
-        book.getCountOfBookInShelf().putIfAbsent(shelf, 1);
-
+    public boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) {
+        if (bookCopy.getBook().getBookCopyIdAndShelf().containsKey(bookCopy.getId())) {
+            throw new BookIsExistsInShelfException(bookCopy.getId(), shelf.getInventNum());
+        }
         boolean result;
 
         try (Connection connection = ConnectionUtils.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, book.getId());
+             PreparedStatement statement = connection.prepareStatement(ADD_BOOK_COPY_TO_SHELF)) {
+            statement.setInt(1, bookCopy.getId());
             statement.setInt(2, shelf.getId());
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {

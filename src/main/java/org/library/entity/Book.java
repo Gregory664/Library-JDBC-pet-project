@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +17,7 @@ public class Book implements Comparable<Book> {
     private Publisher publisher;
     private Genre genre;
     private int length;
-    private int countOfCopy;
+    private Map<Integer, Shelf> bookCopyIdAndShelf = new TreeMap<>();
 
     @Override
     public int compareTo(Book book) {

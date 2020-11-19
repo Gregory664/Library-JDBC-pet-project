@@ -1,9 +1,6 @@
 package org.library.services;
 
-import org.library.entity.Author;
-import org.library.entity.Book;
-import org.library.entity.Genre;
-import org.library.entity.Publisher;
+import org.library.entity.*;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.repositories.IBook;
 import org.library.utils.ConnectionUtils;
@@ -11,18 +8,19 @@ import org.library.utils.ConnectionUtils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import static org.library.utils.BookSQLStatements.*;
+import static org.library.utils.statements.BookSQLStatements.*;
 
 public class BookService implements IBook {
+    BookShelfService bookShelfService = new BookShelfService();
 
     private Book getBookFromResultSet(ResultSet resultSet) {
         try {
             int id = resultSet.getInt("id");
             String title = resultSet.getString("title");
             int length = resultSet.getInt("length");
-            int count = resultSet.getInt("count");
 
             int authorId = resultSet.getInt("author_id");
             String authorName = resultSet.getString("author_name");
@@ -36,7 +34,9 @@ public class BookService implements IBook {
             String genreTitle = resultSet.getString("genre_title");
             Genre genre = new Genre(genreId, genreTitle);
 
-            return new Book(id, title, author, publisher, genre, length, count);
+            Map<Integer, Shelf> bookCopyIdAndShelf = bookShelfService.getBookCopyIdAndShelf(id);
+
+            return new Book(id, title, author, publisher, genre, length, bookCopyIdAndShelf);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }

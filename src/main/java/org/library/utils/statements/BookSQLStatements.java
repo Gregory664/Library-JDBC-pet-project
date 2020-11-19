@@ -1,12 +1,11 @@
-package org.library.utils;
+package org.library.utils.statements;
 
 public class BookSQLStatements {
     public static final String FIND_ALL = "" +
             "SELECT b.id, b.title, b.length, " +
             "a.id as 'author_id', a.name as 'author_name', " +
             "p.id as 'publisher_id', p.title as 'publisher_title', " +
-            "g.id as 'genre_id', g.title as 'genre_title', " +
-            "(SELECT COUNT(*) FROM book_copy WHERE book_id = b.id) as 'count' " +
+            "g.id as 'genre_id', g.title as 'genre_title' " +
             "FROM  book b " +
             "JOIN  author a    ON b.author_id    = a.id " +
             "JOIN  publisher p ON b.publisher_id = p.id " +
