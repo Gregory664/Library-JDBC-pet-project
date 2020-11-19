@@ -1,7 +1,5 @@
 package org.library.controllers;
 
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,7 +31,9 @@ import java.util.Optional;
 public class MainController {
     public TableView<Map.Entry<Shelf, Integer>> shelfView;
     public TableColumn<Map.Entry<Shelf, Integer>, String> shelfViewName;
-    public TableColumn<Map.Entry<Shelf, Integer>, Integer> shelfViewCount = new TableColumn<>();
+    public TableColumn shelfViewBookCopyId;
+
+
     public ContextMenu shelfViewContextMenu = new ContextMenu();
     public MenuItem getBookFromShelfMenuItem = new MenuItem();
     public TableView<Book> booksView = new TableView<>();
@@ -43,6 +43,8 @@ public class MainController {
     public TableColumn<Book, String> booksViewPublisher;
     public TableColumn<Book, String> booksViewGenre;
     public TableColumn<Book, Integer> booksViewLength = new TableColumn<>();
+    public TableColumn<Book, Integer> booksViewCount = new TableColumn<>();
+
     public TableView<Reader> readerView;
     public TableColumn<Reader, Integer> readerViewID;
     public TableColumn<Reader, String> readerViewFio;
@@ -50,6 +52,7 @@ public class MainController {
     public TableColumn<Reader, String> readerViewAddress;
     public TableColumn<Reader, String> readerViewPhone;
     public TableColumn<Reader, String> readerViewPassport;
+
     public TableView<Map.Entry<Book, Period>> rentBookView;
     public TableColumn<Map.Entry<Book, Period>, Integer> rentBookViewId = new TableColumn<>();
     public TableColumn<Map.Entry<Book, Period>, String> rentBookViewTitle = new TableColumn<>();
@@ -62,9 +65,9 @@ public class MainController {
     BookRentService bookRentService = new BookRentService();
     ReaderService readerService = new ReaderService();
     private ObservableList<Book> books = null;
-    private ObservableList<Map.Entry<Shelf, Integer>> bookShelfCount = null;
-    private ObservableList<Reader> readers = null;
-    private ObservableList<Map.Entry<Book, Period>> rentBooks = null;
+    private final ObservableList<Map.Entry<Shelf, Integer>> bookShelfCount = null;
+    private final ObservableList<Reader> readers = null;
+    private final ObservableList<Map.Entry<Book, Period>> rentBooks = null;
 
     public MainController() {
     }
@@ -79,8 +82,8 @@ public class MainController {
         books = FXCollections.observableList(bookService.findAll());
         booksView.setItems(books);
 
-        readers = FXCollections.observableList(readerService.findAll());
-        readerView.setItems(readers);
+//        readers = FXCollections.observableList(readerService.findAll());
+//        readerView.setItems(readers);
     }
 
     private void initListeners() {
@@ -123,6 +126,7 @@ public class MainController {
             }
         });
         booksViewLength.setCellValueFactory(new PropertyValueFactory<>("length"));
+        booksViewCount.setCellValueFactory(new PropertyValueFactory<>("countOfCopy"));
         booksViewTitle.setMaxWidth(1f * Integer.MAX_VALUE * 25);
         booksViewAuthor.setMaxWidth(1f * Integer.MAX_VALUE * 25);
         booksViewPublisher.setMaxWidth(1f * Integer.MAX_VALUE * 25);
@@ -143,23 +147,23 @@ public class MainController {
 
 
     private void fillShelfView() {
-        Book selectedBook = booksView.getSelectionModel().getSelectedItem();
-        shelfViewName.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getKey().getInventNum()));
-        shelfViewCount.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getValue()));
-        bookShelfCount = FXCollections.observableArrayList(selectedBook.getCountOfBookInShelf().entrySet());
-        shelfView.setItems(bookShelfCount);
+//        Book selectedBook = booksView.getSelectionModel().getSelectedItem();
+//        shelfViewName.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getKey().getInventNum()));
+//        shelfViewCount.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getValue()));
+////        bookShelfCount = FXCollections.observableArrayList(selectedBook.getCountOfBookInShelf().entrySet());
+//        shelfView.setItems(bookShelfCount);
     }
 
     private void fillRentBookView() {
-        Reader selectedReader = readerView.getSelectionModel().getSelectedItem();
-        rentBookViewId.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getId()));
-        rentBookViewTitle.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getTitle()));
-        rentBookViewAuthor.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getAuthor().getName()));
-        rentBookViewStartDate.setCellValueFactory(param -> new SimpleObjectProperty<>(
-                Date.valueOf(param.getValue().getValue().getStartDate())
-        ));
-        rentBooks = FXCollections.observableArrayList(selectedReader.getRentBooks().entrySet());
-        rentBookView.setItems(rentBooks);
+//        Reader selectedReader = readerView.getSelectionModel().getSelectedItem();
+//        rentBookViewId.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getId()));
+//        rentBookViewTitle.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getTitle()));
+//        rentBookViewAuthor.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getAuthor().getName()));
+//        rentBookViewStartDate.setCellValueFactory(param -> new SimpleObjectProperty<>(
+//                Date.valueOf(param.getValue().getValue().getStartDate())
+//        ));
+//        rentBooks = FXCollections.observableArrayList(selectedReader.getRentBooks().entrySet());
+//        rentBookView.setItems(rentBooks);
     }
 
     @FXML

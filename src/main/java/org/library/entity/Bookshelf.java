@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class Bookshelf {
     private int id;
     private Shelf shelf;
-    private Book book;
+    private BookCopy bookCopy;
 }

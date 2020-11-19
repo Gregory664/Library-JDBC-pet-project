@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class BookRent {
     private int id;
     private Reader reader;
-    private Book book;
+    private BookCopy bookCopy;
     private LocalDate startDate;
     private LocalDate endDate;
 }

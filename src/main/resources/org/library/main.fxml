@@ -30,7 +30,7 @@
                                  </placeholder>
                                  <columns>
                                     <TableColumn fx:id="shelfViewName" editable="false" maxWidth="99.0" minWidth="99.0" prefWidth="-1.0" text="Полка" />
-                                    <TableColumn fx:id="shelfViewCount" editable="false" maxWidth="99.0" minWidth="99.0" prefWidth="-1.0" text="Кол-во" />
+                                    <TableColumn fx:id="shelfViewBookCopyId" editable="false" maxWidth="99.0" minWidth="99.0" prefWidth="-1.0" text="Экземпляр" />
                                  </columns>
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -50,12 +50,13 @@
                            <center>
                               <TableView fx:id="booksView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="687.0" BorderPane.alignment="CENTER">
                                  <columns>
-                                    <TableColumn fx:id="booksViewId" editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="-1.0" resizable="false" text="ID" />
-                                    <TableColumn fx:id="booksViewTitle" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Название" />
-                                    <TableColumn fx:id="booksViewAuthor" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Автор" />
-                                    <TableColumn fx:id="booksViewPublisher" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Издатель" />
-                                    <TableColumn fx:id="booksViewGenre" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Жанр" />
-                                    <TableColumn fx:id="booksViewLength" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" text="Размер (стр)" />
+                                    <TableColumn fx:id="booksViewId" editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="-1.0" resizable="false" style="-fx-alignment: CENTER;" text="ID" />
+                                    <TableColumn fx:id="booksViewTitle" editable="false" maxWidth="1.7976931348623157E308" minWidth="97.0" prefWidth="235.0" style="-fx-alignment: CENTER;" text="Название" />
+                                    <TableColumn fx:id="booksViewAuthor" editable="false" maxWidth="1.7976931348623157E308" minWidth="37.0" prefWidth="117.0" style="-fx-alignment: CENTER;" text="Автор" />
+                                    <TableColumn fx:id="booksViewPublisher" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="158.0" style="-fx-alignment: CENTER;" text="Издатель" />
+                                    <TableColumn fx:id="booksViewGenre" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" text="Жанр" />
+                                    <TableColumn fx:id="booksViewLength" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" text="Размер (стр)" />
+                                    <TableColumn fx:id="booksViewCount" maxWidth="100.0" minWidth="100.0" prefWidth="75.0" style="-fx-alignment: CENTER;" text="Количество" />
                                  </columns>
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
