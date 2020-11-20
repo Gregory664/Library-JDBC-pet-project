@@ -114,7 +114,6 @@ public class BookService implements IBook {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-
         return result;
     }
 

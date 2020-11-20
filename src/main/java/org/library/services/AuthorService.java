@@ -10,15 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.library.utils.statements.AuthorSQLStatements.*;
+
 public class AuthorService implements IAuthor {
 
     @Override
     public List<Author> findAll() {
         List<Author> authors = new ArrayList<>();
-        String query = "SELECT * FROM author;";
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
@@ -33,11 +34,10 @@ public class AuthorService implements IAuthor {
 
     @Override
     public Optional<Author> findById(Integer id) {
-        String query = "SELECT * FROM author WHERE id = ?;";
         Author author = null;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -54,11 +54,10 @@ public class AuthorService implements IAuthor {
 
     @Override
     public boolean existsById(Integer id) {
-        String query = "SELECT COUNT(1) FROM author WHERE id = ?;";
         boolean isExists = false;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet set = statement.executeQuery()) {
                 while (set.next()) {
@@ -73,11 +72,9 @@ public class AuthorService implements IAuthor {
 
     @Override
     public void deleteAll() {
-        String query = "DELETE FROM author;";
-
         try (Connection connection = ConnectionUtils.getConnection();
              Statement statement = connection.createStatement()) {
-            statement.executeUpdate(query);
+            statement.executeUpdate(DELETE);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -85,14 +82,14 @@ public class AuthorService implements IAuthor {
 
     @Override
     public long count() {
-        String query = "SELECT COUNT(*) FROM author;";
-        long result;
+        long result = 0;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(COUNT)) {
             try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.next();
-                result = resultSet.getInt(1);
+                while (resultSet.next()) {
+                    result = resultSet.getInt(1);
+                }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -103,10 +100,9 @@ public class AuthorService implements IAuthor {
     @Override
     public boolean deleteById(Integer id) {
         boolean result;
-        String query = "DELETE FROM author WHERE id = ?";
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
@@ -118,14 +114,12 @@ public class AuthorService implements IAuthor {
 
     @Override
     public boolean save(Author author) {
-        String query = "INSERT INTO author (name) VALUES (?);";
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE)) {
             statement.setString(1, author.getName());
             isSave = statement.executeUpdate() == 1;
-
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }

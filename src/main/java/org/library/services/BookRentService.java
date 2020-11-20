@@ -36,7 +36,6 @@ public class BookRentService implements IBookRent {
                     rentBooksByReaderIdMap.put(bookCopy, new Period(startDate.toLocalDate(), endDate.toLocalDate()));
                 }
             }
-
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -62,7 +61,6 @@ public class BookRentService implements IBookRent {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-
         return result;
     }
 

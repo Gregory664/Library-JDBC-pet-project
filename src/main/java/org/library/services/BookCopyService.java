@@ -90,7 +90,6 @@ public class BookCopyService implements IBookCopy {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-
         return result;
     }
 

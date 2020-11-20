@@ -57,7 +57,6 @@ public class BookShelfService implements IBookshelf {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-
         return result;
     }
 
