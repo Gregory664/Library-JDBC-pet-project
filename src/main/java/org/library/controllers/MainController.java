@@ -57,12 +57,14 @@ public class MainController {
     public TableColumn<Reader, String> readerViewPhone;
     public TableColumn<Reader, String> readerViewPassport;
 
-    public TableView<Map.Entry<Book, Period>> rentBookView;
-    public TableColumn<Map.Entry<Book, Period>, Integer> rentBookViewId = new TableColumn<>();
-    public TableColumn<Map.Entry<Book, Period>, String> rentBookViewTitle = new TableColumn<>();
-    public TableColumn<Map.Entry<Book, Period>, String> rentBookViewAuthor = new TableColumn<>();
-    public TableColumn<Map.Entry<Book, Period>, Date> rentBookViewStartDate = new TableColumn<>();
-    public TableColumn<Map.Entry<Book, Period>, Date> rentBookViewEndDate = new TableColumn<>();
+    public TableView<Map.Entry<BookCopy, Period>> rentBookView;
+    public TableColumn<Map.Entry<BookCopy, Period>, Integer> rentBookViewCopyId = new TableColumn<>();
+    public TableColumn<Map.Entry<BookCopy, Period>, Integer> rentBookViewId = new TableColumn<>();
+    public TableColumn<Map.Entry<BookCopy, Period>, String> rentBookViewTitle = new TableColumn<>();
+    public TableColumn<Map.Entry<BookCopy, Period>, String> rentBookViewAuthor = new TableColumn<>();
+    public TableColumn<Map.Entry<BookCopy, Period>, Date> rentBookViewStartDate = new TableColumn<>();
+    public TableColumn<Map.Entry<BookCopy, Period>, Date> rentBookViewEndDate = new TableColumn<>();
+    public MenuItem addBookCopyToShelfMenuItem = new MenuItem();
 
     public MainController() {
     }
@@ -72,13 +74,14 @@ public class MainController {
         initBookViewCellProperties();
         initReaderViewCellProperties();
         getBookFromShelfMenuItem.setDisable(true);
+        addBookCopyToShelfMenuItem.setDisable(true);
         initListeners();
 
         ObservableList<Book> booksList = FXCollections.observableList(bookService.findAll());
         booksView.setItems(booksList);
 
-//        readers = FXCollections.observableList(readerService.findAll());
-//        readerView.setItems(readers);
+        ObservableList<Reader> readers = FXCollections.observableList(readerService.findAll());
+        readerView.setItems(readers);
     }
 
     private void initListeners() {
@@ -97,6 +100,10 @@ public class MainController {
                 fillRentBookView();
             }
         });
+
+        rentBookView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+            addBookCopyToShelfMenuItem.setDisable(newValue == null)
+        );
     }
 
     private void initBookViewCellProperties() {
@@ -145,7 +152,6 @@ public class MainController {
         readerViewAddress.setMaxWidth(1f * Integer.MAX_VALUE * 50);
     }
 
-
     private void fillShelfView() {
         Book selectedBook = booksView.getSelectionModel().getSelectedItem();
         shelfViewName.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getValue().getInventNum()));
@@ -155,15 +161,19 @@ public class MainController {
     }
 
     private void fillRentBookView() {
-//        Reader selectedReader = readerView.getSelectionModel().getSelectedItem();
-//        rentBookViewId.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getId()));
-//        rentBookViewTitle.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getTitle()));
-//        rentBookViewAuthor.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getAuthor().getName()));
-//        rentBookViewStartDate.setCellValueFactory(param -> new SimpleObjectProperty<>(
-//                Date.valueOf(param.getValue().getValue().getStartDate())
-//        ));
-//        rentBooks = FXCollections.observableArrayList(selectedReader.getRentBooks().entrySet());
-//        rentBookView.setItems(rentBooks);
+        Reader selectedReader = readerView.getSelectionModel().getSelectedItem();
+        rentBookViewCopyId.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getId()));
+        rentBookViewId.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getBook().getId()));
+        rentBookViewTitle.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getBook().getTitle()));
+        rentBookViewAuthor.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getKey().getBook().getAuthor().getName()));
+        rentBookViewStartDate.setCellValueFactory(param -> new SimpleObjectProperty<>(
+                Date.valueOf(param.getValue().getValue().getStartDate())
+        ));
+        rentBookViewEndDate.setCellValueFactory(param -> new SimpleObjectProperty<>(
+                Date.valueOf(param.getValue().getValue().getEndDate())
+        ));
+        ObservableList<Map.Entry<BookCopy, Period>> rentBooks = FXCollections.observableArrayList(selectedReader.getRentBookCopies().entrySet());
+        rentBookView.setItems(rentBooks);
     }
 
     @FXML
@@ -192,9 +202,17 @@ public class MainController {
 
                 booksView.getSelectionModel().getSelectedItem().getBookCopyIdAndShelf().remove(selectedBookCopyId);
 
+                Reader changedReader = readerView.getItems().stream()
+                        .filter(reader1 -> reader1.getId() == reader.getId())
+                        .findFirst()
+                        .orElseThrow(RuntimeException::new);
+                changedReader.getRentBookCopies().put(bookCopy, period);
+
                 fillShelfView();
+                fillRentBookView();
                 booksView.refresh();
                 booksView.getSelectionModel().selectFirst();
+                readerView.refresh();
                 MessageBox.OkBox("Книга выдана").show();
             } else {
                 MessageBox.WarningBox("Читатель не найден!").showAndWait();
@@ -203,6 +221,50 @@ public class MainController {
             e.printStackTrace();
         } catch (BookCopyNotFoundException e) {
             MessageBox.WarningBox(e.getMessage());
+        }
+    }
+
+    @FXML
+    public void returnBook(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("returnRentBook.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+            ReturnRentBookController returnRentBookController = fxmlLoader.getController();
+
+            stage.showAndWait();
+            if(returnRentBookController.isClose()) {
+                return;
+            }
+
+            Optional<Shelf> optionalShelf = returnRentBookController.getSelectedShelf();
+            if(optionalShelf.isPresent()) {
+                Reader reader = readerView.getSelectionModel().getSelectedItem();
+                BookCopy bookCopy = rentBookView.getSelectionModel().getSelectedItem().getKey();
+                Shelf shelf = optionalShelf.get();
+
+                bookRentService.deleteRentBookCopiesFromReader(reader, bookCopy, shelf);
+
+                Book changedBook = booksView.getItems().stream()
+                        .filter(book -> book.getId() == bookCopy.getBook().getId())
+                        .findFirst()
+                        .orElseThrow(RuntimeException::new);
+                changedBook.getBookCopyIdAndShelf().put(bookCopy.getId(), shelf);
+
+                fillRentBookView();
+                rentBookView.refresh();
+                fillShelfView();
+                booksView.refresh();
+                readerView.getSelectionModel().select(reader);
+
+                MessageBox.OkBox("Книга возвращена").show();
+            } else {
+                MessageBox.WarningBox("Полки с таким номером не существует!");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
