@@ -65,6 +65,7 @@ public class MainController {
     public TableColumn<Map.Entry<BookCopy, Period>, Date> rentBookViewStartDate = new TableColumn<>();
     public TableColumn<Map.Entry<BookCopy, Period>, Date> rentBookViewEndDate = new TableColumn<>();
     public MenuItem addBookCopyToShelfMenuItem = new MenuItem();
+    public MenuItem addBookMenuItem;
 
     public MainController() {
     }
@@ -104,7 +105,7 @@ public class MainController {
         });
 
         rentBookView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-            addBookCopyToShelfMenuItem.setDisable(newValue == null)
+                addBookCopyToShelfMenuItem.setDisable(newValue == null)
         );
     }
 
@@ -236,12 +237,12 @@ public class MainController {
             ReturnRentBookController returnRentBookController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if(returnRentBookController.isClose()) {
+            if (returnRentBookController.isClose()) {
                 return;
             }
 
             Optional<Shelf> optionalShelf = returnRentBookController.getSelectedShelf();
-            if(optionalShelf.isPresent()) {
+            if (optionalShelf.isPresent()) {
                 Reader reader = readerView.getSelectionModel().getSelectedItem();
                 BookCopy bookCopy = rentBookView.getSelectionModel().getSelectedItem().getKey();
                 Shelf shelf = optionalShelf.get();
@@ -265,6 +266,29 @@ public class MainController {
                 MessageBox.WarningBox("Полки с таким номером не существует!");
             }
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addBook(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("book.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+            BookController bookController = fxmlLoader.getController();
+
+            stage.showAndWait();
+            if (bookController.isClose()) {
+                return;
+            }
+            System.out.println(bookController.isSave());
+            if (bookController.isSave()) {
+                booksView.getItems().add(bookController.getBook());
+                fillShelfView();
+                MessageBox.OkBox("Книга успешно добавлена!").show();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

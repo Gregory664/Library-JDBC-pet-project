@@ -5,6 +5,8 @@ public class PublisherSQLStatements {
 
     public static final String FIND_BY_ID = FIND_ALL + " WHERE id = ?;";
 
+    public static final String FIND_BY_TITLE = FIND_ALL + " WHERE title = ?;";
+
     public static final String COUNT = "SELECT COUNT(*) FROM publisher ";
 
     public static final String EXISTS_BY_ID = COUNT + " WHERE id = ?;";

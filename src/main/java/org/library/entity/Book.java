@@ -19,6 +19,14 @@ public class Book implements Comparable<Book> {
     private int length;
     private Map<Integer, Shelf> bookCopyIdAndShelf = new TreeMap<>();
 
+    public Book(String title, Author author, Publisher publisher, Genre genre, int length) {
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.genre = genre;
+        this.length = length;
+    }
+
     @Override
     public int compareTo(Book book) {
         return Integer.compare(this.id, book.id);

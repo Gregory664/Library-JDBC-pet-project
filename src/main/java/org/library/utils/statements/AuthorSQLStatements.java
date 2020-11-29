@@ -5,6 +5,8 @@ public class AuthorSQLStatements {
 
     public static final String FIND_BY_ID = FIND_ALL + " WHERE id = ?;";
 
+    public static final String FIND_BY_NAME = FIND_ALL + " WHERE name = ?;";
+
     public static final String COUNT = "SELECT COUNT(*) FROM author ";
 
     public static final String EXISTS_BY_ID = COUNT + " WHERE id = ?;";

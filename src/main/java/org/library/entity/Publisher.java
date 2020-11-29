@@ -10,4 +10,8 @@ import lombok.NoArgsConstructor;
 public class Publisher {
     private int id;
     private String title;
+
+    public Publisher(String title) {
+        this.title = title;
+    }
 }

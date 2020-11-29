@@ -108,7 +108,6 @@ public class AuthorService implements IAuthor {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-
         return result;
     }
 
@@ -124,5 +123,24 @@ public class AuthorService implements IAuthor {
             throw new SQLExceptionWrapper(e);
         }
         return isSave;
+    }
+
+    @Override
+    public Optional<Author> findByName(String name) {
+        Author author = null;
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME)) {
+            preparedStatement.setString(1, name);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String fName = resultSet.getString("name");
+                    author = new Author(id, fName);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return Optional.ofNullable(author);
     }
 }

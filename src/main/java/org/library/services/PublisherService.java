@@ -124,4 +124,24 @@ public class PublisherService implements IPublisher {
         }
         return result;
     }
+
+    @Override
+    public Optional<Publisher> findByTitle(String title) {
+        Publisher publisher = null;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
+            statement.setString(1, title);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String fTitle = resultSet.getString("title");
+                    publisher = new Publisher(id, fTitle);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return Optional.ofNullable(publisher);
+    }
 }

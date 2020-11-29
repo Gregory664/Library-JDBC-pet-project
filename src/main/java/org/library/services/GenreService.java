@@ -53,6 +53,26 @@ public class GenreService implements IGenre {
     }
 
     @Override
+    public Optional<Genre> findByTitle(String title) {
+        Genre genre = null;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
+            statement.setString(1, title);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int newId = resultSet.getInt(1);
+                    String fTitle = resultSet.getString(2);
+                    genre = new Genre(newId, fTitle);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return Optional.ofNullable(genre);
+    }
+
+    @Override
     public boolean existsById(Integer id) {
         boolean isExists = false;
 
