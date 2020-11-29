@@ -1,8 +1,8 @@
 package org.library.services;
 
-import org.library.entity.Author;
+import org.library.entity.Genre;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IAuthor;
+import org.library.repositories.IGenre;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.*;
@@ -10,31 +10,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.library.utils.statements.AuthorSQLStatements.*;
+import static org.library.utils.statements.GenreSQLStatements.*;
 
-public class AuthorService implements IAuthor {
 
+public class GenreService implements IGenre {
     @Override
-    public List<Author> findAll() {
-        List<Author> authors = new ArrayList<>();
+    public List<Genre> findAll() {
+        List<Genre> genres = new ArrayList<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
-                String name = resultSet.getString(2);
-                authors.add(new Author(id, name));
+                String title = resultSet.getString(2);
+                genres.add(new Genre(id, title));
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return authors;
+        return genres;
     }
 
     @Override
-    public Optional<Author> findById(Integer id) {
-        Author author = null;
+    public Optional<Genre> findById(Integer id) {
+        Genre genre = null;
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
@@ -42,14 +42,34 @@ public class AuthorService implements IAuthor {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int newId = resultSet.getInt(1);
-                    String name = resultSet.getString(2);
-                    author = new Author(newId, name);
+                    String title = resultSet.getString(2);
+                    genre = new Genre(newId, title);
                 }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return Optional.ofNullable(author);
+        return Optional.ofNullable(genre);
+    }
+
+    @Override
+    public Optional<Genre> findByTitle(String title) {
+        Genre genre = null;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
+            statement.setString(1, title);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int newId = resultSet.getInt(1);
+                    String fTitle = resultSet.getString(2);
+                    genre = new Genre(newId, fTitle);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return Optional.ofNullable(genre);
     }
 
     @Override
@@ -59,9 +79,9 @@ public class AuthorService implements IAuthor {
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
-            try (ResultSet set = statement.executeQuery()) {
-                while (set.next()) {
-                    isExists = set.getInt(1) == 1;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    isExists = resultSet.getInt(1) == 1;
                 }
             }
         } catch (SQLException e) {
@@ -81,23 +101,6 @@ public class AuthorService implements IAuthor {
     }
 
     @Override
-    public long count() {
-        long result = 0;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT)) {
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    result = resultSet.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
-    }
-
-    @Override
     public boolean deleteById(Integer id) {
         boolean result;
 
@@ -108,16 +111,17 @@ public class AuthorService implements IAuthor {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+
         return result;
     }
 
     @Override
-    public boolean save(Author author) {
+    public boolean save(Genre genre) {
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setString(1, author.getName());
+            statement.setString(1, genre.getTitle());
             isSave = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -126,21 +130,18 @@ public class AuthorService implements IAuthor {
     }
 
     @Override
-    public Optional<Author> findByName(String name) {
-        Author author = null;
+    public long count() {
+        long result;
+
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME)) {
-            preparedStatement.setString(1, name);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String fName = resultSet.getString("name");
-                    author = new Author(id, fName);
-                }
+             PreparedStatement statement = connection.prepareStatement(COUNT)) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                resultSet.next();
+                result = resultSet.getInt(1);
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return Optional.ofNullable(author);
+        return result;
     }
 }

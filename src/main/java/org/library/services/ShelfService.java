@@ -13,14 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.library.utils.statements.ShelfSQLStatements.*;
+
 public class ShelfService implements IShelf {
     @Override
     public List<Shelf> findAll() {
-        String query = "SELECT * FROM shelf;";
         List<Shelf> shelves = new ArrayList<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int id = resultSet.getInt(1);
@@ -36,11 +37,10 @@ public class ShelfService implements IShelf {
 
     @Override
     public Optional<Shelf> findById(Integer id) {
-        String query = "SELECT * FROM shelf WHERE id = ?;";
         Shelf shelf = null;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -48,7 +48,6 @@ public class ShelfService implements IShelf {
                     shelf = new Shelf(id, inventNum);
                 }
             }
-
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -57,11 +56,10 @@ public class ShelfService implements IShelf {
 
     @Override
     public boolean existsById(Integer id) {
-        String query = "SELECT COUNT(*) FROM shelf WHERE id = ?;";
         boolean result = false;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -76,40 +74,36 @@ public class ShelfService implements IShelf {
 
     @Override
     public void deleteAll() {
-        String query = "DELETE FROM shelf;";
-
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE)) {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-
     }
 
     @Override
-    public void deleteById(Integer id) {
-        String query = "DELETE FROM shelf WHERE id = ?;";
+    public boolean deleteById(Integer id) {
+        boolean result;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
-            statement.executeUpdate();
+            result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+        return result;
     }
 
     @Override
     public boolean save(Shelf shelf) {
-        String query = "INSERT INTO shelf (invent_num) VALUES (?);";
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE)) {
             statement.setString(1, shelf.getInventNum());
             isSave = statement.executeUpdate() == 1;
-
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -118,12 +112,11 @@ public class ShelfService implements IShelf {
 
     @Override
     public long count() {
-        String query = "SELECT COUNT(*) FROM shelf;";
         long result = 0;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery(query)) {
+             PreparedStatement statement = connection.prepareStatement(COUNT);
+             ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 result = resultSet.getInt(1);
             }

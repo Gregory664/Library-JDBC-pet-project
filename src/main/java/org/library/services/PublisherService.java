@@ -1,8 +1,8 @@
 package org.library.services;
 
-import org.library.entity.Author;
+import org.library.entity.Publisher;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IAuthor;
+import org.library.repositories.IPublisher;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.*;
@@ -10,31 +10,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.library.utils.statements.AuthorSQLStatements.*;
+import static org.library.utils.statements.PublisherSQLStatements.*;
 
-public class AuthorService implements IAuthor {
-
+public class PublisherService implements IPublisher {
     @Override
-    public List<Author> findAll() {
-        List<Author> authors = new ArrayList<>();
+    public List<Publisher> findAll() {
+        List<Publisher> publishers = new ArrayList<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
-                String name = resultSet.getString(2);
-                authors.add(new Author(id, name));
+                String title = resultSet.getString(2);
+                publishers.add(new Publisher(id, title));
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return authors;
+        return publishers;
     }
 
     @Override
-    public Optional<Author> findById(Integer id) {
-        Author author = null;
+    public Optional<Publisher> findById(Integer id) {
+        Publisher publisher = null;
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
@@ -42,14 +41,14 @@ public class AuthorService implements IAuthor {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int newId = resultSet.getInt(1);
-                    String name = resultSet.getString(2);
-                    author = new Author(newId, name);
+                    String title = resultSet.getString(2);
+                    publisher = new Publisher(newId, title);
                 }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return Optional.ofNullable(author);
+        return Optional.ofNullable(publisher);
     }
 
     @Override
@@ -59,9 +58,9 @@ public class AuthorService implements IAuthor {
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
-            try (ResultSet set = statement.executeQuery()) {
-                while (set.next()) {
-                    isExists = set.getInt(1) == 1;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    isExists = resultSet.getInt(1) == 1;
                 }
             }
         } catch (SQLException e) {
@@ -78,6 +77,35 @@ public class AuthorService implements IAuthor {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+    }
+
+    @Override
+    public boolean deleteById(Integer id) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+            statement.setInt(1, id);
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean save(Publisher publisher) {
+        boolean isSave;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+            statement.setString(1, publisher.getTitle());
+            isSave = statement.executeUpdate() == 1;
+
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return isSave;
     }
 
     @Override
@@ -98,49 +126,22 @@ public class AuthorService implements IAuthor {
     }
 
     @Override
-    public boolean deleteById(Integer id) {
-        boolean result;
+    public Optional<Publisher> findByTitle(String title) {
+        Publisher publisher = null;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
-            statement.setInt(1, id);
-            result = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
-    }
-
-    @Override
-    public boolean save(Author author) {
-        boolean isSave;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setString(1, author.getName());
-            isSave = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return isSave;
-    }
-
-    @Override
-    public Optional<Author> findByName(String name) {
-        Author author = null;
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME)) {
-            preparedStatement.setString(1, name);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
+            statement.setString(1, title);
+            try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int id = resultSet.getInt("id");
-                    String fName = resultSet.getString("name");
-                    author = new Author(id, fName);
+                    String fTitle = resultSet.getString("title");
+                    publisher = new Publisher(id, fTitle);
                 }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return Optional.ofNullable(author);
+        return Optional.ofNullable(publisher);
     }
 }

@@ -1,8 +1,15 @@
 package org.library.repositories;
 
-import org.library.entity.Bookshelf;
-import org.library.utils.JDBCRepository;
+import org.library.entity.Book;
+import org.library.entity.BookCopy;
+import org.library.entity.Shelf;
 
-public interface IBookshelf extends JDBCRepository<Bookshelf, Integer> {
-    long countByBookId(Integer id);
+import java.util.Map;
+
+public interface IBookshelf {
+    Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId);
+
+    boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf);
+
+    boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf);
 }

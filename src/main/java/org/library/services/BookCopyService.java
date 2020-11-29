@@ -1,8 +1,9 @@
 package org.library.services;
 
-import org.library.entity.Author;
+import org.library.entity.BookCopy;
+import org.library.exceptions.BookNotFound;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IAuthor;
+import org.library.repositories.IBookCopy;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.*;
@@ -10,74 +11,99 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.library.utils.statements.AuthorSQLStatements.*;
+import static org.library.utils.statements.BookCopySQLStatements.*;
 
-public class AuthorService implements IAuthor {
+public class BookCopyService implements IBookCopy {
+    private final BookService bookService = new BookService();
 
     @Override
-    public List<Author> findAll() {
-        List<Author> authors = new ArrayList<>();
+    public List<BookCopy> findAll() {
+        List<BookCopy> bookCopies = new ArrayList<>();
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                int id = resultSet.getInt(1);
-                String name = resultSet.getString(2);
-                authors.add(new Author(id, name));
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    int bookId = resultSet.getInt("copyId");
+                    bookCopies.add(new BookCopy(id, bookService.findById(bookId).orElseThrow(BookNotFound::new)));
+                }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return authors;
+        return bookCopies;
     }
 
     @Override
-    public Optional<Author> findById(Integer id) {
-        Author author = null;
+    public Optional<BookCopy> findById(Integer id) {
+        BookCopy bookCopy = null;
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    int newId = resultSet.getInt(1);
-                    String name = resultSet.getString(2);
-                    author = new Author(newId, name);
+                    int bookCopyId = resultSet.getInt("id");
+                    int bookId = resultSet.getInt("book_id");
+                    bookCopy = new BookCopy(bookCopyId, bookService.findById(bookId).orElseThrow(BookNotFound::new));
                 }
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return Optional.ofNullable(author);
+        return Optional.ofNullable(bookCopy);
     }
 
     @Override
     public boolean existsById(Integer id) {
-        boolean isExists = false;
-
+        boolean result;
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
-            try (ResultSet set = statement.executeQuery()) {
-                while (set.next()) {
-                    isExists = set.getInt(1) == 1;
-                }
+            try (ResultSet resultSet = statement.executeQuery()) {
+                result = resultSet.getInt(1) == 1;
             }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
-        return isExists;
+        return result;
     }
 
     @Override
     public void deleteAll() {
         try (Connection connection = ConnectionUtils.getConnection();
              Statement statement = connection.createStatement()) {
-            statement.executeUpdate(DELETE);
+            statement.executeUpdate(DELETE_ALL);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+    }
+
+    @Override
+    public boolean deleteById(Integer id) {
+        boolean result;
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+            statement.setInt(1, id);
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean save(BookCopy bookCopy) {
+        boolean result;
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+            statement.setInt(1, bookCopy.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return result;
     }
 
     @Override
@@ -95,52 +121,5 @@ public class AuthorService implements IAuthor {
             throw new SQLExceptionWrapper(e);
         }
         return result;
-    }
-
-    @Override
-    public boolean deleteById(Integer id) {
-        boolean result;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
-            statement.setInt(1, id);
-            result = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
-    }
-
-    @Override
-    public boolean save(Author author) {
-        boolean isSave;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setString(1, author.getName());
-            isSave = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return isSave;
-    }
-
-    @Override
-    public Optional<Author> findByName(String name) {
-        Author author = null;
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME)) {
-            preparedStatement.setString(1, name);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String fName = resultSet.getString("name");
-                    author = new Author(id, fName);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(author);
     }
 }
