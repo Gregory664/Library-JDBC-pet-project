@@ -79,9 +79,11 @@ public class MainController {
 
         ObservableList<Book> booksList = FXCollections.observableList(bookService.findAll());
         booksView.setItems(booksList);
+        booksView.getSelectionModel().selectFirst();
 
         ObservableList<Reader> readers = FXCollections.observableList(readerService.findAll());
         readerView.setItems(readers);
+        readerView.getSelectionModel().selectFirst();
     }
 
     private void initListeners() {
