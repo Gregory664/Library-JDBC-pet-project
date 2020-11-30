@@ -1,37 +1,48 @@
 package org.library.services;
 
 import org.library.entity.Author;
+import org.library.exceptions.AuthorNotFoundByIdException;
+import org.library.exceptions.AuthorNotFoundByNameException;
+import org.library.interfaces.AuthorRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public class AuthorService {
-    //TODO
+    private final AuthorRepository authorRepository;
 
-    public List<Author> findAll() {
-        return null;
+    public AuthorService(AuthorRepository authorRepository) {
+        this.authorRepository = authorRepository;
     }
 
-    public Optional<Author> findById(Integer id) {
-        return Optional.empty();
+    public List<Author> findAll() {
+        return authorRepository.findAll();
+    }
+
+    public Author findById(Integer id) throws AuthorNotFoundByIdException {
+        return authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundByIdException(id));
     }
 
     public boolean existsById(Integer id) {
-        return false;
+        return authorRepository.existsById(id);
     }
 
     public void deleteAll() {
+        authorRepository.deleteAll();
     }
 
     public long count() {
-        return 0;
+        return authorRepository.count();
     }
 
     public boolean deleteById(Integer id) {
-        return false;
+        return authorRepository.deleteById(id);
     }
 
-    public Optional<Author> findByName(String name) {
-        return Optional.empty();
+    public Author findByName(String name) throws AuthorNotFoundByNameException {
+        return authorRepository.findByName(name).orElseThrow(() -> new AuthorNotFoundByNameException(name));
+    }
+
+    public boolean save(Author author) {
+        return authorRepository.save(author);
     }
 }

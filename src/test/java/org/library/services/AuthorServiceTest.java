@@ -2,88 +2,71 @@ package org.library.services;
 
 import org.junit.jupiter.api.Test;
 import org.library.entity.Author;
+import org.library.exceptions.AuthorNotFoundByIdException;
+import org.library.exceptions.AuthorNotFoundByNameException;
+import org.library.interfaces.AuthorRepository;
+import org.library.repositories.AuthorRepositoryImpl;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AuthorServiceTest {
-    AuthorService service = new AuthorService();
+    private final AuthorRepository repository = mock(AuthorRepositoryImpl.class);
+    private final AuthorService service = new AuthorService(repository);
 
     @Test
     void findAll() {
-        List<Author> authors = service.findAll();
-        assertNotNull(authors);
+        List<Author> list = List.of(
+                new Author(1, "author1"),
+                new Author(1, "author1"),
+                new Author(1, "author1")
+        );
+        when(repository.findAll()).thenReturn(list);
+        assertEquals(list, service.findAll());
     }
 
     @Test
-    void findById() {
-        Optional<Author> optionalAuthor = service.findById(1);
-        assertTrue(optionalAuthor.isPresent());
-        Author author = optionalAuthor.get();
-        assertNotEquals(0, author.getId());
-        assertNotNull(author.getName());
+    void findById() throws AuthorNotFoundByIdException {
+        Author author = new Author(1, "author1");
+        when(repository.findById(1)).thenReturn(Optional.of(author));
+        assertNotNull(service.findById(1));
+        assertEquals(author, service.findById(1));
+
+        Throwable throwable = assertThrows(AuthorNotFoundByIdException.class, () -> service.findById(1));
+        assertNotNull(throwable);
+        assertNotEquals("", throwable.getMessage());
     }
 
     @Test
     void existsById() {
+        when(repository.existsById(1)).thenReturn(true);
         assertTrue(service.existsById(1));
-        assertFalse(service.existsById(-1));
-    }
-
-    @Test
-    void deleteAll() {
-        long beforeDeleteAll = service.count();
-        List<Author> authors = service.findAll();
-        assertEquals(beforeDeleteAll, authors.size());
-
-        service.deleteAll();
-        long afterDeleteAll = service.count();
-        assertEquals(0, afterDeleteAll);
-
-        authors.forEach(service::save);
-        long afterAdd = service.count();
-        assertEquals(beforeDeleteAll, afterAdd);
-    }
-
-    @Test
-    void deleteById() {
-        long beforeAdd = service.count();
-        Author author = new Author();
-        author.setName("test author");
-        service.save(author);
-        long afterADD = service.count();
-        assertEquals(beforeAdd + 1, afterADD);
-
-        List<Author> authors = service.findAll();
-        int lastId = authors.get(authors.size() - 1).getId();
-        service.deleteById(lastId);
-        long afterDelete = service.count();
-        assertEquals(beforeAdd, afterDelete);
-    }
-
-    @Test
-    void save() {
-        Author newAuthor = new Author();
-        newAuthor.setName("test author");
-        long beforeAdd = service.count();
-        assertTrue(service.save(newAuthor));
-        long afterAdd = service.count();
-        assertEquals(beforeAdd + 1, afterAdd);
-
-        List<Author> authors = service.findAll();
-        Optional<Author> optionalAuthor = authors.stream().
-                filter(author -> author.getName().equals(newAuthor.getName()))
-                .findFirst();
-
-        assertTrue(optionalAuthor.isPresent());
-        service.deleteById(optionalAuthor.get().getId());
     }
 
     @Test
     void count() {
-        List<Author> authors = service.findAll();
-        assertEquals(authors.size(), service.count());
+        when(repository.count()).thenReturn(1L);
+        assertEquals(1, repository.count());
+    }
+
+    @Test
+    void deleteById() {
+    }
+
+    @Test
+    void findByName() throws AuthorNotFoundByNameException {
+        Author author = new Author(1, "author1");
+        when(repository.findByName("author1")).thenReturn(Optional.of(author));
+        assertNotNull(service.findByName("author1"));
+        assertEquals(author, service.findByName("author1"));
+        assertEquals(author.getName(), service.findByName("author1").getName());
+
+        Throwable throwable = assertThrows(AuthorNotFoundByNameException.class, () -> service.findByName("author2"));
+        assertNotNull(throwable);
+        assertNotEquals("", throwable.getMessage());
     }
 }

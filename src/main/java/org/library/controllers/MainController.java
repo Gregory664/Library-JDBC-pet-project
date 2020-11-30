@@ -271,6 +271,7 @@ public class MainController {
         }
     }
 
+    @FXML
     public void addBook(ActionEvent actionEvent) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("book.fxml"));
