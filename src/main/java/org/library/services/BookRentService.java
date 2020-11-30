@@ -8,17 +8,15 @@ import org.library.interfaces.BookRentRepository;
 
 import java.util.Map;
 
-public class BookRentService implements BookRentRepository {
+public class BookRentService {
     //TODO add BookCopyRepository, BookShelfRepository
 //    private final BookCopyService bookCopyService = new BookCopyService();
 //    private final BookShelfService bookShelfService = new BookShelfService();
 
-    @Override
     public Map<BookCopy, Period> getRentBookCopiesByReaderId(int readerId) {
         return null;
     }
 
-    @Override
     public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy, Shelf shelf) {
 //        Map<BookCopy, Period> rentBookCopies = reader.getRentBookCopies();
 //        boolean result;
@@ -41,7 +39,6 @@ public class BookRentService implements BookRentRepository {
         return false;
     }
 
-    @Override
     public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) {
 //        if (reader.getRentBookCopies().containsKey(bookCopy)) {
 //            throw new BookIsExistsInReaderException(bookCopy.getId(), reader.getId());

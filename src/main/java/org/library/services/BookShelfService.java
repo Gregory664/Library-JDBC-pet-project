@@ -5,7 +5,6 @@ import org.library.entity.Shelf;
 import org.library.exceptions.BookIsExistsInShelfException;
 import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.interfaces.BookshelfRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.Connection;
@@ -17,8 +16,7 @@ import java.util.TreeMap;
 
 import static org.library.utils.statements.BookShelfSQLStatements.*;
 
-public class BookShelfService implements BookshelfRepository {
-    @Override
+public class BookShelfService {
     public Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId) {
         Map<Integer, Shelf> bookCopyIdAndShelf = new TreeMap<>();
 
@@ -39,7 +37,6 @@ public class BookShelfService implements BookshelfRepository {
         return bookCopyIdAndShelf;
     }
 
-    @Override
     public boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf) {
         Map<Integer, Shelf> bookCopyIdAndShelf = bookCopy.getBook().getBookCopyIdAndShelf();
         boolean result;
@@ -60,7 +57,6 @@ public class BookShelfService implements BookshelfRepository {
         return result;
     }
 
-    @Override
     public boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) {
         if (bookCopy.getBook().getBookCopyIdAndShelf().containsKey(bookCopy.getId())) {
             throw new BookIsExistsInShelfException(bookCopy.getId(), shelf.getInventNum());

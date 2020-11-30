@@ -20,7 +20,8 @@ public class AuthorService {
         return false;
     }
 
-    public void deleteAll() {   }
+    public void deleteAll() {
+    }
 
     public long count() {
         return 0;
