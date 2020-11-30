@@ -10,7 +10,7 @@ import java.util.Map;
 public interface BookRentRepository {
     Map<BookCopy, Period> getRentBookCopiesByReaderId(int readerId);
 
-    boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy book, Shelf shelf);
+    boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy, Shelf shelf);
 
-    boolean addRentBookCopiesToReader(Reader reader, BookCopy book, Period period, Shelf shelf);
+    boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf);
 }

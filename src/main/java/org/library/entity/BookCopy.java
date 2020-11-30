@@ -15,6 +15,10 @@ public class BookCopy implements Comparable<BookCopy> {
     private int id;
     private Book book;
 
+    public BookCopy(int id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
