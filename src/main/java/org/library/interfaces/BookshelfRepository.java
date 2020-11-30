@@ -1,12 +1,11 @@
-package org.library.repositories;
+package org.library.interfaces;
 
-import org.library.entity.Book;
 import org.library.entity.BookCopy;
 import org.library.entity.Shelf;
 
 import java.util.Map;
 
-public interface IBookshelf {
+public interface BookshelfRepository {
     Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId);
 
     boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf);

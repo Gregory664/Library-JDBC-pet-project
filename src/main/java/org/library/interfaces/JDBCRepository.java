@@ -1,4 +1,4 @@
-package org.library.utils;
+package org.library.interfaces;
 
 import java.util.List;
 import java.util.Optional;

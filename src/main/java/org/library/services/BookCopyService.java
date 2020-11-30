@@ -3,7 +3,7 @@ package org.library.services;
 import org.library.entity.BookCopy;
 import org.library.exceptions.BookNotFound;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IBookCopy;
+import org.library.interfaces.BookCopyRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.*;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static org.library.utils.statements.BookCopySQLStatements.*;
 
-public class BookCopyService implements IBookCopy {
+public class BookCopyService implements BookCopyRepository {
     private final BookService bookService = new BookService();
 
     @Override

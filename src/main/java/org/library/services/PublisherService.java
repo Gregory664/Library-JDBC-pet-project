@@ -2,7 +2,7 @@ package org.library.services;
 
 import org.library.entity.Publisher;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IPublisher;
+import org.library.interfaces.PublisherRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.*;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static org.library.utils.statements.PublisherSQLStatements.*;
 
-public class PublisherService implements IPublisher {
+public class PublisherService implements PublisherRepository {
     @Override
     public List<Publisher> findAll() {
         List<Publisher> publishers = new ArrayList<>();

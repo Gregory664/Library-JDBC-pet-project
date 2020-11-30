@@ -2,7 +2,7 @@ package org.library.services;
 
 import org.library.entity.Shelf;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IShelf;
+import org.library.interfaces.ShelfRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.Connection;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.library.utils.statements.ShelfSQLStatements.*;
 
-public class ShelfService implements IShelf {
+public class ShelfService implements ShelfRepository {
     @Override
     public List<Shelf> findAll() {
         List<Shelf> shelves = new ArrayList<>();

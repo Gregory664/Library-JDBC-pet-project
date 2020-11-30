@@ -1,4 +1,4 @@
-package org.library.repositories;
+package org.library.interfaces;
 
 import org.library.entity.BookCopy;
 import org.library.entity.Period;
@@ -7,7 +7,7 @@ import org.library.entity.Shelf;
 
 import java.util.Map;
 
-public interface IBookRent {
+public interface BookRentRepository {
     Map<BookCopy, Period> getRentBookCopiesByReaderId(int readerId);
 
     boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy book, Shelf shelf);

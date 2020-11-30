@@ -7,7 +7,7 @@ import org.library.entity.Shelf;
 import org.library.exceptions.BookIsExistsInReaderException;
 import org.library.exceptions.RentBookNotFoundInReader;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IBookRent;
+import org.library.interfaces.BookRentRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.*;
@@ -16,7 +16,7 @@ import java.util.TreeMap;
 
 import static org.library.utils.statements.BookRentSQLStatements.*;
 
-public class BookRentService implements IBookRent {
+public class BookRentService implements BookRentRepository {
     private final BookCopyService bookCopyService = new BookCopyService();
     private final BookShelfService bookShelfService = new BookShelfService();
 

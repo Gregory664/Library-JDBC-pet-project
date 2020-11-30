@@ -5,7 +5,7 @@ import org.library.entity.Shelf;
 import org.library.exceptions.BookIsExistsInShelfException;
 import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IBookshelf;
+import org.library.interfaces.BookshelfRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.Connection;
@@ -17,7 +17,7 @@ import java.util.TreeMap;
 
 import static org.library.utils.statements.BookShelfSQLStatements.*;
 
-public class BookShelfService implements IBookshelf {
+public class BookShelfService implements BookshelfRepository {
     @Override
     public Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId) {
         Map<Integer, Shelf> bookCopyIdAndShelf = new TreeMap<>();

@@ -2,7 +2,7 @@ package org.library.services;
 
 import org.library.entity.*;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IBook;
+import org.library.interfaces.BookRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.*;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static org.library.utils.statements.BookSQLStatements.*;
 
-public class BookService implements IBook {
+public class BookService implements BookRepository {
     private final BookShelfService bookShelfService = new BookShelfService();
 
     private Book getBookFromResultSet(ResultSet resultSet) {

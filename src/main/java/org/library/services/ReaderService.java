@@ -4,7 +4,7 @@ import org.library.entity.BookCopy;
 import org.library.entity.Period;
 import org.library.entity.Reader;
 import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IReader;
+import org.library.interfaces.ReaderRepository;
 import org.library.utils.ConnectionUtils;
 
 import java.sql.Connection;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static org.library.utils.statements.ReaderSQLStatements.*;
 
-public class ReaderService implements IReader {
+public class ReaderService implements ReaderRepository {
     private final BookRentService bookRentService = new BookRentService();
 
     private Reader getReaderFromResultSet(ResultSet resultSet) {
