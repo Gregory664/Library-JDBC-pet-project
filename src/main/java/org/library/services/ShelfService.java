@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ShelfService implements ShelfRepository {
+    //TODO
     @Override
     public List<Shelf> findAll() {
         return null;
