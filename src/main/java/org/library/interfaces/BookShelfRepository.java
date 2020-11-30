@@ -5,7 +5,7 @@ import org.library.entity.Shelf;
 
 import java.util.Map;
 
-public interface BookshelfRepository {
+public interface BookShelfRepository {
     Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId);
 
     boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf);
