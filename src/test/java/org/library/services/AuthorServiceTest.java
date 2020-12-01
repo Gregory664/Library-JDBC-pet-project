@@ -2,8 +2,8 @@ package org.library.services;
 
 import org.junit.jupiter.api.Test;
 import org.library.entity.Author;
-import org.library.exceptions.AuthorNotFoundByIdException;
-import org.library.exceptions.AuthorNotFoundByNameException;
+import org.library.exceptions.newExc.AuthorNotFoundByIdException;
+import org.library.exceptions.newExc.AuthorNotFoundByNameException;
 import org.library.interfaces.AuthorRepository;
 import org.library.repositories.AuthorRepositoryImpl;
 

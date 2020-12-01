@@ -1,7 +1,7 @@
-package org.library.exceptions;
+package org.library.exceptions.newExc;
 
 public class AuthorNotFoundByIdException extends Exception {
-    public AuthorNotFoundByIdException(Integer id) {
+    public AuthorNotFoundByIdException(int id) {
         super(String.format("Author with id = %d not found ", id));
     }
 }

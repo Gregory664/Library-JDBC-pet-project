@@ -18,6 +18,8 @@ import javafx.stage.Stage;
 import org.library.App;
 import org.library.entity.*;
 import org.library.exceptions.BookCopyNotFoundException;
+import org.library.repositories.BookRepositoryImpl;
+import org.library.repositories.BookShelfRepositoryImpl;
 import org.library.services.BookCopyService;
 import org.library.services.BookRentService;
 import org.library.services.BookService;
@@ -30,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class MainController {
-    private final BookService bookService = new BookService();
+    private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
     private final BookRentService bookRentService = new BookRentService();
     private final ReaderService readerService = new ReaderService();
     private final BookCopyService bookCopyService = new BookCopyService();

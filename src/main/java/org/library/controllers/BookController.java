@@ -12,9 +12,11 @@ import org.library.entity.Author;
 import org.library.entity.Book;
 import org.library.entity.Genre;
 import org.library.entity.Publisher;
-import org.library.exceptions.AuthorNotFoundByNameException;
+import org.library.exceptions.newExc.AuthorNotFoundByNameException;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.repositories.AuthorRepositoryImpl;
+import org.library.repositories.BookRepositoryImpl;
+import org.library.repositories.BookShelfRepositoryImpl;
 import org.library.services.AuthorService;
 import org.library.services.BookService;
 import org.library.services.GenreService;
@@ -27,9 +29,9 @@ import java.util.stream.Collectors;
 
 public class BookController {
     private final AuthorService authorService = new AuthorService(new AuthorRepositoryImpl());
+    private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
     private final GenreService genreService = new GenreService();
     private final PublisherService publisherService = new PublisherService();
-    private final BookService bookService = new BookService();
     public TextField titleTextField = new TextField();
     public ComboBox<String> authorComboBox = new ComboBox<>();
     public ComboBox<String> publisherComboBox = new ComboBox<>();

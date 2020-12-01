@@ -1,8 +1,8 @@
 package org.library.services;
 
 import org.library.entity.Author;
-import org.library.exceptions.AuthorNotFoundByIdException;
-import org.library.exceptions.AuthorNotFoundByNameException;
+import org.library.exceptions.newExc.AuthorNotFoundByIdException;
+import org.library.exceptions.newExc.AuthorNotFoundByNameException;
 import org.library.interfaces.AuthorRepository;
 
 import java.util.List;
