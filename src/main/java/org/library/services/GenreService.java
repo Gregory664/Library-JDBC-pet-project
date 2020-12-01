@@ -1,42 +1,48 @@
 package org.library.services;
 
 import org.library.entity.Genre;
+import org.library.exceptions.newExc.GenreNotFoundByIdException;
+import org.library.exceptions.newExc.GenreNotFoundByTitleException;
+import org.library.interfaces.GenreRepository;
 
 import java.util.List;
-import java.util.Optional;
-
 
 public class GenreService {
-    //TODO
+    private final GenreRepository repository;
+
+    public GenreService(GenreRepository repository) {
+        this.repository = repository;
+    }
+
     public List<Genre> findAll() {
-        return null;
+        return repository.findAll();
     }
 
-    public Optional<Genre> findById(Integer id) {
-        return Optional.empty();
+    public Genre findById(Integer id) throws GenreNotFoundByIdException {
+        return repository.findById(id).orElseThrow(() -> new GenreNotFoundByIdException(id));
     }
 
-    public Optional<Genre> findByTitle(String title) {
-        return Optional.empty();
+    public Genre findByTitle(String title) throws GenreNotFoundByTitleException {
+        return repository.findByTitle(title).orElseThrow(() -> new GenreNotFoundByTitleException(title));
     }
 
     public boolean existsById(Integer id) {
-        return false;
+        return repository.existsById(id);
     }
 
     public void deleteAll() {
-
+        repository.deleteAll();
     }
 
     public boolean deleteById(Integer id) {
-        return false;
+        return repository.deleteById(id);
     }
 
     public boolean save(Genre genre) {
-        return false;
+        return repository.save(genre);
     }
 
     public long count() {
-        return 0;
+        return repository.count();
     }
 }

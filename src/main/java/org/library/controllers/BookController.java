@@ -12,13 +12,10 @@ import org.library.entity.Author;
 import org.library.entity.Book;
 import org.library.entity.Genre;
 import org.library.entity.Publisher;
-import org.library.exceptions.SQLExceptionWrapper;
 import org.library.exceptions.newExc.AuthorNotFoundByNameException;
+import org.library.exceptions.newExc.GenreNotFoundByTitleException;
 import org.library.exceptions.newExc.PublisherNotFoundByTitleException;
-import org.library.repositories.AuthorRepositoryImpl;
-import org.library.repositories.BookRepositoryImpl;
-import org.library.repositories.BookShelfRepositoryImpl;
-import org.library.repositories.PublisherRepositoryImpl;
+import org.library.repositories.*;
 import org.library.services.AuthorService;
 import org.library.services.BookService;
 import org.library.services.GenreService;
@@ -26,13 +23,12 @@ import org.library.services.PublisherService;
 import org.library.utils.MessageBox;
 import org.library.utils.Utils;
 
-import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 public class BookController {
     private final AuthorService authorService = new AuthorService(new AuthorRepositoryImpl());
     private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
-    private final GenreService genreService = new GenreService();
+    private final GenreService genreService = new GenreService(new GenreRepositoryImpl());
     private final PublisherService publisherService = new PublisherService(new PublisherRepositoryImpl());
     public TextField titleTextField = new TextField();
     public ComboBox<String> authorComboBox = new ComboBox<>();
@@ -88,7 +84,7 @@ public class BookController {
             String title = titleTextField.getText();
             author = authorService.findByName(authorComboBox.getSelectionModel().getSelectedItem());
             publisher = publisherService.findByTitle(publisherComboBox.getSelectionModel().getSelectedItem());
-            genre = genreService.findByTitle(genreComboBox.getSelectionModel().getSelectedItem()).orElseThrow(SQLException::new);
+            genre = genreService.findByTitle(genreComboBox.getSelectionModel().getSelectedItem());
             int length = Integer.parseInt(lengthTextField.getText());
             book = Book.builder()
                     .title(title)
@@ -99,9 +95,7 @@ public class BookController {
                     .build();
             save = bookService.save(book);
             Utils.getStage(saveButton).close();
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        } catch (AuthorNotFoundByNameException | PublisherNotFoundByTitleException e) {
+        } catch (AuthorNotFoundByNameException | PublisherNotFoundByTitleException | GenreNotFoundByTitleException e) {
             MessageBox.WarningBox(e.getMessage());
         }
 
