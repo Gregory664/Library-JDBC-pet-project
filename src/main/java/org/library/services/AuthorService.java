@@ -1,8 +1,8 @@
 package org.library.services;
 
 import org.library.entity.Author;
-import org.library.exceptions.newExc.AuthorNotFoundByIdException;
 import org.library.exceptions.newExc.AuthorNotFoundByNameException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.AuthorRepository;
 
 import java.util.List;
@@ -18,8 +18,8 @@ public class AuthorService {
         return authorRepository.findAll();
     }
 
-    public Author findById(Integer id) throws AuthorNotFoundByIdException {
-        return authorRepository.findById(id).orElseThrow(() -> new AuthorNotFoundByIdException(id));
+    public Author findById(Integer id) throws EntityNotFoundByIdException {
+        return authorRepository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Author.class, id));
     }
 
     public boolean existsById(Integer id) {

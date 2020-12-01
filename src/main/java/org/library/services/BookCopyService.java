@@ -2,7 +2,7 @@ package org.library.services;
 
 import org.library.entity.Book;
 import org.library.entity.BookCopy;
-import org.library.exceptions.newExc.BookCopyNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.BookCopyRepository;
 import org.library.interfaces.BookRepository;
 
@@ -17,19 +17,19 @@ public class BookCopyService {
         this.bookCopyRepository = bookCopyRepository;
     }
 
-    public List<BookCopy> findAll() throws BookCopyNotFoundByIdException {
+    public List<BookCopy> findAll() throws EntityNotFoundByIdException {
         List<BookCopy> bookCopies = bookCopyRepository.findAll();
         for (BookCopy bookCopy : bookCopies) {
             int bookId = bookCopy.getId();
-            Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookCopyNotFoundByIdException(bookId));
+            Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, bookId));
             bookCopy.setBook(book);
         }
         return bookCopies;
     }
 
-    public BookCopy findById(Integer id) throws BookCopyNotFoundByIdException {
-        BookCopy bookCopy = bookCopyRepository.findById(id).orElseThrow(() -> new BookCopyNotFoundByIdException(id));
-        Book book = bookRepository.findById(bookCopy.getBook().getId()).orElseThrow(() -> new BookCopyNotFoundByIdException(id));
+    public BookCopy findById(Integer id) throws EntityNotFoundByIdException {
+        BookCopy bookCopy = bookCopyRepository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, id));
+        Book book = bookRepository.findById(bookCopy.getBook().getId()).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, id));
         bookCopy.setBook(book);
         return bookCopy;
     }

@@ -3,8 +3,8 @@ package org.library.services;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.Author;
-import org.library.exceptions.newExc.AuthorNotFoundByIdException;
 import org.library.exceptions.newExc.AuthorNotFoundByNameException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.AuthorRepository;
 import org.library.repositories.AuthorRepositoryImpl;
 
@@ -44,12 +44,12 @@ class AuthorServiceTest {
     }
 
     @Test
-    void findById() throws AuthorNotFoundByIdException {
+    void findById() throws EntityNotFoundByIdException {
         Author author = new Author(1, "author1");
         assertNotNull(service.findById(1));
         assertEquals(author, service.findById(1));
 
-        Throwable throwable = assertThrows(AuthorNotFoundByIdException.class, () -> service.findById(2));
+        Throwable throwable = assertThrows(EntityNotFoundByIdException.class, () -> service.findById(2));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }

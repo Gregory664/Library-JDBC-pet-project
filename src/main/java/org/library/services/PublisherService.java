@@ -1,8 +1,8 @@
 package org.library.services;
 
 import org.library.entity.Publisher;
-import org.library.exceptions.newExc.PublisherNotFoundByIdException;
-import org.library.exceptions.newExc.PublisherNotFoundByTitleException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.PublisherRepository;
 
 import java.util.List;
@@ -18,8 +18,8 @@ public class PublisherService {
         return repository.findAll();
     }
 
-    public Publisher findById(Integer id) throws PublisherNotFoundByIdException {
-        return repository.findById(id).orElseThrow(() -> new PublisherNotFoundByIdException(id));
+    public Publisher findById(Integer id) throws EntityNotFoundByIdException {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Publisher.class, id));
     }
 
     public boolean existsById(Integer id) {
@@ -42,7 +42,7 @@ public class PublisherService {
         return repository.count();
     }
 
-    public Publisher findByTitle(String title) throws PublisherNotFoundByTitleException {
-        return repository.findByTitle(title).orElseThrow(() -> new PublisherNotFoundByTitleException(title));
+    public Publisher findByTitle(String title) throws EntityNotFoundByTitleException {
+        return repository.findByTitle(title).orElseThrow(() -> new EntityNotFoundByTitleException(Publisher.class, title));
     }
 }

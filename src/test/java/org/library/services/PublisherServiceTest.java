@@ -3,8 +3,8 @@ package org.library.services;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.Publisher;
-import org.library.exceptions.newExc.PublisherNotFoundByIdException;
-import org.library.exceptions.newExc.PublisherNotFoundByTitleException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.PublisherRepository;
 import org.library.repositories.PublisherRepositoryImpl;
 
@@ -29,7 +29,7 @@ class PublisherServiceTest {
 
         when(repository.findAll()).thenReturn(publisherList);
         when(repository.findById(1)).thenReturn(Optional.ofNullable(publisherList.get(0)));
-        when(repository.findByTitle("publisher 1")).thenReturn(Optional.ofNullable(publisherList.get(0)));
+        when(repository.findByTitle("publisher 1")).thenReturn(Optional.of(publisherList.get(0)));
         when(repository.existsById(1)).thenReturn(true);
         when(repository.deleteById(1)).thenReturn(true);
         when(repository.save(publisherList.get(0))).thenReturn(true);
@@ -44,12 +44,12 @@ class PublisherServiceTest {
     }
 
     @Test
-    void findById() throws PublisherNotFoundByIdException {
+    void findById() throws EntityNotFoundByIdException {
         Publisher byId = service.findById(1);
         assertNotNull(byId);
         assertEquals(publisherList.get(0), byId);
 
-        Throwable throwable = assertThrows(PublisherNotFoundByIdException.class, () -> service.findById(4));
+        Throwable throwable = assertThrows(EntityNotFoundByIdException.class, () -> service.findById(4));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }
@@ -87,12 +87,12 @@ class PublisherServiceTest {
     }
 
     @Test
-    void findByTitle() throws PublisherNotFoundByTitleException {
+    void findByTitle() throws EntityNotFoundByTitleException {
         Publisher byPublisher = service.findByTitle("publisher 1");
         assertNotNull(byPublisher);
         assertEquals(publisherList.get(0), byPublisher);
 
-        Throwable throwable = assertThrows(PublisherNotFoundByIdException.class, () -> service.findById(4));
+        Throwable throwable = assertThrows(EntityNotFoundByTitleException.class, () -> service.findByTitle("publisher 4"));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }

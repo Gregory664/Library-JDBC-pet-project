@@ -3,7 +3,7 @@ package org.library.services;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.*;
-import org.library.exceptions.newExc.BookCopyNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.BookCopyRepository;
 import org.library.interfaces.BookRepository;
 import org.library.repositories.BookCopyRepositoryImpl;
@@ -71,19 +71,19 @@ class BookCopyServiceTest {
     }
 
     @Test
-    void findAll() throws BookCopyNotFoundByIdException {
+    void findAll() throws EntityNotFoundByIdException {
         List<BookCopy> all = bookCopyService.findAll();
         assertNotNull(all);
         assertEquals(bookCopyList, all);
     }
 
     @Test
-    void findById() throws BookCopyNotFoundByIdException {
+    void findById() throws EntityNotFoundByIdException {
         BookCopy byId = bookCopyService.findById(1);
         assertNotNull(byId);
         assertEquals(bookCopyList.get(0), byId);
 
-        Throwable throwable = assertThrows(BookCopyNotFoundByIdException.class, () -> bookCopyService.findById(3));
+        Throwable throwable = assertThrows(EntityNotFoundByIdException.class, () -> bookCopyService.findById(3));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }

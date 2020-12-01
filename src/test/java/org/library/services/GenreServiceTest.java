@@ -3,8 +3,8 @@ package org.library.services;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.Genre;
-import org.library.exceptions.newExc.GenreNotFoundByIdException;
-import org.library.exceptions.newExc.GenreNotFoundByTitleException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.GenreRepository;
 import org.library.repositories.GenreRepositoryImpl;
 
@@ -44,23 +44,23 @@ class GenreServiceTest {
     }
 
     @Test
-    void findById() throws GenreNotFoundByIdException {
+    void findById() throws EntityNotFoundByIdException {
         Genre byId = service.findById(1);
         assertNotNull(byId);
         assertEquals(genreList.get(0), byId);
 
-        Throwable throwable = assertThrows(GenreNotFoundByIdException.class, () -> service.findById(4));
+        Throwable throwable = assertThrows(EntityNotFoundByIdException.class, () -> service.findById(4));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }
 
     @Test
-    void findByTitle() throws GenreNotFoundByTitleException {
+    void findByTitle() throws EntityNotFoundByTitleException {
         Genre byTitle = service.findByTitle("genre 1");
         assertNotNull(byTitle);
         assertEquals(genreList.get(0), byTitle);
 
-        Throwable throwable = assertThrows(GenreNotFoundByTitleException.class, () -> service.findByTitle("genre 4"));
+        Throwable throwable = assertThrows(EntityNotFoundByTitleException.class, () -> service.findByTitle("genre 4"));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }

@@ -13,8 +13,7 @@ import org.library.entity.Book;
 import org.library.entity.Genre;
 import org.library.entity.Publisher;
 import org.library.exceptions.newExc.AuthorNotFoundByNameException;
-import org.library.exceptions.newExc.GenreNotFoundByTitleException;
-import org.library.exceptions.newExc.PublisherNotFoundByTitleException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.repositories.*;
 import org.library.services.AuthorService;
 import org.library.services.BookService;
@@ -95,7 +94,7 @@ public class BookController {
                     .build();
             save = bookService.save(book);
             Utils.getStage(saveButton).close();
-        } catch (AuthorNotFoundByNameException | PublisherNotFoundByTitleException | GenreNotFoundByTitleException e) {
+        } catch (AuthorNotFoundByNameException | EntityNotFoundByTitleException e) {
             MessageBox.WarningBox(e.getMessage());
         }
 

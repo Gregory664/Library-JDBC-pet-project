@@ -1,8 +1,8 @@
 package org.library.services;
 
 import org.library.entity.Genre;
-import org.library.exceptions.newExc.GenreNotFoundByIdException;
-import org.library.exceptions.newExc.GenreNotFoundByTitleException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.GenreRepository;
 
 import java.util.List;
@@ -18,12 +18,12 @@ public class GenreService {
         return repository.findAll();
     }
 
-    public Genre findById(Integer id) throws GenreNotFoundByIdException {
-        return repository.findById(id).orElseThrow(() -> new GenreNotFoundByIdException(id));
+    public Genre findById(Integer id) throws EntityNotFoundByIdException {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Genre.class, id));
     }
 
-    public Genre findByTitle(String title) throws GenreNotFoundByTitleException {
-        return repository.findByTitle(title).orElseThrow(() -> new GenreNotFoundByTitleException(title));
+    public Genre findByTitle(String title) throws EntityNotFoundByTitleException {
+        return repository.findByTitle(title).orElseThrow(() -> new EntityNotFoundByTitleException(Genre.class, title));
     }
 
     public boolean existsById(Integer id) {

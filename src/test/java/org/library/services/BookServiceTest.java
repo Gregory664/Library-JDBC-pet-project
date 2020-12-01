@@ -3,8 +3,8 @@ package org.library.services;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.*;
-import org.library.exceptions.newExc.BookNotFoundByIdException;
-import org.library.exceptions.newExc.BookNotFoundByTitleException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.BookRepository;
 import org.library.interfaces.BookShelfRepository;
 import org.library.repositories.BookRepositoryImpl;
@@ -94,12 +94,12 @@ class BookServiceTest {
     }
 
     @Test
-    void findByTitle() throws BookNotFoundByTitleException {
+    void findByTitle() throws EntityNotFoundByTitleException {
         Book byTitle = bookService.findByTitle("book 1");
         assertNotNull(byTitle);
         assertEquals(books.get(0), byTitle);
 
-        Throwable throwable = assertThrows(BookNotFoundByTitleException.class, () -> bookService.findByTitle("book 3"));
+        Throwable throwable = assertThrows(EntityNotFoundByTitleException.class, () -> bookService.findByTitle("book 3"));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }
@@ -112,12 +112,12 @@ class BookServiceTest {
     }
 
     @Test
-    void findById() throws BookNotFoundByIdException {
+    void findById() throws EntityNotFoundByIdException {
         Book byId = bookService.findById(1);
         assertNotNull(byId);
         assertEquals(books.get(0), byId);
 
-        Throwable throwable = assertThrows(BookNotFoundByIdException.class, () -> bookService.findById(3));
+        Throwable throwable = assertThrows(EntityNotFoundByIdException.class, () -> bookService.findById(3));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }

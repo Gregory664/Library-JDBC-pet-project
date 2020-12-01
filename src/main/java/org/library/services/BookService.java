@@ -4,8 +4,8 @@ import org.library.entity.Author;
 import org.library.entity.Book;
 import org.library.entity.Genre;
 import org.library.entity.Publisher;
-import org.library.exceptions.newExc.BookNotFoundByIdException;
-import org.library.exceptions.newExc.BookNotFoundByTitleException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.BookRepository;
 import org.library.interfaces.BookShelfRepository;
 
@@ -38,8 +38,8 @@ public class BookService {
         return byGenre;
     }
 
-    public Book findByTitle(String title) throws BookNotFoundByTitleException {
-        Book book = bookRepository.findByTitle(title).orElseThrow(() -> new BookNotFoundByTitleException(title));
+    public Book findByTitle(String title) throws EntityNotFoundByTitleException {
+        Book book = bookRepository.findByTitle(title).orElseThrow(() -> new EntityNotFoundByTitleException(Book.class, title));
         book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
         return book;
     }
@@ -50,8 +50,8 @@ public class BookService {
         return all;
     }
 
-    public Book findById(Integer id) throws BookNotFoundByIdException {
-        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundByIdException(id));
+    public Book findById(Integer id) throws EntityNotFoundByIdException {
+        Book book = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Book.class, id));
         book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
         return book;
     }

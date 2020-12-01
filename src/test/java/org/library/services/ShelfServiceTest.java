@@ -3,7 +3,7 @@ package org.library.services;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.Shelf;
-import org.library.exceptions.newExc.ShelfNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.ShelfRepository;
 import org.library.repositories.ShelfRepositoryImpl;
 
@@ -42,12 +42,12 @@ class ShelfServiceTest {
     }
 
     @Test
-    void findById() throws ShelfNotFoundByIdException {
+    void findById() throws EntityNotFoundByIdException {
         Shelf byId = shelfService.findById(1);
         assertNotNull(byId);
         assertEquals(shelfList.get(0), byId);
 
-        Throwable throwable = assertThrows(ShelfNotFoundByIdException.class, () -> shelfService.findById(4));
+        Throwable throwable = assertThrows(EntityNotFoundByIdException.class, () -> shelfService.findById(4));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
     }

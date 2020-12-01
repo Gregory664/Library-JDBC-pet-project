@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import org.library.App;
 import org.library.entity.*;
 import org.library.exceptions.BookCopyNotFoundException;
-import org.library.exceptions.newExc.BookCopyNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.repositories.BookCopyRepositoryImpl;
 import org.library.repositories.BookRepositoryImpl;
 import org.library.repositories.BookShelfRepositoryImpl;
@@ -226,7 +226,7 @@ public class MainController {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (BookCopyNotFoundException | BookCopyNotFoundByIdException e) {
+        } catch (BookCopyNotFoundException | EntityNotFoundByIdException e) {
             MessageBox.WarningBox(e.getMessage());
         }
     }
