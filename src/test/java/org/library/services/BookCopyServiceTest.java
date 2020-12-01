@@ -14,14 +14,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class BookCopyServiceTest {
     private static final BookCopyRepository bookCopyRepository = mock(BookCopyRepositoryImpl.class);
     private static final BookRepository bookRepository = mock(BookRepositoryImpl.class);
-    private static final BookCopyService bookCopyService = new BookCopyService(bookRepository, bookCopyRepository);
     private static List<BookCopy> bookCopyList;
+    private final BookCopyService bookCopyService = new BookCopyService(bookRepository, bookCopyRepository);
 
     @BeforeAll
     static void initialize() {
@@ -90,22 +89,32 @@ class BookCopyServiceTest {
     }
 
     @Test
+    void deleteAll() {
+        bookCopyService.deleteAll();
+        verify(bookCopyRepository, times(1)).deleteAll();
+    }
+
+    @Test
     void existsById() {
         assertTrue(bookCopyService.existsById(1));
+        verify(bookCopyRepository, times(1)).existsById(1);
     }
 
     @Test
     void deleteById() {
         assertTrue(bookCopyService.deleteById(1));
+        verify(bookCopyRepository, times(1)).deleteById(1);
     }
 
     @Test
     void save() {
         assertTrue(bookCopyService.save(bookCopyList.get(0)));
+        verify(bookCopyRepository, times(1)).save(bookCopyList.get(0));
     }
 
     @Test
     void count() {
         assertEquals(1L, bookCopyService.count());
+        verify(bookCopyRepository, times(1)).count();
     }
 }

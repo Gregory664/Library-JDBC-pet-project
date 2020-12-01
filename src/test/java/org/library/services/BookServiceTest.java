@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class BookServiceTest {
     private static final BookShelfRepository bookShelfRepository = mock(BookShelfRepositoryImpl.class);
@@ -126,20 +125,30 @@ class BookServiceTest {
     @Test
     void existsById() {
         assertTrue(bookService.existsById(1));
+        verify(bookRepository, times(1)).existsById(1);
+    }
+
+    @Test
+    void deleteAll() {
+        bookService.deleteAll();
+        verify(bookRepository, times(1)).deleteAll();
     }
 
     @Test
     void deleteById() {
         assertTrue(bookService.deleteById(2));
+        verify(bookRepository, times(1)).deleteById(2);
     }
 
     @Test
     void save() {
         assertTrue(bookService.save(books.get(0)));
+        verify(bookRepository, times(1)).save(books.get(0));
     }
 
     @Test
     void count() {
         assertEquals(2, bookService.count());
+        verify(bookRepository, times(1)).count();
     }
 }
