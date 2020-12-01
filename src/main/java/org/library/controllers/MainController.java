@@ -18,6 +18,8 @@ import javafx.stage.Stage;
 import org.library.App;
 import org.library.entity.*;
 import org.library.exceptions.BookCopyNotFoundException;
+import org.library.exceptions.newExc.BookCopyNotFoundByIdException;
+import org.library.repositories.BookCopyRepositoryImpl;
 import org.library.repositories.BookRepositoryImpl;
 import org.library.repositories.BookShelfRepositoryImpl;
 import org.library.services.BookCopyService;
@@ -35,7 +37,7 @@ public class MainController {
     private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
     private final BookRentService bookRentService = new BookRentService();
     private final ReaderService readerService = new ReaderService();
-    private final BookCopyService bookCopyService = new BookCopyService();
+    private final BookCopyService bookCopyService = new BookCopyService(new BookRepositoryImpl(), new BookCopyRepositoryImpl());
 
     public TableView<Map.Entry<Integer, Shelf>> shelfView;
     public TableColumn<Map.Entry<Integer, Shelf>, String> shelfViewName;
@@ -199,7 +201,7 @@ public class MainController {
             if (optionalReader.isPresent()) {
                 int selectedBookCopyId = shelfView.getSelectionModel().getSelectedItem().getKey();
 
-                BookCopy bookCopy = bookCopyService.findById(selectedBookCopyId).orElseThrow(() -> new BookCopyNotFoundException(selectedBookCopyId));
+                BookCopy bookCopy = bookCopyService.findById(selectedBookCopyId);
                 Shelf shelf = shelfView.getSelectionModel().getSelectedItem().getValue();
                 Reader reader = optionalReader.get();
                 Period period = rentController.getPeriod();
@@ -224,7 +226,7 @@ public class MainController {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (BookCopyNotFoundException e) {
+        } catch (BookCopyNotFoundException | BookCopyNotFoundByIdException e) {
             MessageBox.WarningBox(e.getMessage());
         }
     }
