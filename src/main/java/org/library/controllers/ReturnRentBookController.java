@@ -8,6 +8,7 @@ import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import lombok.Getter;
 import org.library.entity.Shelf;
+import org.library.repositories.ShelfRepositoryImpl;
 import org.library.services.ShelfService;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ReturnRentBookController {
-    private final ShelfService shelfService = new ShelfService();
+    private final ShelfService shelfService = new ShelfService(new ShelfRepositoryImpl());
     public ComboBox<String> shelfComboBox = new ComboBox<>();
     public Button saveButton = new Button();
     public Button cancelButton = new Button();

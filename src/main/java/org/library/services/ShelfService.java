@@ -1,36 +1,43 @@
 package org.library.services;
 
 import org.library.entity.Shelf;
+import org.library.exceptions.newExc.ShelfNotFoundByIdException;
+import org.library.interfaces.ShelfRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public class ShelfService {
-    //TODO
-    public List<Shelf> findAll() {
-        return null;
+    private final ShelfRepository repository;
+
+    public ShelfService(ShelfRepository repository) {
+        this.repository = repository;
     }
 
-    public Optional<Shelf> findById(Integer id) {
-        return Optional.empty();
+    public List<Shelf> findAll() {
+        return repository.findAll();
+    }
+
+    public Shelf findById(Integer id) throws ShelfNotFoundByIdException {
+        return repository.findById(id).orElseThrow(() -> new ShelfNotFoundByIdException(id));
     }
 
     public boolean existsById(Integer id) {
-        return false;
+        return repository.existsById(id);
     }
 
     public void deleteAll() {
+        repository.deleteAll();
     }
 
     public boolean deleteById(Integer id) {
-        return false;
+        return repository.deleteById(id);
     }
 
     public boolean save(Shelf shelf) {
-        return false;
+        return repository.save(shelf);
     }
 
     public long count() {
-        return 0;
+        return repository.count();
     }
 }
