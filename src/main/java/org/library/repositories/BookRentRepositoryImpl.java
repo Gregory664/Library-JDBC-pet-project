@@ -40,7 +40,7 @@ public class BookRentRepositoryImpl implements BookRentRepository {
     }
 
     @Override
-    public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy, Shelf shelf) {
+    public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy) throws RentBookNotFoundInReader {
         Map<BookCopy, Period> rentBookCopies = reader.getRentBookCopies();
         boolean result;
 
@@ -48,7 +48,6 @@ public class BookRentRepositoryImpl implements BookRentRepository {
             throw new RentBookNotFoundInReader(reader.getId(), bookCopy.getId());
         }
         rentBookCopies.remove(bookCopy);
-        //bookShelfService.addBookCopyToShelf(bookCopy, shelf);
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_RENT_BOOK_COPY)) {
@@ -62,11 +61,11 @@ public class BookRentRepositoryImpl implements BookRentRepository {
     }
 
     @Override
-    public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) {
+    public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) throws BookIsExistsInReaderException {
         if (reader.getRentBookCopies().containsKey(bookCopy)) {
             throw new BookIsExistsInReaderException(bookCopy.getId(), reader.getId());
         }
-        //bookShelfService.deleteBookCopyFromShelf(bookCopy, shelf);
+
         reader.getRentBookCopies().put(bookCopy, period);
         boolean result;
 

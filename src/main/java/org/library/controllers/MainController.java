@@ -18,8 +18,12 @@ import javafx.stage.Stage;
 import org.library.App;
 import org.library.entity.*;
 import org.library.exceptions.BookCopyNotFoundException;
+import org.library.exceptions.BookIsExistsInReaderException;
+import org.library.exceptions.BookIsExistsInShelfException;
+import org.library.exceptions.RentBookNotFoundInReader;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.repositories.BookCopyRepositoryImpl;
+import org.library.repositories.BookRentRepositoryImpl;
 import org.library.repositories.BookRepositoryImpl;
 import org.library.repositories.BookShelfRepositoryImpl;
 import org.library.services.BookCopyService;
@@ -35,7 +39,7 @@ import java.util.Optional;
 
 public class MainController {
     private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
-    private final BookRentService bookRentService = new BookRentService();
+    private final BookRentService bookRentService = new BookRentService(new BookRentRepositoryImpl(), new BookShelfRepositoryImpl());
     private final ReaderService readerService = new ReaderService();
     private final BookCopyService bookCopyService = new BookCopyService(new BookRepositoryImpl(), new BookCopyRepositoryImpl());
 
@@ -226,7 +230,7 @@ public class MainController {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (BookCopyNotFoundException | EntityNotFoundByIdException e) {
+        } catch (BookCopyNotFoundException | EntityNotFoundByIdException | BookIsExistsInReaderException e) {
             MessageBox.WarningBox(e.getMessage());
         }
     }
@@ -272,6 +276,8 @@ public class MainController {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (RentBookNotFoundInReader | BookIsExistsInShelfException e) {
+            MessageBox.WarningBox(e.getMessage());
         }
     }
 
