@@ -14,6 +14,8 @@ import lombok.Getter;
 import org.library.entity.Period;
 import org.library.entity.Reader;
 import org.library.exceptions.ReaderNotFoundByPassportException;
+import org.library.repositories.BookRentRepositoryImpl;
+import org.library.repositories.ReaderRepositoryImpl;
 import org.library.services.ReaderService;
 import org.library.utils.MessageBox;
 
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class RentController {
-    private final ReaderService readerService = new ReaderService();
+    private final ReaderService readerService = new ReaderService(new ReaderRepositoryImpl(), new BookRentRepositoryImpl());
     public Label fioLabel = new Label();
     public TextField timeCountText = new TextField();
     public ComboBox<String> timeComboBox = new ComboBox<>();
