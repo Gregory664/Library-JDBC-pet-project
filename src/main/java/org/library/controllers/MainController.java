@@ -36,7 +36,7 @@ import java.util.Optional;
 
 public class MainController {
     private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
-    private final BookRentService bookRentService = new BookRentService(new BookRentRepositoryImpl(), new BookShelfRepositoryImpl());
+    private final BookRentService bookRentService = new BookRentService(new BookRentRepositoryImpl(), new BookShelfRepositoryImpl(), new BookCopyRepositoryImpl(), new BookRepositoryImpl());
     private final ReaderService readerService = new ReaderService(new ReaderRepositoryImpl(), new BookRentRepositoryImpl());
     private final BookCopyService bookCopyService = new BookCopyService(new BookRepositoryImpl(), new BookCopyRepositoryImpl());
 
@@ -88,6 +88,9 @@ public class MainController {
         booksView.getSelectionModel().selectFirst();
 
         ObservableList<Reader> readers = FXCollections.observableList(readerService.findAll());
+        for (Reader reader : readers) {
+            reader.setRentBookCopies(bookRentService.getRentBookCopiesByReaderId(reader.getId()));
+        }
         readerView.setItems(readers);
         readerView.getSelectionModel().selectFirst();
     }
@@ -291,7 +294,7 @@ public class MainController {
             if (bookController.isClose()) {
                 return;
             }
-            System.out.println(bookController.isSave());
+
             if (bookController.isSave()) {
                 booksView.getItems().add(bookController.getBook());
                 fillShelfView();

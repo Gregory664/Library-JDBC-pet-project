@@ -6,95 +6,105 @@ import org.library.entity.*;
 import org.library.exceptions.BookIsExistsInReaderException;
 import org.library.exceptions.BookIsExistsInShelfException;
 import org.library.exceptions.RentBookNotFoundInReader;
+import org.library.interfaces.BookCopyRepository;
 import org.library.interfaces.BookRentRepository;
+import org.library.interfaces.BookRepository;
 import org.library.interfaces.BookShelfRepository;
 import org.library.repositories.BookRentRepositoryImpl;
+import org.library.repositories.BookRepositoryImpl;
 import org.library.repositories.BookShelfRepositoryImpl;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BookRentServiceTest {
     private static final BookRentRepository bookRentRepository = mock(BookRentRepositoryImpl.class);
     private static final BookShelfRepository bookShelfRepository = mock(BookShelfRepositoryImpl.class);
-    private static final BookRentService bookRentService = new BookRentService(bookRentRepository, bookShelfRepository);
-    private static final Shelf shelf = new Shelf(1, "Z1");
-    private static Map<BookCopy, Period> rentBookCopyPeriod;
+    private static final BookCopyRepository bookCopyRepository = mock(BookCopyRepository.class);
+    private static final BookRepository bookRepository = mock(BookRepositoryImpl.class);
+    private static final BookRentService bookRentService = new BookRentService(bookRentRepository, bookShelfRepository, bookCopyRepository, bookRepository);
+    private static Map<BookCopy, Period> bookCopyPeriodMap;
     private static Reader reader;
-    private static BookCopy bookCopy1;
-    private static BookCopy bookCopy2;
-    private static BookCopy bookCopy3;
+    private static BookCopy bookCopy;
+    private static Shelf shelf;
+    private static Period period;
 
     @BeforeAll
-    static void initialize() throws RentBookNotFoundInReader, BookIsExistsInReaderException {
-        bookCopy1 = new BookCopy(1, Book.builder()
+    static void initialize() {
+        shelf = new Shelf(1, "Z");
+        period = new Period(LocalDate.now(), LocalDate.now().plusDays(2));
+
+        bookCopy = BookCopy.builder()
                 .id(1)
-                .title("book")
-                .author(new Author(1, "author 1"))
-                .publisher(new Publisher(1, "publisher 1"))
-                .genre(new Genre(1, "genre 1"))
-                .length(100)
-                .build());
+                .book(Book.builder()
+                        .id(1)
+                        .title("title")
+                        .author(new Author(1, "author"))
+                        .publisher(new Publisher(1, "publisher"))
+                        .genre(new Genre(1, "genre"))
+                        .length(100)
+                        .bookCopyIdAndShelf(Map.of(1, shelf))
+                        .build())
+                .build();
 
-        bookCopy2 = new BookCopy(2, Book.builder()
-                .id(2)
-                .title("book 2")
-                .author(new Author(2, "author 2"))
-                .publisher(new Publisher(2, "publisher 2"))
-                .genre(new Genre(2, "genre 2"))
-                .length(200)
-                .build());
-
-        bookCopy3 = new BookCopy(3, Book.builder()
-                .id(3)
-                .title("book 3")
-                .author(new Author(3, "author 3"))
-                .publisher(new Publisher(3, "publisher 3"))
-                .genre(new Genre(3, "genre 3"))
-                .length(300)
-                .build());
-
-        rentBookCopyPeriod = Map.of(
-                bookCopy1, new Period(LocalDate.now(), LocalDate.now().minusDays(2)),
-                bookCopy2, new Period(LocalDate.now(), LocalDate.now().minusDays(7))
-        );
+        bookCopyPeriodMap = Map.of(bookCopy, period);
 
         reader = Reader.builder()
                 .id(1)
-                .fio("test fio")
-                .age(10)
-                .address("test address")
+                .fio("fio")
+                .age(12)
+                .address("address")
                 .phone("88005553535")
-                .passport("2010111222")
-                .rentBookCopies(rentBookCopyPeriod)
+                .passport("2000111222")
+                .rentBookCopies(bookCopyPeriodMap)
                 .build();
-
-        when(bookRentRepository.getRentBookCopiesByReaderId(1)).thenReturn(rentBookCopyPeriod);
-        when(bookRentRepository.deleteRentBookCopiesFromReader(reader, bookCopy1)).thenReturn(true);
-        when(bookRentRepository.addRentBookCopiesToReader(reader, bookCopy1, rentBookCopyPeriod.get(bookCopy1), shelf)).thenReturn(true);
     }
 
     @Test
     void getRentBookCopiesByReaderId() {
+        when(bookRentRepository.getRentBookCopiesByReaderId(1)).thenReturn(
+                Map.of(
+                        new BookCopy(1), new Period(LocalDate.now(), LocalDate.now().plusDays(2))
+                )
+        );
+
+        when(bookCopyRepository.findById(1)).thenReturn(Optional.of(new BookCopy(1, Book.builder().id(1).build())));
+        when(bookRepository.findById(1)).thenReturn(Optional.of(Book.builder()
+                .id(1)
+                .title("title")
+                .author(new Author(1, "author"))
+                .publisher(new Publisher(1, "publisher"))
+                .genre(new Genre(1, "genre"))
+                .length(100)
+                .build()
+        ));
+        when(bookShelfRepository.getBookCopyIdAndShelf(1)).thenReturn(Map.of(1, shelf));
+
         assertNotNull(bookRentService.getRentBookCopiesByReaderId(1));
-        verify(bookRentRepository, times(1)).getRentBookCopiesByReaderId(1);
+        assertEquals(bookCopyPeriodMap, bookRentService.getRentBookCopiesByReaderId(1));
     }
 
     @Test
     void deleteRentBookCopiesFromReader() throws BookIsExistsInShelfException, RentBookNotFoundInReader {
-        assertTrue(bookRentService.deleteRentBookCopiesFromReader(reader, bookCopy1, shelf));
-        verify(bookShelfRepository, times(1)).addBookCopyToShelf(bookCopy1, shelf);
-        verify(bookRentRepository, times(1)).deleteRentBookCopiesFromReader(reader, bookCopy1);
+        when(bookShelfRepository.addBookCopyToShelf(bookCopy, shelf)).thenReturn(true);
+        when(bookRentRepository.deleteRentBookCopiesFromReader(reader, bookCopy)).thenReturn(true);
+
+        assertTrue(bookRentService.deleteRentBookCopiesFromReader(reader, bookCopy, shelf));
+        verify(bookShelfRepository).addBookCopyToShelf(bookCopy, shelf);
+        verify(bookRentRepository).deleteRentBookCopiesFromReader(reader, bookCopy);
     }
 
     @Test
     void addRentBookCopiesToReader() throws BookIsExistsInReaderException {
-        assertTrue(bookRentService.addRentBookCopiesToReader(reader, bookCopy1, rentBookCopyPeriod.get(bookCopy1), shelf));
-        verify(bookShelfRepository, times(1)).deleteBookCopyFromShelf(bookCopy1, shelf);
-        verify(bookRentRepository, times(1)).addRentBookCopiesToReader(reader, bookCopy1, rentBookCopyPeriod.get(bookCopy1), shelf);
+        when(bookShelfRepository.deleteBookCopyFromShelf(bookCopy, shelf)).thenReturn(true);
+        when(bookRentRepository.addRentBookCopiesToReader(reader, bookCopy, period, shelf)).thenReturn(true);
+
+        assertTrue(bookRentService.addRentBookCopiesToReader(reader, bookCopy, period, shelf));
+        verify(bookShelfRepository, times(1)).deleteBookCopyFromShelf(bookCopy, shelf);
+        verify(bookRentRepository, times(1)).addRentBookCopiesToReader(reader, bookCopy, period, shelf);
     }
 }

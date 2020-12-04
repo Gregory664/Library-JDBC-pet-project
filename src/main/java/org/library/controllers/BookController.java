@@ -22,6 +22,7 @@ import org.library.services.PublisherService;
 import org.library.utils.MessageBox;
 import org.library.utils.Utils;
 
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class BookController {
@@ -91,6 +92,7 @@ public class BookController {
                     .publisher(publisher)
                     .genre(genre)
                     .length(length)
+                    .bookCopyIdAndShelf(new TreeMap<>())
                     .build();
             save = bookService.save(book);
             Utils.getStage(saveButton).close();
