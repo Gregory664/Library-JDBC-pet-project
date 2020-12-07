@@ -9,10 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.library.App;
@@ -68,6 +65,7 @@ public class MainController {
     public TableColumn<Map.Entry<BookCopy, Period>, Date> rentBookViewEndDate = new TableColumn<>();
     public MenuItem addBookCopyToShelfMenuItem = new MenuItem();
     public MenuItem addBookMenuItem;
+    public MenuItem deleteBookMenuItem;
 
     public MainController() {
     }
@@ -294,11 +292,31 @@ public class MainController {
 
             if (bookController.isSave()) {
                 booksView.getItems().add(bookController.getBook());
-                fillShelfView();
                 MessageBox.OkBox("Книга успешно добавлена!").show();
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void deleteBook(ActionEvent actionEvent) {
+        Book selectedBook = booksView.getSelectionModel().getSelectedItem();
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Внимание");
+        alert.setHeaderText("Вы действительно хотите удалить книгу?  \nВсе упоминания о книге будут удалены");
+
+        Optional<ButtonType> buttonType = alert.showAndWait();
+
+        if (buttonType.isPresent()) {
+            if (buttonType.get() == ButtonType.OK) {
+                bookService.deleteById(selectedBook.getId());
+
+                readerView.getItems().forEach(reader -> reader.getRentBookCopies().entrySet()
+                        .removeIf(entry -> entry.getKey().getBook().getId() == selectedBook.getId()));
+
+                booksView.getItems().remove(selectedBook);
+            }
         }
     }
 }
