@@ -3,8 +3,8 @@ package org.library.services;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.*;
+import org.library.exceptions.BookCopyIsExistsInShelfException;
 import org.library.exceptions.BookIsExistsInReaderException;
-import org.library.exceptions.BookIsExistsInShelfException;
 import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.exceptions.RentBookNotFoundInReader;
 import org.library.interfaces.BookCopyRepository;
@@ -29,7 +29,7 @@ class BookRentServiceTest {
     private static final BookCopyRepository bookCopyRepository = mock(BookCopyRepository.class);
     private static final BookRepository bookRepository = mock(BookRepositoryImpl.class);
     private static final BookRentService bookRentService = new BookRentService(bookRentRepository, bookShelfRepository, bookCopyRepository, bookRepository);
-    private static Map<BookCopy, Period> bookCopyPeriodMap = new TreeMap<>();
+    private static final Map<BookCopy, Period> bookCopyPeriodMap = new TreeMap<>();
     private static Reader reader;
     private static BookCopy bookCopy;
     private static BookCopy bookCopy2;
@@ -85,11 +85,8 @@ class BookRentServiceTest {
 
     @Test
     void getRentBookCopiesByReaderId() {
-        when(bookRentRepository.getRentBookCopiesByReaderId(1)).thenReturn(
-                Map.of(
-                        new BookCopy(1), new Period(LocalDate.now(), LocalDate.now().plusDays(2))
-                )
-        );
+        Map<BookCopy, Period> bookCopyPeriodMap = Map.of(new BookCopy(1), new Period(LocalDate.now(), LocalDate.now().plusDays(2)));
+        when(bookRentRepository.getRentBookCopiesByReaderId(1)).thenReturn(bookCopyPeriodMap);
 
         when(bookCopyRepository.findById(1)).thenReturn(Optional.of(new BookCopy(1, Book.builder().id(1).build())));
         when(bookRepository.findById(1)).thenReturn(Optional.of(Book.builder()
@@ -108,7 +105,7 @@ class BookRentServiceTest {
     }
 
     @Test
-    void deleteRentBookCopiesFromReader() throws BookIsExistsInShelfException, RentBookNotFoundInReader {
+    void deleteRentBookCopiesFromReader() throws BookCopyIsExistsInShelfException, RentBookNotFoundInReader {
         Reader reader1 = reader;
 
         when(bookShelfRepository.addBookCopyToShelf(bookCopy, shelf)).thenReturn(true);

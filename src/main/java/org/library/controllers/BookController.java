@@ -97,7 +97,7 @@ public class BookController {
             save = bookService.save(book);
             Utils.getStage(saveButton).close();
         } catch (AuthorNotFoundByNameException | EntityNotFoundByTitleException e) {
-            MessageBox.WarningBox(e.getMessage());
+            MessageBox.WarningBox(e.getMessage()).show();
         }
 
         Stage stage = (Stage) saveButton.getScene().getWindow();

@@ -53,7 +53,7 @@ public class RentController {
         }
 
         if (timeCountText.getText().trim().equals("")) {
-            MessageBox.WarningBox("Введите интервал!").showAndWait();
+            MessageBox.WarningBox("Введите интервал!").show();
             return;
         }
 

@@ -1,8 +1,8 @@
 package org.library.services;
 
 import org.library.entity.*;
+import org.library.exceptions.BookCopyIsExistsInShelfException;
 import org.library.exceptions.BookIsExistsInReaderException;
-import org.library.exceptions.BookIsExistsInShelfException;
 import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.exceptions.RentBookNotFoundInReader;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
@@ -57,14 +57,14 @@ public class BookRentService {
         return bookCopyPeriodMap;
     }
 
-    public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy, Shelf shelf) throws RentBookNotFoundInReader, BookIsExistsInShelfException {
+    public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy, Shelf shelf) throws RentBookNotFoundInReader, BookCopyIsExistsInShelfException {
         Map<BookCopy, Period> rentBookCopies = reader.getRentBookCopies();
 
-        if(!rentBookCopies.containsKey(bookCopy)) {
+        if (!rentBookCopies.containsKey(bookCopy)) {
             throw new RentBookNotFoundInReader(reader.getId(), bookCopy.getId());
         }
         if (bookCopy.getBook().getBookCopyIdAndShelf().containsKey(bookCopy.getId())) {
-            throw new BookIsExistsInShelfException(bookCopy.getId(), shelf.getInventNum());
+            throw new BookCopyIsExistsInShelfException(bookCopy.getId(), shelf.getInventNum());
         }
         rentBookCopies.remove(bookCopy);
 

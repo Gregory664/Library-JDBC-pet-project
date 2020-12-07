@@ -223,10 +223,10 @@ public class MainController {
                 readerView.refresh();
                 MessageBox.OkBox("Книга выдана").show();
             } else {
-                MessageBox.WarningBox("Читатель не найден!").showAndWait();
+                MessageBox.WarningBox("Читатель не найден!").show();
             }
         } catch (IOException e) {
-            MessageBox.WarningBox("Error of loading form: \n " + e.getMessage()).show();
+            MessageBox.WarningBox("Error of loading form: \n " + e.getMessage()).showAndWait();
         } catch (BookCopyNotFoundException | EntityNotFoundByIdException | BookIsExistsInReaderException | BookNotFoundOnShelfException e) {
             MessageBox.WarningBox(e.getMessage()).show();
         }
@@ -268,13 +268,13 @@ public class MainController {
 
                 MessageBox.OkBox("Книга возвращена").show();
             } else {
-                MessageBox.WarningBox("Полки с таким номером не существует!");
+                MessageBox.WarningBox("Полки с таким номером не существует!").showAndWait();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (RentBookNotFoundInReader | BookIsExistsInShelfException e) {
-            MessageBox.WarningBox(e.getMessage());
+        } catch (RentBookNotFoundInReader | BookCopyIsExistsInShelfException e) {
+            MessageBox.WarningBox(e.getMessage()).show();
         }
     }
 
