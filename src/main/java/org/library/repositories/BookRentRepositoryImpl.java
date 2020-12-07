@@ -4,8 +4,6 @@ import org.library.entity.BookCopy;
 import org.library.entity.Period;
 import org.library.entity.Reader;
 import org.library.entity.Shelf;
-import org.library.exceptions.BookIsExistsInReaderException;
-import org.library.exceptions.RentBookNotFoundInReader;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.BookRentRepository;
 import org.library.utils.ConnectionUtils;
@@ -40,14 +38,8 @@ public class BookRentRepositoryImpl implements BookRentRepository {
     }
 
     @Override
-    public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy) throws RentBookNotFoundInReader {
-        Map<BookCopy, Period> rentBookCopies = reader.getRentBookCopies();
+    public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy) {
         boolean result;
-
-        if (!rentBookCopies.containsKey(bookCopy)) {
-            throw new RentBookNotFoundInReader(reader.getId(), bookCopy.getId());
-        }
-        rentBookCopies.remove(bookCopy);
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_RENT_BOOK_COPY)) {
@@ -61,12 +53,7 @@ public class BookRentRepositoryImpl implements BookRentRepository {
     }
 
     @Override
-    public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) throws BookIsExistsInReaderException {
-        if (reader.getRentBookCopies().containsKey(bookCopy)) {
-            throw new BookIsExistsInReaderException(bookCopy.getId(), reader.getId());
-        }
-
-        reader.getRentBookCopies().put(bookCopy, period);
+    public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) {
         boolean result;
 
         try (Connection connection = ConnectionUtils.getConnection();

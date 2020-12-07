@@ -24,12 +24,12 @@ public class BookCopy implements Comparable<BookCopy> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BookCopy bookCopy = (BookCopy) o;
-        return Objects.equals(book, bookCopy.book);
+        return id == bookCopy.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(book);
+        return Objects.hash(id);
     }
 
     @Override

@@ -2,8 +2,6 @@ package org.library.repositories;
 
 import org.library.entity.BookCopy;
 import org.library.entity.Shelf;
-import org.library.exceptions.BookIsExistsInShelfException;
-import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.BookShelfRepository;
 import org.library.utils.ConnectionUtils;
@@ -41,13 +39,7 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
 
     @Override
     public boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf) {
-        Map<Integer, Shelf> bookCopyIdAndShelf = bookCopy.getBook().getBookCopyIdAndShelf();
         boolean result;
-
-        if (!bookCopyIdAndShelf.containsKey(bookCopy.getId())) {
-            throw new BookNotFoundOnShelfException(bookCopy.getId(), shelf.getId());
-        }
-        bookCopyIdAndShelf.remove(bookCopy.getId());
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_FROM_BOOK_SHELF)) {
@@ -61,10 +53,7 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
     }
 
     @Override
-    public boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) throws BookIsExistsInShelfException {
-        if (bookCopy.getBook().getBookCopyIdAndShelf().containsKey(bookCopy.getId())) {
-            throw new BookIsExistsInShelfException(bookCopy.getId(), shelf.getInventNum());
-        }
+    public boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) {
         boolean result;
 
         try (Connection connection = ConnectionUtils.getConnection();

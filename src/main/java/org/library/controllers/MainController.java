@@ -17,10 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.library.App;
 import org.library.entity.*;
-import org.library.exceptions.BookCopyNotFoundException;
-import org.library.exceptions.BookIsExistsInReaderException;
-import org.library.exceptions.BookIsExistsInShelfException;
-import org.library.exceptions.RentBookNotFoundInReader;
+import org.library.exceptions.*;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.repositories.*;
 import org.library.services.BookCopyService;
@@ -38,7 +35,7 @@ public class MainController {
     private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
     private final BookRentService bookRentService = new BookRentService(new BookRentRepositoryImpl(), new BookShelfRepositoryImpl(), new BookCopyRepositoryImpl(), new BookRepositoryImpl());
     private final ReaderService readerService = new ReaderService(new ReaderRepositoryImpl(), new BookRentRepositoryImpl());
-    private final BookCopyService bookCopyService = new BookCopyService(new BookRepositoryImpl(), new BookCopyRepositoryImpl());
+    private final BookCopyService bookCopyService = new BookCopyService(new BookRepositoryImpl(), new BookCopyRepositoryImpl(), new BookShelfRepositoryImpl());
 
     public TableView<Map.Entry<Integer, Shelf>> shelfView;
     public TableColumn<Map.Entry<Integer, Shelf>, String> shelfViewName;
@@ -229,9 +226,9 @@ public class MainController {
                 MessageBox.WarningBox("Читатель не найден!").showAndWait();
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (BookCopyNotFoundException | EntityNotFoundByIdException | BookIsExistsInReaderException e) {
-            MessageBox.WarningBox(e.getMessage());
+            MessageBox.WarningBox("Error of loading form: \n " + e.getMessage()).show();
+        } catch (BookCopyNotFoundException | EntityNotFoundByIdException | BookIsExistsInReaderException | BookNotFoundOnShelfException e) {
+            MessageBox.WarningBox(e.getMessage()).show();
         }
     }
 

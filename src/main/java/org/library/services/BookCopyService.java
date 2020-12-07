@@ -5,16 +5,19 @@ import org.library.entity.BookCopy;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.BookCopyRepository;
 import org.library.interfaces.BookRepository;
+import org.library.interfaces.BookShelfRepository;
 
 import java.util.List;
 
 public class BookCopyService {
     private final BookRepository bookRepository;
     private final BookCopyRepository bookCopyRepository;
+    private final BookShelfRepository bookShelfRepository;
 
-    public BookCopyService(BookRepository bookRepository, BookCopyRepository bookCopyRepository) {
+    public BookCopyService(BookRepository bookRepository, BookCopyRepository bookCopyRepository, BookShelfRepository bookShelfRepository) {
         this.bookRepository = bookRepository;
         this.bookCopyRepository = bookCopyRepository;
+        this.bookShelfRepository = bookShelfRepository;
     }
 
     public List<BookCopy> findAll() throws EntityNotFoundByIdException {
@@ -22,6 +25,7 @@ public class BookCopyService {
         for (BookCopy bookCopy : bookCopies) {
             int bookId = bookCopy.getId();
             Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, bookId));
+            book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
             bookCopy.setBook(book);
         }
         return bookCopies;
@@ -30,6 +34,7 @@ public class BookCopyService {
     public BookCopy findById(Integer id) throws EntityNotFoundByIdException {
         BookCopy bookCopy = bookCopyRepository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, id));
         Book book = bookRepository.findById(bookCopy.getBook().getId()).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, id));
+        book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
         bookCopy.setBook(book);
         return bookCopy;
     }

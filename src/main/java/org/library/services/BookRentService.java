@@ -3,6 +3,7 @@ package org.library.services;
 import org.library.entity.*;
 import org.library.exceptions.BookIsExistsInReaderException;
 import org.library.exceptions.BookIsExistsInShelfException;
+import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.exceptions.RentBookNotFoundInReader;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.BookCopyRepository;
@@ -57,11 +58,32 @@ public class BookRentService {
     }
 
     public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy, Shelf shelf) throws RentBookNotFoundInReader, BookIsExistsInShelfException {
+        Map<BookCopy, Period> rentBookCopies = reader.getRentBookCopies();
+
+        if(!rentBookCopies.containsKey(bookCopy)) {
+            throw new RentBookNotFoundInReader(reader.getId(), bookCopy.getId());
+        }
+        if (bookCopy.getBook().getBookCopyIdAndShelf().containsKey(bookCopy.getId())) {
+            throw new BookIsExistsInShelfException(bookCopy.getId(), shelf.getInventNum());
+        }
+        rentBookCopies.remove(bookCopy);
+
         bookShelfRepository.addBookCopyToShelf(bookCopy, shelf);
         return bookRentRepository.deleteRentBookCopiesFromReader(reader, bookCopy);
     }
 
-    public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) throws BookIsExistsInReaderException {
+    public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) throws BookIsExistsInReaderException, BookNotFoundOnShelfException {
+        Map<Integer, Shelf> bookCopyIdAndShelf = bookCopy.getBook().getBookCopyIdAndShelf();
+
+        if (!bookCopyIdAndShelf.containsKey(bookCopy.getId())) {
+            throw new BookNotFoundOnShelfException(bookCopy.getId(), shelf.getId());
+        }
+        if (reader.getRentBookCopies().containsKey(bookCopy)) {
+            throw new BookIsExistsInReaderException(bookCopy.getId(), reader.getId());
+        }
+        bookCopyIdAndShelf.remove(bookCopy.getId());
+        reader.getRentBookCopies().put(bookCopy, period);
+
         bookShelfRepository.deleteBookCopyFromShelf(bookCopy, shelf);
         return bookRentRepository.addRentBookCopiesToReader(reader, bookCopy, period, shelf);
     }

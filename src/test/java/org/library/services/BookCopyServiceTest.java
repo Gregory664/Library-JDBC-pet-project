@@ -6,8 +6,10 @@ import org.library.entity.*;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.interfaces.BookCopyRepository;
 import org.library.interfaces.BookRepository;
+import org.library.interfaces.BookShelfRepository;
 import org.library.repositories.BookCopyRepositoryImpl;
 import org.library.repositories.BookRepositoryImpl;
+import org.library.repositories.BookShelfRepositoryImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -19,8 +21,9 @@ import static org.mockito.Mockito.*;
 class BookCopyServiceTest {
     private static final BookCopyRepository bookCopyRepository = mock(BookCopyRepositoryImpl.class);
     private static final BookRepository bookRepository = mock(BookRepositoryImpl.class);
+    private static final BookShelfRepository bookShelfRepository = mock(BookShelfRepositoryImpl.class);
     private static List<BookCopy> bookCopyList;
-    private final BookCopyService bookCopyService = new BookCopyService(bookRepository, bookCopyRepository);
+    private final BookCopyService bookCopyService = new BookCopyService(bookRepository, bookCopyRepository, bookShelfRepository);
 
     @BeforeAll
     static void initialize() {
