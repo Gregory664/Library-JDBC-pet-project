@@ -199,13 +199,21 @@ public class BookRepositoryImpl implements BookRepository {
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, book.getTitle());
             statement.setInt(2, book.getAuthor().getId());
             statement.setInt(3, book.getPublisher().getId());
             statement.setInt(4, book.getGenre().getId());
             statement.setInt(5, book.getLength());
             isSave = statement.executeUpdate() == 1;
+
+            if (isSave) {
+                try (ResultSet set = statement.getGeneratedKeys()) {
+                    while (set.next()) {
+                        book.setId(set.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }

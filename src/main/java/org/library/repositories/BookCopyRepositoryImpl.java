@@ -95,9 +95,17 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     public boolean save(BookCopy bookCopy) {
         boolean result;
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setInt(1, bookCopy.getId());
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setInt(1, bookCopy.getBook().getId());
             result = statement.executeUpdate() == 1;
+
+            if (result) {
+                try (ResultSet set = statement.getGeneratedKeys()) {
+                    while (set.next()) {
+                        bookCopy.setId(set.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }

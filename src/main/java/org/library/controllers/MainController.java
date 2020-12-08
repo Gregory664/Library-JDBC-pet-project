@@ -17,10 +17,7 @@ import org.library.entity.*;
 import org.library.exceptions.*;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.repositories.*;
-import org.library.services.BookCopyService;
-import org.library.services.BookRentService;
-import org.library.services.BookService;
-import org.library.services.ReaderService;
+import org.library.services.*;
 import org.library.utils.MessageBox;
 
 import java.io.IOException;
@@ -33,6 +30,7 @@ public class MainController {
     private final BookRentService bookRentService = new BookRentService(new BookRentRepositoryImpl(), new BookShelfRepositoryImpl(), new BookCopyRepositoryImpl(), new BookRepositoryImpl());
     private final ReaderService readerService = new ReaderService(new ReaderRepositoryImpl(), new BookRentRepositoryImpl());
     private final BookCopyService bookCopyService = new BookCopyService(new BookRepositoryImpl(), new BookCopyRepositoryImpl(), new BookShelfRepositoryImpl());
+    private final BookShelfService bookShelfService = new BookShelfService(new BookShelfRepositoryImpl());
 
     public TableView<Map.Entry<Integer, Shelf>> shelfView;
     public TableColumn<Map.Entry<Integer, Shelf>, String> shelfViewName;
@@ -66,6 +64,7 @@ public class MainController {
     public MenuItem addBookCopyToShelfMenuItem = new MenuItem();
     public MenuItem addBookMenuItem;
     public MenuItem deleteBookMenuItem;
+    public MenuItem addBookCopyMenuItem;
 
     public MainController() {
     }
@@ -317,6 +316,35 @@ public class MainController {
 
                 booksView.getItems().remove(selectedBook);
             }
+        }
+    }
+
+    public void addBookCopy(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("returnRentBook.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+            ReturnRentBookController returnRentBookController = fxmlLoader.getController();
+
+            stage.showAndWait();
+            if (returnRentBookController.isClose()) {
+                return;
+            }
+
+            Optional<Shelf> optionalShelf = returnRentBookController.getSelectedShelf();
+            if (optionalShelf.isPresent()) {
+                Book selectedBook = booksView.getSelectionModel().getSelectedItem();
+                BookCopy bookCopy = BookCopy.builder().book(selectedBook).build();
+                bookCopyService.save(bookCopy);
+                bookShelfService.addBookCopyToShelf(bookCopy, optionalShelf.get());
+                fillShelfView();
+                MessageBox.OkBox("Копия книги успешно добавлена!").show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (BookCopyIsExistsInShelfException e) {
+            MessageBox.WarningBox(e.getMessage()).show();
         }
     }
 }
