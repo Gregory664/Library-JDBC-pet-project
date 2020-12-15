@@ -20,6 +20,7 @@ public class BookShelfService {
     }
 
     public boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf) throws BookNotFoundOnShelfException {
+        //TODO
         Map<Integer, Shelf> bookCopyIdAndShelf = bookCopy.getBook().getBookCopyIdAndShelf();
 
         if (!bookCopyIdAndShelf.containsKey(bookCopy.getId())) {

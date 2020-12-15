@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class ReturnRentBookController {
+public class ShelfController {
     private final ShelfService shelfService = new ShelfService(new ShelfRepositoryImpl());
     public ComboBox<String> shelfComboBox = new ComboBox<>();
     public Button saveButton = new Button();

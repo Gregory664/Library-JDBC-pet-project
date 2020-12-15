@@ -49,7 +49,8 @@ public class RentController {
     @FXML
     public void saveRentBook(ActionEvent actionEvent) {
         if (selectedReader.isEmpty()) {
-            throw new ReaderNotFoundByPassportException(fioLabel);
+            MessageBox.WarningBox("Читатель не найден!").show();
+            return;
         }
 
         if (timeCountText.getText().trim().equals("")) {

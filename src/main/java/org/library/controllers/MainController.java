@@ -65,6 +65,7 @@ public class MainController {
     public MenuItem addBookMenuItem;
     public MenuItem deleteBookMenuItem;
     public MenuItem addBookCopyMenuItem;
+    public MenuItem deleteBookCopy;
 
     public MainController() {
     }
@@ -232,18 +233,18 @@ public class MainController {
     @FXML
     public void returnBook(ActionEvent actionEvent) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("returnRentBook.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("shelf.fxml"));
             Stage stage = new Stage();
             Scene scene = new Scene(fxmlLoader.load());
             stage.setScene(scene);
-            ReturnRentBookController returnRentBookController = fxmlLoader.getController();
+            ShelfController shelfController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if (returnRentBookController.isClose()) {
+            if (shelfController.isClose()) {
                 return;
             }
 
-            Optional<Shelf> optionalShelf = returnRentBookController.getSelectedShelf();
+            Optional<Shelf> optionalShelf = shelfController.getSelectedShelf();
             if (optionalShelf.isPresent()) {
                 Reader reader = readerView.getSelectionModel().getSelectedItem();
                 BookCopy bookCopy = rentBookView.getSelectionModel().getSelectedItem().getKey();
@@ -321,18 +322,18 @@ public class MainController {
 
     public void addBookCopy(ActionEvent actionEvent) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("returnRentBook.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("shelf.fxml"));
             Stage stage = new Stage();
             Scene scene = new Scene(fxmlLoader.load());
             stage.setScene(scene);
-            ReturnRentBookController returnRentBookController = fxmlLoader.getController();
+            ShelfController shelfController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if (returnRentBookController.isClose()) {
+            if (shelfController.isClose()) {
                 return;
             }
 
-            Optional<Shelf> optionalShelf = returnRentBookController.getSelectedShelf();
+            Optional<Shelf> optionalShelf = shelfController.getSelectedShelf();
             if (optionalShelf.isPresent()) {
                 Book selectedBook = booksView.getSelectionModel().getSelectedItem();
                 BookCopy bookCopy = BookCopy.builder().book(selectedBook).build();
@@ -346,5 +347,17 @@ public class MainController {
         } catch (BookCopyIsExistsInShelfException e) {
             MessageBox.WarningBox(e.getMessage()).show();
         }
+    }
+
+    public void deleteBookCopy(ActionEvent actionEvent) {
+        Map.Entry<Integer, Shelf> selectedBookCopyShelf = shelfView.getSelectionModel().getSelectedItem();
+        Book selectedItem = booksView.getSelectionModel().getSelectedItem();
+
+        //TODO
+
+
+        selectedItem.getBookCopyIdAndShelf().remove(selectedBookCopyShelf.getKey());
+        fillShelfView();
+        booksView.refresh();
     }
 }
