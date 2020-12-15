@@ -3,7 +3,6 @@ package org.library.services;
 import org.library.entity.BookCopy;
 import org.library.entity.Shelf;
 import org.library.exceptions.BookCopyIsExistsInShelfException;
-import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.interfaces.BookShelfRepository;
 
 import java.util.Map;
@@ -19,15 +18,8 @@ public class BookShelfService {
         return repository.getBookCopyIdAndShelf(bookId);
     }
 
-    public boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf) throws BookNotFoundOnShelfException {
-        //TODO
-        Map<Integer, Shelf> bookCopyIdAndShelf = bookCopy.getBook().getBookCopyIdAndShelf();
-
-        if (!bookCopyIdAndShelf.containsKey(bookCopy.getId())) {
-            throw new BookNotFoundOnShelfException(bookCopy.getId(), shelf.getId());
-        }
-        bookCopyIdAndShelf.remove(bookCopy.getId());
-        return repository.deleteBookCopyFromShelf(bookCopy, shelf);
+    public boolean deleteBookCopyFromShelf(int bookCopyId, int shelfId) {
+        return repository.deleteBookCopyFromShelf(bookCopyId, shelfId);
     }
 
     public boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) throws BookCopyIsExistsInShelfException {

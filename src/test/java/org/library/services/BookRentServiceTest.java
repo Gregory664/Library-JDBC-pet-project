@@ -120,14 +120,14 @@ class BookRentServiceTest {
 
     @Test
     void addRentBookCopiesToReader() throws BookIsExistsInReaderException, BookNotFoundOnShelfException {
-        when(bookShelfRepository.deleteBookCopyFromShelf(bookCopy2, shelf)).thenReturn(true);
+        when(bookShelfRepository.deleteBookCopyFromShelf(bookCopy2.getId(), shelf.getId())).thenReturn(true);
         when(bookRentRepository.addRentBookCopiesToReader(reader, bookCopy2, period, shelf)).thenReturn(true);
 
         assertTrue(bookRentService.addRentBookCopiesToReader(reader, bookCopy2, period, shelf));
         assertFalse(bookCopy2.getBook().getBookCopyIdAndShelf().containsKey(bookCopy2.getId()));
         assertTrue(reader.getRentBookCopies().containsKey(bookCopy2));
 
-        verify(bookShelfRepository, times(1)).deleteBookCopyFromShelf(bookCopy2, shelf);
+        verify(bookShelfRepository, times(1)).deleteBookCopyFromShelf(bookCopy2.getId(), shelf.getId());
         verify(bookRentRepository, times(1)).addRentBookCopiesToReader(reader, bookCopy2, period, shelf);
     }
 }

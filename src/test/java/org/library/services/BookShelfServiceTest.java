@@ -52,16 +52,9 @@ class BookShelfServiceTest {
     }
 
     @Test
-    void deleteBookCopyFromShelf() throws BookNotFoundOnShelfException {
-        when(bookShelfRepository.deleteBookCopyFromShelf(bookCopy, shelf)).thenReturn(true);
-
-        assertTrue(bookCopy.getBook().getBookCopyIdAndShelf().containsKey(bookCopy.getId()));
-        assertTrue(bookShelfService.deleteBookCopyFromShelf(bookCopy, shelf));
-        assertFalse(bookCopy.getBook().getBookCopyIdAndShelf().containsKey(bookCopy.getId()));
-
-        Throwable throwable = assertThrows(BookNotFoundOnShelfException.class, () -> bookShelfService.deleteBookCopyFromShelf(bookCopy, shelf));
-        assertNotNull(throwable);
-        assertNotEquals("", throwable.getMessage());
+    void deleteBookCopyFromShelf() {
+        when(bookShelfRepository.deleteBookCopyFromShelf(bookCopy.getId(), shelf.getId())).thenReturn(true);
+        assertTrue(bookShelfService.deleteBookCopyFromShelf(bookCopy.getId(), shelf.getId()));
     }
 
     @Test

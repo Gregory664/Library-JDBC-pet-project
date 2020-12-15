@@ -350,14 +350,17 @@ public class MainController {
     }
 
     public void deleteBookCopy(ActionEvent actionEvent) {
-        Map.Entry<Integer, Shelf> selectedBookCopyShelf = shelfView.getSelectionModel().getSelectedItem();
+        Map.Entry<Integer, Shelf> entry = shelfView.getSelectionModel().getSelectedItem();
         Book selectedItem = booksView.getSelectionModel().getSelectedItem();
 
-        //TODO
+        if (bookCopyService.deleteById(entry.getKey())) {
+            selectedItem.getBookCopyIdAndShelf().remove(entry.getKey());
+            fillShelfView();
+            booksView.refresh();
 
-
-        selectedItem.getBookCopyIdAndShelf().remove(selectedBookCopyShelf.getKey());
-        fillShelfView();
-        booksView.refresh();
+            MessageBox.OkBox("Копия успешно удалена!").show();
+        } else {
+            MessageBox.WarningBox("Ошибка удаления копии книги!").show();
+        }
     }
 }

@@ -38,13 +38,13 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
     }
 
     @Override
-    public boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf) {
+    public boolean deleteBookCopyFromShelf(int bookId, int shelfId) {
         boolean result;
 
         try (Connection connection = ConnectionUtils.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_FROM_BOOK_SHELF)) {
-            statement.setInt(1, shelf.getId());
-            statement.setInt(2, bookCopy.getId());
+            statement.setInt(1, shelfId);
+            statement.setInt(2, bookId);
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
