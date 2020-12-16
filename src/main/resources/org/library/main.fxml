@@ -52,7 +52,10 @@
                            </right>
                            <center>
                               <TableView fx:id="booksView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="687.0" BorderPane.alignment="CENTER">
-                                 <columns>
+                                  <placeholder>
+                                      <Label text="Нет данных" />
+                                  </placeholder>
+                                  <columns>
                                     <TableColumn fx:id="booksViewId" editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="-1.0" resizable="false" style="-fx-alignment: CENTER;" text="ID" />
                                     <TableColumn fx:id="booksViewTitle" editable="false" maxWidth="1.7976931348623157E308" minWidth="97.0" prefWidth="235.0" style="-fx-alignment: CENTER;" text="Название" />
                                     <TableColumn fx:id="booksViewAuthor" editable="false" maxWidth="1.7976931348623157E308" minWidth="37.0" prefWidth="117.0" style="-fx-alignment: CENTER;" text="Автор" />
@@ -93,7 +96,10 @@
                         <BorderPane prefHeight="200.0" prefWidth="200.0">
                            <center>
                               <TableView fx:id="readerView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="687.0" BorderPane.alignment="CENTER">
-                                 <columns>
+                                  <placeholder>
+                                      <Label text="Нет данных" />
+                                  </placeholder>
+                                  <columns>
                                     <TableColumn fx:id="readerViewID" editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="-1.0" resizable="false" text="ID" />
                                     <TableColumn fx:id="readerViewFio" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="ФИО" />
                                     <TableColumn fx:id="readerViewAge" editable="false" maxWidth="80.0" minWidth="80.0" text="Возраст" />
@@ -114,7 +120,10 @@
                            </top>
                            <bottom>
                               <TableView fx:id="rentBookView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                <columns>
+                                  <placeholder>
+                                      <Label text="Нет данных" />
+                                  </placeholder>
+                                  <columns>
                                     <TableColumn fx:id="rentBookViewCopyId" maxWidth="80.0" minWidth="80.0" prefWidth="75.0" text="ID копии" />
                                   <TableColumn fx:id="rentBookViewId" maxWidth="80.0" minWidth="80.0" prefWidth="81.0" resizable="false" text="ID книги" />
                                   <TableColumn fx:id="rentBookViewTitle" maxWidth="1.7976931348623157E308" prefWidth="144.0" text="Название" />
