@@ -16,5 +16,7 @@ public interface JDBCRepository<T, ID> {
 
     boolean save(T entity);
 
+    boolean update(T entity);
+
     long count();
 }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.library.utils.statements.AuthorSQLStatements.UPDATE;
 import static org.library.utils.statements.PublisherSQLStatements.*;
 
 public class PublisherRepositoryImpl implements PublisherRepository {
@@ -142,6 +143,22 @@ public class PublisherRepositoryImpl implements PublisherRepository {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+        return result;
+    }
+
+    @Override
+    public boolean update(Publisher publisher) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setString(1, publisher.getTitle());
+            statement.setInt(2, publisher.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
         return result;
     }
 }

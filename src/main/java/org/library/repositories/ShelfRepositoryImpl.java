@@ -125,4 +125,20 @@ public class ShelfRepositoryImpl implements ShelfRepository {
         }
         return result;
     }
+
+    @Override
+    public boolean update(Shelf shelf) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setString(1, shelf.getInventNum());
+            statement.setInt(2, shelf.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
+        return result;
+    }
 }

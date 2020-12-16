@@ -235,4 +235,24 @@ public class BookRepositoryImpl implements BookRepository {
         }
         return result;
     }
+
+    @Override
+    public boolean update(Book book) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setString(1, book.getTitle());
+            statement.setInt(2, book.getAuthor().getId());
+            statement.setInt(3, book.getPublisher().getId());
+            statement.setInt(4, book.getGenre().getId());
+            statement.setInt(5, book.getLength());
+            statement.setInt(6, book.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
+        return result;
+    }
 }

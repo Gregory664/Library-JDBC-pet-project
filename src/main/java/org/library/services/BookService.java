@@ -75,4 +75,8 @@ public class BookService {
     public long count() {
         return bookRepository.count();
     }
+
+    public boolean update(Book book) {
+        return bookRepository.update(book);
+    }
 }

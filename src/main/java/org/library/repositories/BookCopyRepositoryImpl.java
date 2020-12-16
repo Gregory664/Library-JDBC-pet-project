@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.library.utils.statements.AuthorSQLStatements.UPDATE;
 import static org.library.utils.statements.BookCopySQLStatements.*;
 
 public class BookCopyRepositoryImpl implements BookCopyRepository {
@@ -126,6 +127,22 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
+        return result;
+    }
+
+    @Override
+    public boolean update(BookCopy bookCopy) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setInt(1, bookCopy.getBook().getId());
+            statement.setInt(2, bookCopy.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
         return result;
     }
 }

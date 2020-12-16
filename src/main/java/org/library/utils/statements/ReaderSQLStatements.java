@@ -20,4 +20,13 @@ public class ReaderSQLStatements {
     public static final String SAVE = "" +
             "INSERT INTO reader (fio, age, address, phone, passport) " +
             "VALUES (?, ?, ?, ?, ?);";
+
+    public static final String UPDATE = "" +
+            "UPDATE reader " +
+            "SET    fio      = ?, " +
+            "       age      = ?, " +
+            "       address  = ?, " +
+            "       phone    = ?, " +
+            "       passport = ? " +
+            "WHERE  id       = ?";
 }

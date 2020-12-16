@@ -45,4 +45,8 @@ public class GenreService {
     public long count() {
         return repository.count();
     }
+
+    public boolean update(Genre genre) {
+        return repository.update(genre);
+    }
 }

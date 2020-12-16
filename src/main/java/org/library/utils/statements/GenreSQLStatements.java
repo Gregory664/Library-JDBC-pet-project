@@ -16,4 +16,9 @@ public class GenreSQLStatements {
     public static final String DELETE_BY_ID = DELETE + "WHERE id = ?;";
 
     public static final String SAVE = "INSERT INTO genre (title) VALUES (?);";
+
+    public static final String UPDATE = "" +
+            "UPDATE genre " +
+            "SET    title = ? " +
+            "WHERE  id    = ?";
 }

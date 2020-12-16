@@ -33,4 +33,13 @@ public class BookSQLStatements {
             "VALUES (?, ?, ?, ?, ?);";
 
     public static final String COUNT = "SELECT COUNT(*) FROM book;";
+
+    public static final String UPDATE = "" +
+            "UPDATE book " +
+            "SET    title        = ?, " +
+            "       author_id    = ?, " +
+            "       publisher_id = ?, " +
+            "       genre_id     = ?, " +
+            "       length       = ? " +
+            "WHERE  id = ?";
 }

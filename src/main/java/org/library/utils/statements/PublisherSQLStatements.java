@@ -16,4 +16,9 @@ public class PublisherSQLStatements {
     public static final String DELETE_BY_ID = DELETE + "WHERE id = ?;";
 
     public static final String SAVE = "INSERT INTO publisher (title) VALUES (?);";
+
+    public static final String UPDATE = "" +
+            "UPDATE publisher " +
+            "SET    title = ? " +
+            "WHERE  id    = ?";
 }

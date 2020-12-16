@@ -339,6 +339,7 @@ public class MainController {
                 BookCopy bookCopy = BookCopy.builder().book(selectedBook).build();
                 bookCopyService.save(bookCopy);
                 bookShelfService.addBookCopyToShelf(bookCopy, optionalShelf.get());
+                booksView.refresh();
                 fillShelfView();
                 MessageBox.OkBox("Копия книги успешно добавлена!").show();
             }

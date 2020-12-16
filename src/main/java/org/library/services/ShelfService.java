@@ -40,4 +40,8 @@ public class ShelfService {
     public long count() {
         return repository.count();
     }
+
+    public boolean update(Shelf shelf) {
+        return repository.update(shelf);
+    }
 }

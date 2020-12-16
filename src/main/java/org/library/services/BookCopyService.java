@@ -58,4 +58,8 @@ public class BookCopyService {
     public long count() {
         return bookCopyRepository.count();
     }
+
+    public boolean update(BookCopy bookCopy) {
+        return bookCopyRepository.update(bookCopy);
+    }
 }

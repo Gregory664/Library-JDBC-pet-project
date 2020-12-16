@@ -142,4 +142,20 @@ public class AuthorRepositoryImpl implements AuthorRepository {
         }
         return result;
     }
+
+    @Override
+    public boolean update(Author author) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setString(1, author.getName());
+            statement.setInt(2, author.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
+        return result;
+    }
 }

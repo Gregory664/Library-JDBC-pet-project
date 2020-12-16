@@ -182,4 +182,24 @@ public class ReaderRepositoryImpl implements ReaderRepository {
         }
         return result;
     }
+
+    @Override
+    public boolean update(Reader reader) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setString(1, reader.getFio());
+            statement.setInt(2, reader.getAge());
+            statement.setString(3, reader.getAddress());
+            statement.setString(4, reader.getPhone());
+            statement.setString(5, reader.getAddress());
+            statement.setInt(6, reader.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
+        return result;
+    }
 }

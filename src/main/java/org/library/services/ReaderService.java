@@ -59,4 +59,8 @@ public class ReaderService {
     public long count() {
         return readerRepository.count();
     }
+
+    public boolean update(Reader reader) {
+        return readerRepository.update(reader);
+    }
 }

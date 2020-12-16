@@ -142,4 +142,20 @@ public class GenreRepositoryImpl implements GenreRepository {
         }
         return result;
     }
+
+    @Override
+    public boolean update(Genre genre) {
+        boolean result;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setString(1, genre.getTitle());
+            statement.setInt(2, genre.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
+        return result;
+    }
 }
