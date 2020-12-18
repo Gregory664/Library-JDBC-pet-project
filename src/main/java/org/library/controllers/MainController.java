@@ -69,6 +69,7 @@ public class MainController {
     public MenuItem updateBookCopyMenuItem;
     public MenuItem addReaderMenuItem;
     public MenuItem updateReaderMenuItem;
+    public MenuItem deleteReaderMenuItem;
 
     public MainController() {
     }
@@ -307,7 +308,7 @@ public class MainController {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Внимание");
-        alert.setHeaderText("Вы действительно хотите удалить книгу?  \nВсе упоминания о книге будут удалены");
+        alert.setHeaderText("Вы действительно хотите удалить книгу?  \nВсе упоминания о книге будут удалены!");
 
         Optional<ButtonType> buttonType = alert.showAndWait();
 
@@ -319,6 +320,7 @@ public class MainController {
                         .removeIf(entry -> entry.getKey().getBook().getId() == selectedBook.getId()));
 
                 booksView.getItems().remove(selectedBook);
+                MessageBox.OkBox("Книга успешно удалена!").show();
             }
         }
     }
@@ -442,6 +444,23 @@ public class MainController {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void deleteReader(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Внимание");
+        alert.setHeaderText("Вы действительно хотите удалить читателя?  \nВсе упоминания о читателе будут удалены!");
+
+        Optional<ButtonType> buttonType = alert.showAndWait();
+        if (buttonType.isPresent()) {
+            if (buttonType.get() == ButtonType.OK) {
+                Reader reader = readerView.getSelectionModel().getSelectedItem();
+                readerService.deleteById(reader.getId());
+                readerView.getItems().remove(reader);
+                readerView.refresh();
+                MessageBox.OkBox("Удаление читателя выполнено успешно!").show();
+            }
         }
     }
 }

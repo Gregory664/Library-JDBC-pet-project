@@ -124,6 +124,9 @@
                                           <items>
                                               <MenuItem fx:id="updateReaderMenuItem" mnemonicParsing="false" onAction="#updateReader" text="Редактировать читателя" />
                                           </items>
+                                          <items>
+                                              <MenuItem fx:id="deleteReaderMenuItem" mnemonicParsing="false" onAction="#deleteReader" text="Удалить читателя" />
+                                          </items>
                                       </ContextMenu>
                                   </contextMenu>
                               </TableView>
