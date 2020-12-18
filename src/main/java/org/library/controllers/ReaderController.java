@@ -36,16 +36,26 @@ public class ReaderController {
     }
 
     public void save(ActionEvent actionEvent) {
-        reader = Reader.builder()
-                .fio(fioTextField.getText())
-                .age(Integer.parseInt(ageTextField.getText()))
-                .address(addressTextField.getText())
-                .passport(passportTextField.getText())
-                .phone(phoneTextField.getText())
-                .rentBookCopies(new TreeMap<>())
-                .build();
+        if (reader == null) {
+            reader = Reader.builder()
+                    .fio(fioTextField.getText())
+                    .age(Integer.parseInt(ageTextField.getText()))
+                    .address(addressTextField.getText())
+                    .passport(passportTextField.getText())
+                    .phone(phoneTextField.getText())
+                    .rentBookCopies(new TreeMap<>())
+                    .build();
 
-        save = readerService.save(reader);
+            save = readerService.save(reader);
+        } else {
+            reader.setFio(fioTextField.getText());
+            reader.setAge(Integer.parseInt(ageTextField.getText()));
+            reader.setAddress(addressTextField.getText());
+            reader.setPhone(phoneTextField.getText());
+            reader.setPassport(passportTextField.getText());
+
+            save = readerService.update(reader);
+        }
         Utils.getStage(saveButton).close();
     }
 

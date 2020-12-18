@@ -199,7 +199,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
             statement.setInt(2, reader.getAge());
             statement.setString(3, reader.getAddress());
             statement.setString(4, reader.getPhone());
-            statement.setString(5, reader.getAddress());
+            statement.setString(5, reader.getPassport());
             statement.setInt(6, reader.getId());
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {

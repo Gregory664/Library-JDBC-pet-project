@@ -68,6 +68,7 @@ public class MainController {
     public MenuItem deleteBookCopy;
     public MenuItem updateBookCopyMenuItem;
     public MenuItem addReaderMenuItem;
+    public MenuItem updateReaderMenuItem;
 
     public MainController() {
     }
@@ -408,7 +409,35 @@ public class MainController {
 
             if (readerController.isSave()) {
                 readerView.getItems().add(readerController.getReader());
-                MessageBox.OkBox("Чиатель успешно добавлен!").show();
+                MessageBox.OkBox("Читатель успешно добавлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка добавления читателя").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateReader(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("reader.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+            ReaderController readerController = fxmlLoader.getController();
+            readerController.setReader(readerView.getSelectionModel().getSelectedItem());
+
+            stage.showAndWait();
+            if (readerController.isClose()) {
+                return;
+            }
+
+            if (readerController.isSave()) {
+                readerView.refresh();
+                MessageBox.OkBox("Читатель успешно редактирован!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка редактирования читателя");
             }
 
         } catch (IOException e) {
