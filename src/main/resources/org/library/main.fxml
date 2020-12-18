@@ -116,6 +116,13 @@
                                  <BorderPane.margin>
                                     <Insets top="30.0" />
                                  </BorderPane.margin>
+                                  <contextMenu>
+                                      <ContextMenu>
+                                          <items>
+                                              <MenuItem fx:id="addReaderMenuItem" mnemonicParsing="false" onAction="#addReader" text="Добавить читателя" />
+                                          </items>
+                                      </ContextMenu>
+                                  </contextMenu>
                               </TableView>
                            </center>
                            <top>

@@ -67,6 +67,7 @@ public class MainController {
     public MenuItem addBookCopyMenuItem;
     public MenuItem deleteBookCopy;
     public MenuItem updateBookCopyMenuItem;
+    public MenuItem addReaderMenuItem;
 
     public MainController() {
     }
@@ -387,6 +388,29 @@ public class MainController {
             } else {
                 MessageBox.WarningBox("Ошибка редактирования книги").show();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addReader(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("reader.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+            ReaderController readerController = fxmlLoader.getController();
+
+            stage.showAndWait();
+            if (readerController.isClose()) {
+                return;
+            }
+
+            if (readerController.isSave()) {
+                readerView.getItems().add(readerController.getReader());
+                MessageBox.OkBox("Чиатель успешно добавлен!").show();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

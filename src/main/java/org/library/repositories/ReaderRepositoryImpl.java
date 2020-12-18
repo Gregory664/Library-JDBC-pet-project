@@ -5,10 +5,7 @@ import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.ReaderRepository;
 import org.library.utils.ConnectionUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -154,13 +151,22 @@ public class ReaderRepositoryImpl implements ReaderRepository {
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, reader.getFio());
             statement.setInt(2, reader.getAge());
             statement.setString(3, reader.getAddress());
             statement.setString(4, reader.getPhone());
             statement.setString(5, reader.getPassport());
+
             isSave = statement.executeUpdate() == 1;
+
+            if (isSave) {
+                try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                    while (resultSet.next()) {
+                        reader.setId(resultSet.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
