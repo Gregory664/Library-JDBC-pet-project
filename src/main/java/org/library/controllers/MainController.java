@@ -66,6 +66,7 @@ public class MainController {
     public MenuItem deleteBookMenuItem;
     public MenuItem addBookCopyMenuItem;
     public MenuItem deleteBookCopy;
+    public MenuItem updateBookCopyMenuItem;
 
     public MainController() {
     }
@@ -362,6 +363,32 @@ public class MainController {
             MessageBox.OkBox("Копия успешно удалена!").show();
         } else {
             MessageBox.WarningBox("Ошибка удаления копии книги!").show();
+        }
+    }
+
+    public void updateBook(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("book.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+
+            BookController bookController = fxmlLoader.getController();
+            bookController.setBook(booksView.getSelectionModel().getSelectedItem());
+
+            stage.showAndWait();
+            if (bookController.isClose()) {
+                return;
+            }
+
+            if (bookController.isSave()) {
+                booksView.refresh();
+                MessageBox.OkBox("Книга успешно редактирована!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка редактирования книги").show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

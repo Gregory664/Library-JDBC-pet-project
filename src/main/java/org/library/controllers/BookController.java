@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import lombok.Getter;
 import org.library.entity.Author;
 import org.library.entity.Book;
@@ -43,6 +42,19 @@ public class BookController {
     private boolean save;
     @Getter
     private Book book;
+
+    public void setBook(Book book) {
+        this.book = book;
+        viewUpdateBook();
+    }
+
+    private void viewUpdateBook() {
+        titleTextField.setText(book.getTitle());
+        authorComboBox.getSelectionModel().select(book.getAuthor().getName());
+        publisherComboBox.getSelectionModel().select(book.getPublisher().getTitle());
+        genreComboBox.getSelectionModel().select(book.getGenre().getTitle());
+        lengthTextField.setText(String.valueOf(book.getLength()));
+    }
 
     @FXML
     public void initialize() {
@@ -86,22 +98,31 @@ public class BookController {
             publisher = publisherService.findByTitle(publisherComboBox.getSelectionModel().getSelectedItem());
             genre = genreService.findByTitle(genreComboBox.getSelectionModel().getSelectedItem());
             int length = Integer.parseInt(lengthTextField.getText());
-            book = Book.builder()
-                    .title(title)
-                    .author(author)
-                    .publisher(publisher)
-                    .genre(genre)
-                    .length(length)
-                    .bookCopyIdAndShelf(new TreeMap<>())
-                    .build();
-            save = bookService.save(book);
+            if (book == null) {
+                book = Book.builder()
+                        .title(title)
+                        .author(author)
+                        .publisher(publisher)
+                        .genre(genre)
+                        .length(length)
+                        .bookCopyIdAndShelf(new TreeMap<>())
+                        .build();
+
+                save = bookService.save(book);
+            } else {
+                book.setTitle(title);
+                book.setAuthor(author);
+                book.setPublisher(publisher);
+                book.setGenre(genre);
+                book.setLength(length);
+
+                save = bookService.update(book);
+            }
+
             Utils.getStage(saveButton).close();
         } catch (AuthorNotFoundByNameException | EntityNotFoundByTitleException e) {
             MessageBox.WarningBox(e.getMessage()).show();
         }
-
-        Stage stage = (Stage) saveButton.getScene().getWindow();
-        stage.close();
     }
 
     @FXML

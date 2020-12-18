@@ -79,6 +79,9 @@
                                             <MenuItem fx:id="addBookCopyMenuItem" mnemonicParsing="false" onAction="#addBookCopy" text="Добавить копию" />
                                         </items>
                                         <items>
+                                            <MenuItem fx:id="updateBookCopyMenuItem" mnemonicParsing="false" onAction="#updateBook" text="Редактировать книгу" />
+                                        </items>
+                                        <items>
                                             <MenuItem fx:id="deleteBookMenuItem" mnemonicParsing="false" onAction="#deleteBook" text="Удалить книгу" />
                                         </items>
                                     </ContextMenu>
