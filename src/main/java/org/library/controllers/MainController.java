@@ -31,6 +31,9 @@ public class MainController {
     private final ReaderService readerService = new ReaderService(new ReaderRepositoryImpl(), new BookRentRepositoryImpl());
     private final BookCopyService bookCopyService = new BookCopyService(new BookRepositoryImpl(), new BookCopyRepositoryImpl(), new BookShelfRepositoryImpl());
     private final BookShelfService bookShelfService = new BookShelfService(new BookShelfRepositoryImpl());
+    private final AuthorService authorService = new AuthorService(new AuthorRepositoryImpl());
+    private final GenreService genreService = new GenreService(new GenreRepositoryImpl());
+    private final PublisherService publisherService = new PublisherService(new PublisherRepositoryImpl());
 
     public TableView<Map.Entry<Integer, Shelf>> shelfView;
     public TableColumn<Map.Entry<Integer, Shelf>, String> shelfViewName;
@@ -70,6 +73,25 @@ public class MainController {
     public MenuItem addReaderMenuItem;
     public MenuItem updateReaderMenuItem;
     public MenuItem deleteReaderMenuItem;
+    public TabPane tabPane;
+    public Tab booksTab;
+    public Tab readersTab;
+    public Tab authorsTab;
+    public Tab genresTab;
+    public Tab publishersTab;
+    public Tab statisticsTap;
+
+    public TableView<Author> authorsView;
+    public TableColumn<Author, Integer> authorViewId;
+    public TableColumn<Author, String> authorViewFIO;
+
+    public TableView<Genre> genresView;
+    public TableColumn<Genre, Integer> genresViewId;
+    public TableColumn<Genre, String> genresViewTitle;
+
+    public TableView<Publisher> publishersView;
+    public TableColumn<Publisher, Integer> publishersViewId;
+    public TableColumn<Publisher, String> publishersViewTitle;
 
     public MainController() {
     }
@@ -78,6 +100,10 @@ public class MainController {
     public void initialize() {
         initBookViewCellProperties();
         initReaderViewCellProperties();
+        initAuthorsViewCellProperties();
+        initGenresViewCellProperties();
+        initPublishersViewCellProperties();
+
         getBookFromShelfMenuItem.setDisable(true);
         addBookCopyToShelfMenuItem.setDisable(true);
         initListeners();
@@ -92,6 +118,26 @@ public class MainController {
         }
         readerView.setItems(readers);
         readerView.getSelectionModel().selectFirst();
+
+        authorsView.setItems(FXCollections.observableArrayList(authorService.findAll()));
+        genresView.setItems(FXCollections.observableArrayList(genreService.findAll()));
+        publishersView.setItems(FXCollections.observableArrayList(publisherService.findAll()));
+
+        tabPane.getSelectionModel().select(booksTab);
+    }
+
+    private void initAuthorsViewCellProperties() {
+        authorViewId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        authorViewFIO.setCellValueFactory(new PropertyValueFactory<>("name"));
+    }
+
+    private void initGenresViewCellProperties() {
+        genresViewId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        genresViewTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+    }
+    private void initPublishersViewCellProperties() {
+        publishersViewId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        publishersViewTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
     }
 
     private void initListeners() {
@@ -463,4 +509,59 @@ public class MainController {
             }
         }
     }
+
+    @FXML
+    public void showBooksTab(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().select(booksTab);
+    }
+
+    @FXML
+    public void showReadersTab(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().select(readersTab);
+    }
+
+    public void showAuthorsTab(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().select(authorsTab);
+    }
+
+    public void showGenresTab(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().select(genresTab);
+    }
+
+    public void showPublisherTab(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().select(publishersTab);
+    }
+
+    public void showStatistics(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().select(statisticsTap);
+    }
+
+    public void addAuthor(ActionEvent actionEvent) {
+    }
+
+    public void editAuthor(ActionEvent actionEvent) {
+    }
+
+    public void deleteAuthor(ActionEvent actionEvent) {
+    }
+
+    public void addGenre(ActionEvent actionEvent) {
+    }
+
+    public void editGenre(ActionEvent actionEvent) {
+    }
+
+    public void deleteGenre(ActionEvent actionEvent) {
+    }
+
+    public void addPublisher(ActionEvent actionEvent) {
+    }
+
+    public void editPublisher(ActionEvent actionEvent) {
+    }
+
+    public void deletePublisher(ActionEvent actionEvent) {
+    }
+
+
 }
