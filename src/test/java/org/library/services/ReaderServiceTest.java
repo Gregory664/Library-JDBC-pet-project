@@ -97,6 +97,7 @@ class ReaderServiceTest {
         when(readerRepository.deleteById(1)).thenReturn(true);
         when(readerRepository.save(readerList.get(0))).thenReturn(true);
         when(readerRepository.count()).thenReturn(2L);
+        when(readerRepository.update(readerList.get(0))).thenReturn(true);
     }
 
     @Test
@@ -165,5 +166,11 @@ class ReaderServiceTest {
     void count() {
         assertEquals(2, readerService.count());
         verify(readerRepository, times(1)).count();
+    }
+
+    @Test
+    void update() {
+        assertTrue(readerService.update(readerList.get(0)));
+        verify(readerRepository).update(readerList.get(0));
     }
 }

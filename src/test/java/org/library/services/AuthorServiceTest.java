@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 class AuthorServiceTest {
     private static final AuthorRepository repository = mock(AuthorRepositoryImpl.class);
     private static final AuthorService service = new AuthorService(repository);
-   private static List<Author> authorList;
+    private static List<Author> authorList;
 
     @BeforeAll
     static void initialize() {
@@ -34,6 +34,7 @@ class AuthorServiceTest {
         when(repository.deleteById(1)).thenReturn(true);
         when(repository.findByName("author1")).thenReturn(Optional.of(authorList.get(0)));
         when(repository.save(authorList.get(0))).thenReturn(true);
+        when(repository.update(authorList.get(0))).thenReturn(true);
     }
 
     @Test
@@ -93,5 +94,11 @@ class AuthorServiceTest {
     void save() {
         assertTrue(service.save(authorList.get(0)));
         verify(repository, times(1)).save(authorList.get(0));
+    }
+
+    @Test
+    void update() {
+        assertTrue(service.update(authorList.get(0)));
+        verify(repository).update(authorList.get(0));
     }
 }

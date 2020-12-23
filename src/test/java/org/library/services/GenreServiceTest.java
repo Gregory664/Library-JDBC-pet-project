@@ -34,6 +34,7 @@ class GenreServiceTest {
         when(repository.deleteById(1)).thenReturn(true);
         when(repository.save(genreList.get(0))).thenReturn(true);
         when(repository.count()).thenReturn(3L);
+        when(repository.update(genreList.get(0))).thenReturn(true);
     }
 
     @Test
@@ -95,5 +96,11 @@ class GenreServiceTest {
     void count() {
         assertEquals(3, service.count());
         verify(repository, times(1)).count();
+    }
+
+    @Test
+    void update() {
+        assertTrue(service.update(genreList.get(0)));
+        verify(repository).update(genreList.get(0));
     }
 }

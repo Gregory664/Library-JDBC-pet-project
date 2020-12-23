@@ -34,6 +34,7 @@ class PublisherServiceTest {
         when(repository.deleteById(1)).thenReturn(true);
         when(repository.save(publisherList.get(0))).thenReturn(true);
         when(repository.count()).thenReturn(3L);
+        when(repository.update(publisherList.get(0))).thenReturn(true);
     }
 
     @Test
@@ -95,5 +96,11 @@ class PublisherServiceTest {
         Throwable throwable = assertThrows(EntityNotFoundByTitleException.class, () -> service.findByTitle("publisher 4"));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
+    }
+
+    @Test
+    void update() {
+        assertTrue(service.update(publisherList.get(0)));
+        verify(repository).update(publisherList.get(0));
     }
 }

@@ -70,6 +70,7 @@ class BookServiceTest {
         when(bookRepository.deleteById(2)).thenReturn(true);
         when(bookRepository.save(books.get(0))).thenReturn(true);
         when(bookRepository.count()).thenReturn(2L);
+        when(bookRepository.update(books.get(0))).thenReturn(true);
     }
 
     @Test
@@ -150,5 +151,11 @@ class BookServiceTest {
     void count() {
         assertEquals(2, bookService.count());
         verify(bookRepository, times(1)).count();
+    }
+
+    @Test
+    void update() {
+        assertTrue(bookService.update(books.get(0)));
+        verify(bookRepository).update(books.get(0));
     }
 }

@@ -71,6 +71,7 @@ class BookCopyServiceTest {
         when(bookCopyRepository.deleteById(1)).thenReturn(true);
         when(bookCopyRepository.save(bookCopyList.get(0))).thenReturn(true);
         when(bookCopyRepository.count()).thenReturn(1L);
+        when(bookCopyRepository.update(bookCopyList.get(0))).thenReturn(true);
     }
 
     @Test
@@ -119,5 +120,11 @@ class BookCopyServiceTest {
     void count() {
         assertEquals(1L, bookCopyService.count());
         verify(bookCopyRepository, times(1)).count();
+    }
+
+    @Test
+    void update() {
+        assertTrue(bookCopyService.update(bookCopyList.get(0)));
+        verify(bookCopyRepository).update(bookCopyList.get(0));
     }
 }

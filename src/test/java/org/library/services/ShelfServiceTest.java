@@ -32,6 +32,7 @@ class ShelfServiceTest {
         when(repository.deleteById(1)).thenReturn(true);
         when(repository.save(shelfList.get(0))).thenReturn(true);
         when(repository.count()).thenReturn(3L);
+        when(repository.update(shelfList.get(0))).thenReturn(true);
     }
 
     @Test
@@ -86,5 +87,11 @@ class ShelfServiceTest {
     void count() {
         assertEquals(3, shelfService.count());
         verify(repository, times(1)).count();
+    }
+
+    @Test
+    void update() {
+        assertTrue(shelfService.update(shelfList.get(0)));
+        verify(repository).update(shelfList.get(0));
     }
 }
