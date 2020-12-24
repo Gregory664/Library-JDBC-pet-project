@@ -565,6 +565,29 @@ public class MainController {
     }
 
     public void editAuthor(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("author.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            AuthorController authorController = loader.getController();
+            authorController.setAuthor(authorsView.getSelectionModel().getSelectedItem());
+
+            stage.showAndWait();
+            if (authorController.isClose()) {
+                return;
+            }
+
+            if (authorController.isSave()) {
+                authorsView.refresh();
+                MessageBox.OkBox("Автор успешно редактирован!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка редактирования автора").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteAuthor(ActionEvent actionEvent) {
