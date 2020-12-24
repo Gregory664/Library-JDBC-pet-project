@@ -591,6 +591,32 @@ public class MainController {
     }
 
     public void deleteAuthor(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Внимание");
+        alert.setHeaderText("Вы действительно хотите удалить автора?  \nВсе упоминания о авторе будут удалены!");
+
+        Optional<ButtonType> buttonType = alert.showAndWait();
+        if (buttonType.isPresent()) {
+            if (buttonType.get() == ButtonType.OK) {
+                Author authorForDelete = authorsView.getSelectionModel().getSelectedItem();
+                authorService.deleteById(authorForDelete.getId());
+                authorsView.getItems().remove(authorForDelete);
+
+                booksView.getItems().stream()
+                        .filter(book -> book.getAuthor().equals(authorForDelete))
+                        .forEach(book -> book.setAuthor(new Author()));
+                booksView.refresh();
+
+                for (Reader reader : readerView.getItems()) {
+                    reader.getRentBookCopies().keySet().stream()
+                            .filter(bookCopy -> bookCopy.getBook().getAuthor().equals(authorForDelete))
+                            .forEach(bookCopy -> bookCopy.getBook().setAuthor(new Author()));
+                }
+                booksView.refresh();
+
+                MessageBox.OkBox("Удаление автора выполнено успешно!").show();
+            }
+        }
     }
 
     public void addGenre(ActionEvent actionEvent) {
