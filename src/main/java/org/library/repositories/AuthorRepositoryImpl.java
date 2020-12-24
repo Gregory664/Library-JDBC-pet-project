@@ -117,9 +117,17 @@ public class AuthorRepositoryImpl implements AuthorRepository {
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, author.getName());
             isSave = statement.executeUpdate() == 1;
+
+            if (isSave) {
+                try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        author.setId(resultSet.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }

@@ -5,11 +5,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.stage.Stage;
 import lombok.Getter;
 import org.library.entity.Shelf;
 import org.library.repositories.ShelfRepositoryImpl;
 import org.library.services.ShelfService;
+import org.library.utils.Utils;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,14 +43,12 @@ public class ShelfController {
 
     @FXML
     public void save(ActionEvent actionEvent) {
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
+        Utils.getStage(saveButton).close();
     }
 
     @FXML
     public void cancel(ActionEvent actionEvent) {
         close = true;
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
+        Utils.getStage(saveButton).close();
     }
 }

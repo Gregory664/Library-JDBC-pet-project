@@ -73,6 +73,7 @@ public class MainController {
     public MenuItem addReaderMenuItem;
     public MenuItem updateReaderMenuItem;
     public MenuItem deleteReaderMenuItem;
+
     public TabPane tabPane;
     public Tab booksTab;
     public Tab readersTab;
@@ -135,6 +136,7 @@ public class MainController {
         genresViewId.setCellValueFactory(new PropertyValueFactory<>("id"));
         genresViewTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
     }
+
     private void initPublishersViewCellProperties() {
         publishersViewId.setCellValueFactory(new PropertyValueFactory<>("id"));
         publishersViewTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -537,6 +539,29 @@ public class MainController {
     }
 
     public void addAuthor(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("author.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            AuthorController authorController = loader.getController();
+
+            stage.showAndWait();
+            if (authorController.isClose()) {
+                return;
+            }
+
+            if (authorController.isSave()) {
+                authorsView.getItems().add(authorController.getAuthor());
+                authorsView.refresh();
+                MessageBox.OkBox("Автор успешно добавлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка добавления автора").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void editAuthor(ActionEvent actionEvent) {
