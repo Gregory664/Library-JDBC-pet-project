@@ -78,10 +78,8 @@ public class MainController {
     public TabPane tabPane;
     public Tab booksTab;
     public Tab readersTab;
-    public Tab authorsTab;
-    public Tab genresTab;
-    public Tab publishersTab;
-    public Tab statisticsTap;
+    public Tab editDataTab;
+    public Tab statisticsTab;
 
     public TableView<Author> authorsView;
     public TableColumn<Author, Integer> authorViewId;
@@ -532,20 +530,12 @@ public class MainController {
         tabPane.getSelectionModel().select(readersTab);
     }
 
-    public void showAuthorsTab(ActionEvent actionEvent) {
-        tabPane.getSelectionModel().select(authorsTab);
-    }
-
-    public void showGenresTab(ActionEvent actionEvent) {
-        tabPane.getSelectionModel().select(genresTab);
-    }
-
-    public void showPublisherTab(ActionEvent actionEvent) {
-        tabPane.getSelectionModel().select(publishersTab);
+    public void showEditData(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().select(editDataTab);
     }
 
     public void showStatistics(ActionEvent actionEvent) {
-        tabPane.getSelectionModel().select(statisticsTap);
+        tabPane.getSelectionModel().select(statisticsTab);
     }
 
     public void addAuthor(ActionEvent actionEvent) {
