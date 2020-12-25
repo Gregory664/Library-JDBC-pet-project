@@ -28,7 +28,7 @@ public class GenreController {
     }
 
     public void save(ActionEvent actionEvent) {
-        if(genre == null) {
+        if (genre == null) {
             genre = new Genre(genreTitleTextField.getText());
             save = service.save(genre);
         } else {

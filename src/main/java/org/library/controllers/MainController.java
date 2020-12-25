@@ -19,6 +19,7 @@ import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.repositories.*;
 import org.library.services.*;
 import org.library.utils.MessageBox;
+import org.library.utils.Utils;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -426,7 +427,8 @@ public class MainController {
             stage.setScene(scene);
 
             BookController bookController = fxmlLoader.getController();
-            bookController.setBook(booksView.getSelectionModel().getSelectedItem());
+            Book selectedBook = booksView.getSelectionModel().getSelectedItem();
+            bookController.setBook(selectedBook);
 
             stage.showAndWait();
             if (bookController.isClose()) {
@@ -435,6 +437,14 @@ public class MainController {
 
             if (bookController.isSave()) {
                 booksView.refresh();
+
+                for (Reader reader : readerView.getItems()) {
+                    reader.getRentBookCopies().keySet().stream()
+                            .filter(bookCopy -> bookCopy.getBook().getId() == selectedBook.getId())
+                            .forEach(bookCopy -> Utils.updateBook(bookCopy.getBook(), selectedBook));
+                }
+                readerView.refresh();
+
                 MessageBox.OkBox("Книга успешно редактирована!").show();
             } else {
                 MessageBox.WarningBox("Ошибка редактирования книги").show();
@@ -571,7 +581,8 @@ public class MainController {
             Scene scene = new Scene(loader.load());
             stage.setScene(scene);
             AuthorController authorController = loader.getController();
-            authorController.setAuthor(authorsView.getSelectionModel().getSelectedItem());
+            Author selectedAuthor = authorsView.getSelectionModel().getSelectedItem();
+            authorController.setAuthor(selectedAuthor);
 
             stage.showAndWait();
             if (authorController.isClose()) {
@@ -580,6 +591,19 @@ public class MainController {
 
             if (authorController.isSave()) {
                 authorsView.refresh();
+
+                booksView.getItems().stream()
+                        .filter(book -> book.getAuthor().getId() == selectedAuthor.getId())
+                        .forEach(book -> book.getAuthor().setName(selectedAuthor.getName()));
+                booksView.refresh();
+
+                for (Reader reader : readerView.getItems()) {
+                    reader.getRentBookCopies().keySet().stream()
+                            .filter(bookCopy -> bookCopy.getBook().getAuthor().getId() == selectedAuthor.getId())
+                            .forEach(bookCopy -> bookCopy.getBook().getAuthor().setName(selectedAuthor.getName()));
+                }
+                readerView.refresh();
+
                 MessageBox.OkBox("Автор успешно редактирован!").show();
             } else {
                 MessageBox.WarningBox("Ошибка редактирования автора").show();
@@ -652,7 +676,8 @@ public class MainController {
             Scene scene = new Scene(loader.load());
             stage.setScene(scene);
             GenreController genreController = loader.getController();
-            genreController.setGenre(genresView.getSelectionModel().getSelectedItem());
+            Genre selectedGenre = genresView.getSelectionModel().getSelectedItem();
+            genreController.setGenre(selectedGenre);
 
             stage.showAndWait();
             if (genreController.isClose()) {
@@ -661,6 +686,12 @@ public class MainController {
 
             if (genreController.isSave()) {
                 genresView.refresh();
+
+                booksView.getItems().stream()
+                        .filter(book -> book.getGenre().getId() == selectedGenre.getId())
+                        .forEach(book -> book.getGenre().setTitle(selectedGenre.getTitle()));
+                booksView.refresh();
+
                 MessageBox.OkBox("Жанр успешно обновлен!").show();
             } else {
                 MessageBox.WarningBox("Ошибка редактирования жанра").show();
@@ -701,6 +732,7 @@ public class MainController {
     }
 
     public void addPublisher(ActionEvent actionEvent) {
+
     }
 
     public void editPublisher(ActionEvent actionEvent) {

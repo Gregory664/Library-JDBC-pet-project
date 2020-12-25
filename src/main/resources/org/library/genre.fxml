@@ -23,7 +23,7 @@
                 <RowConstraints minHeight="60.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="ФИО" />
+                  <Label text="Название" />
                   <TextArea fx:id="genreTitleTextField" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" />
                </children>
             </GridPane>
