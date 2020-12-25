@@ -672,6 +672,32 @@ public class MainController {
     }
 
     public void deleteGenre(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Внимание");
+        alert.setHeaderText("Вы действительно хотите удалить жанр?  \nВсе упоминания о жанре будут удалены!");
+
+        Optional<ButtonType> buttonType = alert.showAndWait();
+        if (buttonType.isPresent()) {
+            if (buttonType.get() == ButtonType.OK) {
+                Genre genreForDelete = genresView.getSelectionModel().getSelectedItem();
+                genreService.deleteById(genreForDelete.getId());
+                genresView.getItems().remove(genreForDelete);
+
+                booksView.getItems().stream()
+                        .filter(book -> book.getGenre().equals(genreForDelete))
+                        .forEach(book -> book.setGenre(new Genre(-1, "Нет данных")));
+                booksView.refresh();
+
+                for (Reader reader : readerView.getItems()) {
+                    reader.getRentBookCopies().keySet().stream()
+                            .filter(bookCopy -> bookCopy.getBook().getGenre().equals(genreForDelete))
+                            .forEach(bookCopy -> bookCopy.getBook().setGenre(new Genre(-1, "Нет данных")));
+                }
+                booksView.refresh();
+
+                MessageBox.OkBox("Удаление жанра выполнено успешно!").show();
+            }
+        }
     }
 
     public void addPublisher(ActionEvent actionEvent) {
