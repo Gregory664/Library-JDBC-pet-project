@@ -758,6 +758,36 @@ public class MainController {
     }
 
     public void editPublisher(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("publisher.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            PublisherController publisherController = loader.getController();
+            Publisher selectedPublisher = publishersView.getSelectionModel().getSelectedItem();
+            publisherController.setPublisher(selectedPublisher);
+
+            stage.showAndWait();
+            if (publisherController.isClose()) {
+                return;
+            }
+
+            if (publisherController.isSave()) {
+                publishersView.refresh();
+
+                booksView.getItems().stream()
+                        .filter(book -> book.getPublisher().getId() == selectedPublisher.getId())
+                        .forEach(book -> book.getPublisher().setTitle(selectedPublisher.getTitle()));
+                booksView.refresh();
+
+                MessageBox.OkBox("Издатель успешно обновлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка редактирования издателя").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deletePublisher(ActionEvent actionEvent) {
