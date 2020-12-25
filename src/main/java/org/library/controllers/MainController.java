@@ -791,5 +791,31 @@ public class MainController {
     }
 
     public void deletePublisher(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Внимание");
+        alert.setHeaderText("Вы действительно хотите удалить издателя?  \nВсе упоминания о издателе будут удалены!");
+
+        Optional<ButtonType> buttonType = alert.showAndWait();
+        if (buttonType.isPresent()) {
+            if (buttonType.get() == ButtonType.OK) {
+                Publisher publisherForDelete = publishersView.getSelectionModel().getSelectedItem();
+                publisherService.deleteById(publisherForDelete.getId());
+                publishersView.getItems().remove(publisherForDelete);
+
+                booksView.getItems().stream()
+                        .filter(book -> book.getPublisher().equals(publisherForDelete))
+                        .forEach(book -> book.setPublisher(new Publisher(-1, "Нет данных")));
+                booksView.refresh();
+
+                for (Reader reader : readerView.getItems()) {
+                    reader.getRentBookCopies().keySet().stream()
+                            .filter(bookCopy -> bookCopy.getBook().getPublisher().equals(publisherForDelete))
+                            .forEach(bookCopy -> bookCopy.getBook().setPublisher(new Publisher(-1, "Нет данных")));
+                }
+                booksView.refresh();
+
+                MessageBox.OkBox("Удаление издателя выполнено успешно!").show();
+            }
+        }
     }
 }
