@@ -604,13 +604,13 @@ public class MainController {
 
                 booksView.getItems().stream()
                         .filter(book -> book.getAuthor().equals(authorForDelete))
-                        .forEach(book -> book.setAuthor(new Author()));
+                        .forEach(book -> book.setAuthor(new Author(-1, "Нет данных")));
                 booksView.refresh();
 
                 for (Reader reader : readerView.getItems()) {
                     reader.getRentBookCopies().keySet().stream()
                             .filter(bookCopy -> bookCopy.getBook().getAuthor().equals(authorForDelete))
-                            .forEach(bookCopy -> bookCopy.getBook().setAuthor(new Author()));
+                            .forEach(bookCopy -> bookCopy.getBook().setAuthor(new Author(-1, "Нет данных")));
                 }
                 booksView.refresh();
 
@@ -620,6 +620,29 @@ public class MainController {
     }
 
     public void addGenre(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("genre.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            GenreController genreController = loader.getController();
+
+            stage.showAndWait();
+            if (genreController.isClose()) {
+                return;
+            }
+
+            if (genreController.isSave()) {
+                genresView.getItems().add(genreController.getGenre());
+                genresView.refresh();
+                MessageBox.OkBox("Жанр успешно добавлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка добавления жанра").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void editGenre(ActionEvent actionEvent) {

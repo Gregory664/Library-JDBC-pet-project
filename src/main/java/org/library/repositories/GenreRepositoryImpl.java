@@ -118,9 +118,17 @@ public class GenreRepositoryImpl implements GenreRepository {
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, genre.getTitle());
             isSave = statement.executeUpdate() == 1;
+
+            if(isSave) {
+                try (ResultSet set =statement.getGeneratedKeys()){
+                    if(set.next()) {
+                        genre.setId(set.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
