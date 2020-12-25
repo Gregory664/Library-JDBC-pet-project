@@ -11,6 +11,10 @@ public class Shelf implements Comparable<Shelf> {
     private int id;
     private String inventNum;
 
+    public Shelf(String inventNum) {
+        this.inventNum = inventNum;
+    }
+
     @Override
     public int compareTo(Shelf shelf) {
         return Integer.compare(this.id, shelf.getId());

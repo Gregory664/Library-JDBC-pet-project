@@ -13,7 +13,7 @@ public class ShelfSQLStatements {
 
     public static final String DELETE_BY_ID = DELETE + "WHERE id = ?;";
 
-    public static final String SAVE = "INSERT INTO shelf (title) VALUES (?);";
+    public static final String SAVE = "INSERT INTO shelf (invent_num) VALUES (?);";
 
     public static final String UPDATE = "" +
             "UPDATE shelf " +

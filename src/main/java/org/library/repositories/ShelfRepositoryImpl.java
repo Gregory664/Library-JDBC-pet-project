@@ -5,10 +5,7 @@ import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.ShelfRepository;
 import org.library.utils.ConnectionUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,9 +98,15 @@ public class ShelfRepositoryImpl implements ShelfRepository {
         boolean isSave;
 
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, shelf.getInventNum());
             isSave = statement.executeUpdate() == 1;
+
+            try (ResultSet set = statement.getGeneratedKeys()) {
+                if (set.next()) {
+                    shelf.setId(set.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }

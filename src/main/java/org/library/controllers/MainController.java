@@ -35,6 +35,7 @@ public class MainController {
     private final AuthorService authorService = new AuthorService(new AuthorRepositoryImpl());
     private final GenreService genreService = new GenreService(new GenreRepositoryImpl());
     private final PublisherService publisherService = new PublisherService(new PublisherRepositoryImpl());
+    private final ShelfService shelfService = new ShelfService(new ShelfRepositoryImpl());
 
     public TableView<Map.Entry<Integer, Shelf>> shelfView;
     public TableColumn<Map.Entry<Integer, Shelf>, String> shelfViewName;
@@ -93,6 +94,10 @@ public class MainController {
     public TableColumn<Publisher, Integer> publishersViewId;
     public TableColumn<Publisher, String> publishersViewTitle;
 
+    public TableView<Shelf> shelfEditDataView;
+    public TableColumn<Shelf, Integer> shelfEditDataViewId;
+    public TableColumn<Shelf, String> shelfEditDataViewNumber;
+
     public MainController() {
     }
 
@@ -103,6 +108,7 @@ public class MainController {
         initAuthorsViewCellProperties();
         initGenresViewCellProperties();
         initPublishersViewCellProperties();
+        initShelfEditViewCellProperties();
 
         getBookFromShelfMenuItem.setDisable(true);
         addBookCopyToShelfMenuItem.setDisable(true);
@@ -122,6 +128,7 @@ public class MainController {
         authorsView.setItems(FXCollections.observableArrayList(authorService.findAll()));
         genresView.setItems(FXCollections.observableArrayList(genreService.findAll()));
         publishersView.setItems(FXCollections.observableArrayList(publisherService.findAll()));
+        shelfEditDataView.setItems(FXCollections.observableArrayList(shelfService.findAll()));
 
         tabPane.getSelectionModel().select(booksTab);
     }
@@ -139,6 +146,11 @@ public class MainController {
     private void initPublishersViewCellProperties() {
         publishersViewId.setCellValueFactory(new PropertyValueFactory<>("id"));
         publishersViewTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+    }
+
+    private void initShelfEditViewCellProperties() {
+        shelfEditDataViewId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        shelfEditDataViewNumber.setCellValueFactory(new PropertyValueFactory<>("inventNum"));
     }
 
     private void initListeners() {
@@ -737,7 +749,7 @@ public class MainController {
             if (publisherController.isSave()) {
                 publishersView.getItems().add(publisherController.getPublisher());
                 publishersView.refresh();
-                MessageBox.OkBox("Издать успешно добавлен!").show();
+                MessageBox.OkBox("Издатель успешно добавлен!").show();
             } else {
                 MessageBox.WarningBox("Ошибка добавления издателя").show();
             }
@@ -805,6 +817,92 @@ public class MainController {
                 booksView.refresh();
 
                 MessageBox.OkBox("Удаление издателя выполнено успешно!").show();
+            }
+        }
+    }
+
+    public void addShelf(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("editShelfData.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            EditShelfDataController editShelfDataController = loader.getController();
+
+            stage.showAndWait();
+            if (editShelfDataController.isClose()) {
+                return;
+            }
+
+            if (editShelfDataController.isSave()) {
+                shelfEditDataView.getItems().add(editShelfDataController.getShelf());
+                shelfEditDataView.refresh();
+                MessageBox.OkBox("Номер полки успешно добавлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка добавления номера полки").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editShelf(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("editShelfData.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            EditShelfDataController editShelfDataController = loader.getController();
+            Shelf selectedShelf = shelfEditDataView.getSelectionModel().getSelectedItem();
+            editShelfDataController.setShelf(selectedShelf);
+
+            stage.showAndWait();
+            if (editShelfDataController.isClose()) {
+                return;
+            }
+
+            if (editShelfDataController.isSave()) {
+                shelfEditDataView.refresh();
+
+                for (Book book : booksView.getItems()) {
+                    book.getBookCopyIdAndShelf().values().stream()
+                            .filter(shelf -> shelf.getId() == selectedShelf.getId())
+                            .forEach(shelf -> shelf.setInventNum(selectedShelf.getInventNum()));
+                }
+                booksView.refresh();
+                shelfView.refresh();
+
+                MessageBox.OkBox("Номер полки успешно обновлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка редактирования номера полки").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteShelf(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Внимание");
+        alert.setHeaderText("Вы действительно хотите удалить полку?  \nВсе упоминания о полке будут удалены!");
+
+        Optional<ButtonType> buttonType = alert.showAndWait();
+        if (buttonType.isPresent()) {
+            if (buttonType.get() == ButtonType.OK) {
+                Shelf shelfForDelete = shelfEditDataView.getSelectionModel().getSelectedItem();
+                shelfService.deleteById(shelfForDelete.getId());
+                shelfEditDataView.getItems().remove(shelfForDelete);
+
+                for (Book book : booksView.getItems()) {
+                    book.getBookCopyIdAndShelf().values().stream()
+                            .filter(shelf -> shelf.getId() == shelfForDelete.getId())
+                            .forEach(Utils::resetShelf);
+                }
+                booksView.refresh();
+
+                MessageBox.OkBox("Удаление полки выполнено успешно!").show();
             }
         }
     }
