@@ -732,7 +732,29 @@ public class MainController {
     }
 
     public void addPublisher(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("publisher.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            PublisherController publisherController = loader.getController();
 
+            stage.showAndWait();
+            if (publisherController.isClose()) {
+                return;
+            }
+
+            if (publisherController.isSave()) {
+                publishersView.getItems().add(publisherController.getPublisher());
+                publishersView.refresh();
+                MessageBox.OkBox("Издать успешно добавлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка добавления издателя").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void editPublisher(ActionEvent actionEvent) {
@@ -740,6 +762,4 @@ public class MainController {
 
     public void deletePublisher(ActionEvent actionEvent) {
     }
-
-
 }
