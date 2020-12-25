@@ -646,6 +646,29 @@ public class MainController {
     }
 
     public void editGenre(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("genre.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            GenreController genreController = loader.getController();
+            genreController.setGenre(genresView.getSelectionModel().getSelectedItem());
+
+            stage.showAndWait();
+            if (genreController.isClose()) {
+                return;
+            }
+
+            if (genreController.isSave()) {
+                genresView.refresh();
+                MessageBox.OkBox("Жанр успешно обновлен!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка редактирования жанра").show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteGenre(ActionEvent actionEvent) {
