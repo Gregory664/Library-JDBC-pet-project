@@ -46,4 +46,14 @@ public class StatisticsRepositoryImpl implements StatisticsRepository {
     public Map<String, Integer> countByGenreTitleInRent() {
         return getMapByQuery(COUNT_BY_GENRE_TITLE_IN_RENT);
     }
+
+    @Override
+    public Map<String, Integer> countByPublisherTitleInShelf() {
+        return getMapByQuery(COUNT_BY_PUBLISHER_TITLE_IN_SHELF);
+    }
+
+    @Override
+    public Map<String, Integer> countByPublisherTitleInRent() {
+        return getMapByQuery(COUNT_BY_PUBLISHER_TITLE_IN_RENT);
+    }
 }

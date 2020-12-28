@@ -27,5 +27,11 @@ public class StatisticsService {
         return repository.countByGenreTitleInRent();
     }
 
+    public Map<String, Integer> countByPublisherTitleInShelf() {
+        return repository.countByPublisherTitleInShelf();
+    }
 
+    public Map<String, Integer> countByPublisherTitleInRent() {
+        return repository.countByPublisherTitleInRent();
+    }
 }

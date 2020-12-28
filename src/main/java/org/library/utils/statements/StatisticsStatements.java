@@ -32,4 +32,20 @@ public class StatisticsStatements {
             "INNER JOIN genre g ON b.genre_id = g.id " +
             "INNER JOIN book_rent br ON br.bookCopy_id = bc.id " +
             "GROUP BY g.title;";
+
+    public static final String COUNT_BY_PUBLISHER_TITLE_IN_SHELF = "" +
+            "SELECT p.title, COUNT(p.title) " +
+            "FROM book_copy bc " +
+            "INNER JOIN book b ON bc.book_id = b.id " +
+            "INNER JOIN publisher p ON b.publisher_id = p.id " +
+            "INNER JOIN bookshelf bs ON bs.bookCopy_id = bc.id " +
+            "GROUP BY p.title;";
+
+    public static final String COUNT_BY_PUBLISHER_TITLE_IN_RENT = "" +
+            "SELECT p.title, COUNT(p.title) " +
+            "FROM book_copy bc " +
+            "INNER JOIN book b ON bc.book_id = b.id " +
+            "INNER JOIN publisher p ON b.publisher_id = p.id " +
+            "INNER JOIN book_rent br ON br.bookCopy_id = bc.id " +
+            "GROUP BY p.title;";
 }

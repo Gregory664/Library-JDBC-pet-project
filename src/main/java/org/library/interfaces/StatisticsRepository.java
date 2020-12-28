@@ -10,5 +10,9 @@ public interface StatisticsRepository {
     Map<String, Integer> countByGenreTitleInShelf();
 
     Map<String, Integer> countByGenreTitleInRent();
+
+    Map<String, Integer> countByPublisherTitleInShelf();
+
+    Map<String, Integer> countByPublisherTitleInRent();
 }
 
