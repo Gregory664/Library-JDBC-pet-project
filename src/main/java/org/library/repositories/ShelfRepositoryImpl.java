@@ -52,6 +52,24 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     }
 
     @Override
+    public Optional<Shelf> findByInventNum(String inventNum) {
+        Shelf shelf = null;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_INVENT_NUM)) {
+            statement.setString(1, inventNum);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    shelf = new Shelf(resultSet.getInt(1), resultSet.getString(2));
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return Optional.ofNullable(shelf);
+    }
+
+    @Override
     public boolean existsById(Integer id) {
         boolean result = false;
 

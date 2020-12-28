@@ -69,6 +69,9 @@
                                           <MenuItem fx:id="getBookFromShelfMenuItem" mnemonicParsing="false" onAction="#rentBook" text="Выдать копию" />
                                        </items>
                                         <items>
+                                            <MenuItem fx:id="editShelfInBookCopyMenuItem" mnemonicParsing="false" onAction="#editBookCopyShelf" text="Изменить полку" />
+                                        </items>
+                                        <items>
                                             <MenuItem fx:id="deleteBookCopy" mnemonicParsing="false" onAction="#deleteBookCopy" text="Удалить копию" />
                                         </items>
                                     </ContextMenu>

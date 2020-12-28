@@ -12,4 +12,6 @@ public interface BookShelfRepository {
     boolean deleteBookCopyFromShelf(int bookId, int shelfId);
 
     boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) throws BookCopyIsExistsInShelfException;
+
+    boolean updateShelf(int shelfId, int bookCopyId, int newShelfId);
 }

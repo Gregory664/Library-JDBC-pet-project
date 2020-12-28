@@ -75,6 +75,7 @@ public class MainController {
     public MenuItem addReaderMenuItem;
     public MenuItem updateReaderMenuItem;
     public MenuItem deleteReaderMenuItem;
+    public MenuItem editShelfInBookCopyMenuItem;
 
     public TabPane tabPane;
     public Tab booksTab;
@@ -307,11 +308,11 @@ public class MainController {
                 return;
             }
 
-            Optional<Shelf> optionalShelf = shelfController.getSelectedShelf();
-            if (optionalShelf.isPresent()) {
+
+            if (shelfController.isSave()) {
                 Reader reader = readerView.getSelectionModel().getSelectedItem();
                 BookCopy bookCopy = rentBookView.getSelectionModel().getSelectedItem().getKey();
-                Shelf shelf = optionalShelf.get();
+                Shelf shelf = shelfController.getSelectedShelf();
 
                 bookRentService.deleteRentBookCopiesFromReader(reader, bookCopy, shelf);
 
@@ -397,12 +398,11 @@ public class MainController {
                 return;
             }
 
-            Optional<Shelf> optionalShelf = shelfController.getSelectedShelf();
-            if (optionalShelf.isPresent()) {
+            if (shelfController.isSave()) {
                 Book selectedBook = booksView.getSelectionModel().getSelectedItem();
                 BookCopy bookCopy = BookCopy.builder().book(selectedBook).build();
                 bookCopyService.save(bookCopy);
-                bookShelfService.addBookCopyToShelf(bookCopy, optionalShelf.get());
+                bookShelfService.addBookCopyToShelf(bookCopy, shelfController.getSelectedShelf());
                 booksView.refresh();
                 fillShelfView();
                 MessageBox.OkBox("Копия книги успешно добавлена!").show();
@@ -411,6 +411,40 @@ public class MainController {
             e.printStackTrace();
         } catch (BookCopyIsExistsInShelfException e) {
             MessageBox.WarningBox(e.getMessage()).show();
+        }
+    }
+
+    public void editBookCopyShelf(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("shelf.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+
+            int bookCopyId = shelfView.getSelectionModel().getSelectedItem().getKey();
+            Shelf currentShelf = booksView.getSelectionModel().getSelectedItem().getBookCopyIdAndShelf().get(bookCopyId);
+            int currentShelfId = currentShelf.getId();
+
+            ShelfController shelfController = fxmlLoader.getController();
+            shelfController.setSelectedShelf(currentShelf);
+
+            stage.showAndWait();
+            if (shelfController.isClose()) {
+                return;
+            }
+
+            if (shelfController.isSave()) {
+                if (bookShelfService.updateShelf(currentShelfId, bookCopyId, currentShelf.getId())) {
+                    booksView.refresh();
+                    shelfView.refresh();
+                    MessageBox.OkBox("Номер полки успешно обновлен!").show();
+                } else {
+                    MessageBox.WarningBox("Ошибка обновления номера полки!").show();
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

@@ -7,12 +7,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import lombok.Getter;
 import org.library.entity.Shelf;
+import org.library.exceptions.newExc.ShelfNotFoundByInventNumException;
 import org.library.repositories.ShelfRepositoryImpl;
 import org.library.services.ShelfService;
+import org.library.utils.MessageBox;
 import org.library.utils.Utils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ShelfController {
@@ -21,9 +22,16 @@ public class ShelfController {
     public Button saveButton = new Button();
     public Button cancelButton = new Button();
     @Getter
-    private Optional<Shelf> selectedShelf = Optional.empty();
+    private Shelf selectedShelf;
     @Getter
     private boolean close;
+    @Getter
+    private boolean save;
+
+    public void setSelectedShelf(Shelf selectedShelf) {
+        this.selectedShelf = selectedShelf;
+        shelfComboBox.getSelectionModel().select(selectedShelf.getInventNum());
+    }
 
     @FXML
     public void initialize() {
@@ -34,16 +42,21 @@ public class ShelfController {
     }
 
     @FXML
-    public void selectShelf(ActionEvent actionEvent) {
-        String selectedShelfNumber = shelfComboBox.getSelectionModel().getSelectedItem();
-        selectedShelf = shelfService.findAll().stream()
-                .filter(shelf -> shelf.getInventNum().equals(selectedShelfNumber))
-                .findFirst();
-    }
-
-    @FXML
     public void save(ActionEvent actionEvent) {
-        Utils.getStage(saveButton).close();
+        try {
+            String selectedShelfNumber = shelfComboBox.getSelectionModel().getSelectedItem();
+
+            if (selectedShelf == null) {
+                selectedShelf = shelfService.findByInventNum(selectedShelfNumber);
+            } else {
+                Utils.updateShelf(selectedShelf, shelfService.findByInventNum(selectedShelfNumber));
+            }
+
+            save = true;
+            Utils.getStage(saveButton).close();
+        } catch (ShelfNotFoundByInventNumException e) {
+            MessageBox.WarningBox(e.getMessage()).show();
+        }
     }
 
     @FXML

@@ -24,7 +24,7 @@
               </rowConstraints>
                <children>
                   <Label text="Номер полки" />
-                  <ComboBox fx:id="shelfComboBox" maxWidth="1.7976931348623157E308" onAction="#selectShelf" prefWidth="150.0" GridPane.columnIndex="1" />
+                  <ComboBox fx:id="shelfComboBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" />
                </children>
             </GridPane>
          </top>

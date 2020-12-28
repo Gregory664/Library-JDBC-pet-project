@@ -22,4 +22,9 @@ public class Utils {
         shelf.setId(-1);
         shelf.setInventNum("Нет данных");
     }
+
+    public static void updateShelf(Shelf shelf, Shelf newShelf) {
+        shelf.setId(newShelf.getId());
+        shelf.setInventNum(newShelf.getInventNum());
+    }
 }

@@ -32,4 +32,8 @@ public class BookShelfService {
         bookCopyIdAndShelf.put(bookCopy.getId(), shelf);
         return repository.addBookCopyToShelf(bookCopy, shelf);
     }
+
+    public boolean updateShelf(int shelfId, int bookCopyId, int newShelfId) {
+        return repository.updateShelf(shelfId, bookCopyId, newShelfId);
+    }
 }

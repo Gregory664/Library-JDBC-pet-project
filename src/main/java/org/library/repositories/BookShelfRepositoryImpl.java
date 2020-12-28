@@ -66,4 +66,21 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
         }
         return result;
     }
+
+    @Override
+    public boolean updateShelf(int shelfId, int bookCopyId, int newShelfId) {
+        boolean result = false;
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_BOOK_COPY)) {
+            statement.setInt(1, newShelfId);
+            statement.setInt(2, shelfId);
+            statement.setInt(3, bookCopyId);
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 }
