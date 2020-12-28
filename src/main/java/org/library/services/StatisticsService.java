@@ -18,4 +18,14 @@ public class StatisticsService {
     public Map<String, Integer> countByAuthorNameInRent() {
         return repository.countByAuthorNameInRent();
     }
+
+    public Map<String, Integer> countByGenreTitleInShelf() {
+        return repository.countByGenreTitleInShelf();
+    }
+
+    public Map<String, Integer> countByGenreTitleInRent() {
+        return repository.countByGenreTitleInRent();
+    }
+
+
 }

@@ -13,13 +13,12 @@ import java.util.Map;
 import static org.library.utils.statements.StatisticsStatements.*;
 
 public class StatisticsRepositoryImpl implements StatisticsRepository {
-    @Override
-    public Map<String, Integer> countByAuthorNameInShelf() {
+    private Map<String, Integer> getMapByQuery(String query) {
         Map<String, Integer> params = new HashMap<>();
         try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT_BY_AUTHOR_NAME_IN_SHELF);
+             PreparedStatement statement = connection.prepareStatement(query);
              ResultSet set = statement.executeQuery()) {
-            while(set.next()) {
+            while (set.next()) {
                 params.put(set.getString(1), set.getInt(2));
             }
         } catch (SQLException e) {
@@ -29,17 +28,22 @@ public class StatisticsRepositoryImpl implements StatisticsRepository {
     }
 
     @Override
+    public Map<String, Integer> countByAuthorNameInShelf() {
+        return getMapByQuery(COUNT_BY_AUTHOR_NAME_IN_SHELF);
+    }
+
+    @Override
     public Map<String, Integer> countByAuthorNameInRent() {
-        Map<String, Integer> params = new HashMap<>();
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT_BY_AUTHOR_NAME_IN_RENT);
-             ResultSet set = statement.executeQuery()) {
-            while(set.next()) {
-                params.put(set.getString(1), set.getInt(2));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return params;
+        return getMapByQuery(COUNT_BY_AUTHOR_NAME_IN_RENT);
+    }
+
+    @Override
+    public Map<String, Integer> countByGenreTitleInShelf() {
+        return getMapByQuery(COUNT_BY_GENRE_TITLE_IN_SHELF);
+    }
+
+    @Override
+    public Map<String, Integer> countByGenreTitleInRent() {
+        return getMapByQuery(COUNT_BY_GENRE_TITLE_IN_RENT);
     }
 }
