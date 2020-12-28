@@ -4,6 +4,7 @@ import org.library.entity.Reader;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.ReaderRepository;
 import org.library.utils.ConnectionUtils;
+import org.library.utils.Gender;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class ReaderRepositoryImpl implements ReaderRepository {
             String address = resultSet.getString(4);
             String phone = resultSet.getString(5);
             String passport = resultSet.getString(6);
+            Gender gender = Gender.valueOf(resultSet.getString(7));
+            Date date = resultSet.getDate(8);
             return Reader.builder()
                     .id(id)
                     .fio(fio)
@@ -28,6 +31,8 @@ public class ReaderRepositoryImpl implements ReaderRepository {
                     .address(address)
                     .phone(phone)
                     .passport(passport)
+                    .gender(gender)
+                    .DOB(date)
                     .build();
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -157,6 +162,8 @@ public class ReaderRepositoryImpl implements ReaderRepository {
             statement.setString(3, reader.getAddress());
             statement.setString(4, reader.getPhone());
             statement.setString(5, reader.getPassport());
+            statement.setString(6, reader.getGender().name());
+            statement.setDate(7, reader.getDOB());
 
             isSave = statement.executeUpdate() == 1;
 
@@ -200,7 +207,9 @@ public class ReaderRepositoryImpl implements ReaderRepository {
             statement.setString(3, reader.getAddress());
             statement.setString(4, reader.getPhone());
             statement.setString(5, reader.getPassport());
-            statement.setInt(6, reader.getId());
+            statement.setString(6, reader.getGender().name());
+            statement.setDate(7, reader.getDOB());
+            statement.setInt(8, reader.getId());
             result = statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);

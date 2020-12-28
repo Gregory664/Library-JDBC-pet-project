@@ -135,6 +135,8 @@
                                     <TableColumn fx:id="readerViewFio" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="ФИО" />
                                     <TableColumn fx:id="readerViewAge" editable="false" maxWidth="80.0" minWidth="80.0" text="Возраст" />
                                     <TableColumn fx:id="readerViewAddress" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="110.0" text="Адрес" />
+                                    <TableColumn fx:id="readerViewGender" maxWidth="50.0" minWidth="50.0" prefWidth="75.0" text="Пол" />
+                                    <TableColumn fx:id="readerViewAgeDOB" maxWidth="140.0" minWidth="140.0" prefWidth="75.0" text="Дата рождения" />
                                     <TableColumn fx:id="readerViewPhone" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" text="Телефон" />
                                     <TableColumn fx:id="readerViewPassport" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" text="Паспорт" />
                                  </columns>

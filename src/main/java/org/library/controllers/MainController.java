@@ -58,6 +58,8 @@ public class MainController {
     public TableColumn<Reader, String> readerViewAddress;
     public TableColumn<Reader, String> readerViewPhone;
     public TableColumn<Reader, String> readerViewPassport;
+    public TableColumn<Reader, String> readerViewGender;
+    public TableColumn<Reader, Date> readerViewAgeDOB;
 
     public TableView<Map.Entry<BookCopy, Period>> rentBookView;
     public TableColumn<Map.Entry<BookCopy, Period>, Integer> rentBookViewCopyId = new TableColumn<>();
@@ -217,6 +219,13 @@ public class MainController {
         readerViewAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
         readerViewPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
         readerViewPassport.setCellValueFactory(new PropertyValueFactory<>("passport"));
+        readerViewGender.setCellValueFactory(param -> new ObservableValueBase<>() {
+            @Override
+            public String getValue() {
+                return param.getValue().getGender().name();
+            }
+        });
+        readerViewAgeDOB.setCellValueFactory(new PropertyValueFactory<>("DOB"));
 
         readerViewFio.setMaxWidth(1f * Integer.MAX_VALUE * 50);
         readerViewAddress.setMaxWidth(1f * Integer.MAX_VALUE * 50);

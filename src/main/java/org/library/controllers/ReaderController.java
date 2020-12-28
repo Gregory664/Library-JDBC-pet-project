@@ -2,16 +2,19 @@ package org.library.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import lombok.Getter;
 import org.library.entity.Reader;
 import org.library.repositories.BookRentRepositoryImpl;
 import org.library.repositories.ReaderRepositoryImpl;
 import org.library.services.ReaderService;
+import org.library.utils.Gender;
 import org.library.utils.Utils;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 public class ReaderController {
@@ -23,6 +26,8 @@ public class ReaderController {
     public TextField phoneTextField;
     public TextField passportTextField;
     public TextArea addressTextField;
+    public ComboBox<String> genderComboBox;
+    public DatePicker dobDatePicker;
     @Getter
     private boolean close;
     @Getter
@@ -32,7 +37,7 @@ public class ReaderController {
 
     @FXML
     public void initialize() {
-
+        Arrays.stream(Gender.values()).forEach(gender -> genderComboBox.getItems().add(gender.name()));
     }
 
     public void save(ActionEvent actionEvent) {
@@ -43,6 +48,8 @@ public class ReaderController {
                     .address(addressTextField.getText())
                     .passport(passportTextField.getText())
                     .phone(phoneTextField.getText())
+                    .gender(Gender.valueOf(genderComboBox.getSelectionModel().getSelectedItem()))
+                    .DOB(Date.valueOf(dobDatePicker.getValue()))
                     .rentBookCopies(new TreeMap<>())
                     .build();
 
@@ -53,6 +60,8 @@ public class ReaderController {
             reader.setAddress(addressTextField.getText());
             reader.setPhone(phoneTextField.getText());
             reader.setPassport(passportTextField.getText());
+            reader.setGender(Gender.valueOf(genderComboBox.getSelectionModel().getSelectedItem()));
+            reader.setDOB(Date.valueOf(dobDatePicker.getValue()));
 
             save = readerService.update(reader);
         }
@@ -75,5 +84,11 @@ public class ReaderController {
         phoneTextField.setText(reader.getPhone());
         passportTextField.setText(reader.getPassport());
         addressTextField.setText(reader.getAddress());
+        genderComboBox.getSelectionModel().select(reader.getGender().name());
+        dobDatePicker.setValue(LocalDate.from(reader.getDOB().toLocalDate()));
+    }
+
+    public void calcAge(ActionEvent actionEvent) {
+        ageTextField.setText("" + ChronoUnit.YEARS.between(dobDatePicker.getValue(), LocalDate.now()));
     }
 }

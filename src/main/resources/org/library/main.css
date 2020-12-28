@@ -4,3 +4,7 @@
 .tab-pane .tab-header-area {
     visibility: hidden ;
 }
+
+.table-column {
+  -fx-alignment: CENTER;
+}

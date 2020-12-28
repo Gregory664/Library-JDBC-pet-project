@@ -18,8 +18,8 @@ public class ReaderSQLStatements {
     public static final String DELETE_BY_ID = DELETE_ALL + "WHERE id = ?;";
 
     public static final String SAVE = "" +
-            "INSERT INTO reader (fio, age, address, phone, passport) " +
-            "VALUES (?, ?, ?, ?, ?);";
+            "INSERT INTO reader (fio, age, address, phone, passport, gender, DOB) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
     public static final String UPDATE = "" +
             "UPDATE reader " +
@@ -27,6 +27,8 @@ public class ReaderSQLStatements {
             "       age      = ?, " +
             "       address  = ?, " +
             "       phone    = ?, " +
-            "       passport = ? " +
+            "       passport = ?, " +
+            "       gender   = ?, " +
+            "       DOB      = ?  " +
             "WHERE  id       = ?";
 }
