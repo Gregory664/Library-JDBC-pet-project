@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.library.App;
 import org.library.entity.*;
 import org.library.exceptions.*;
@@ -100,6 +101,16 @@ public class MainController {
     public TableView<Shelf> shelfEditDataView;
     public TableColumn<Shelf, Integer> shelfEditDataViewId;
     public TableColumn<Shelf, String> shelfEditDataViewNumber;
+    public CheckBox searchTitleCheckBox;
+    public CheckBox searchAuthorCheckBox;
+    public CheckBox searchPublisherCheckBox;
+    public CheckBox searchGenreCheckBox;
+    public TextField searchTitleTextField;
+    public ComboBox<Author> searchAuthorComboBox;
+    public ComboBox<Publisher> searchPublisherComboBox;
+    public ComboBox<Genre> searchGenreComboBox;
+    public Button searchButton;
+    public Button refreshButton;
 
     public MainController() {
     }
@@ -112,6 +123,7 @@ public class MainController {
         initGenresViewCellProperties();
         initPublishersViewCellProperties();
         initShelfEditViewCellProperties();
+        initSearchComboBoxes();
 
         getBookFromShelfMenuItem.setDisable(true);
         addBookCopyToShelfMenuItem.setDisable(true);
@@ -134,6 +146,56 @@ public class MainController {
         shelfEditDataView.setItems(FXCollections.observableArrayList(shelfService.findAll()));
 
         tabPane.getSelectionModel().select(booksTab);
+    }
+
+    private void initSearchComboBoxes() {
+        searchAuthorComboBox.setItems(FXCollections.observableArrayList(authorService.findAll()));
+        searchAuthorComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Author object) {
+                return object != null ? object.getName() : "";
+            }
+
+            @Override
+            public Author fromString(String string) {
+                return searchAuthorComboBox.getItems().stream()
+                        .filter(author -> author.getName().equals(string))
+                        .findFirst()
+                        .orElse(null);
+            }
+        });
+
+        searchPublisherComboBox.setItems(FXCollections.observableArrayList(publisherService.findAll()));
+        searchPublisherComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Publisher object) {
+                return object != null ? object.getTitle() : "";
+            }
+
+            @Override
+            public Publisher fromString(String string) {
+                return searchPublisherComboBox.getItems().stream()
+                        .filter(publisher -> publisher.getTitle().equals(string))
+                        .findFirst()
+                        .orElse(null);
+            }
+        });
+
+        searchGenreComboBox.setItems(FXCollections.observableArrayList(genreService.findAll()));
+        searchGenreComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Genre object) {
+                return object != null ? object.getTitle() : "";
+            }
+
+            @Override
+            public Genre fromString(String string) {
+                return searchGenreComboBox.getItems().stream()
+                        .filter(Genre -> Genre.getTitle().equals(string))
+                        .findFirst()
+                        .orElse(null);
+            }
+        });
     }
 
     private void initAuthorsViewCellProperties() {
@@ -608,6 +670,7 @@ public class MainController {
 
             if (authorController.isSave()) {
                 authorsView.getItems().add(authorController.getAuthor());
+                searchAuthorComboBox.getItems().add(authorController.getAuthor());
                 authorsView.refresh();
                 MessageBox.OkBox("Автор успешно добавлен!").show();
             } else {
@@ -649,6 +712,10 @@ public class MainController {
                 }
                 readerView.refresh();
 
+                searchAuthorComboBox.getItems().stream()
+                        .filter(author -> author.getId() == selectedAuthor.getId())
+                        .forEach(author -> author.setName(selectedAuthor.getName()));
+
                 MessageBox.OkBox("Автор успешно редактирован!").show();
             } else {
                 MessageBox.WarningBox("Ошибка редактирования автора").show();
@@ -681,7 +748,7 @@ public class MainController {
                             .filter(bookCopy -> bookCopy.getBook().getAuthor().equals(authorForDelete))
                             .forEach(bookCopy -> bookCopy.getBook().setAuthor(new Author(-1, "Нет данных")));
                 }
-                booksView.refresh();
+                searchAuthorComboBox.getItems().remove(authorForDelete);
 
                 MessageBox.OkBox("Удаление автора выполнено успешно!").show();
             }
@@ -704,6 +771,7 @@ public class MainController {
             if (genreController.isSave()) {
                 genresView.getItems().add(genreController.getGenre());
                 genresView.refresh();
+                searchGenreComboBox.getItems().add(genreController.getGenre());
                 MessageBox.OkBox("Жанр успешно добавлен!").show();
             } else {
                 MessageBox.WarningBox("Ошибка добавления жанра").show();
@@ -737,6 +805,10 @@ public class MainController {
                         .forEach(book -> book.getGenre().setTitle(selectedGenre.getTitle()));
                 booksView.refresh();
 
+                searchGenreComboBox.getItems().stream()
+                        .filter(genre -> genre.getId() == selectedGenre.getId())
+                        .forEach(genre -> genre.setTitle(selectedGenre.getTitle()));
+
                 MessageBox.OkBox("Жанр успешно обновлен!").show();
             } else {
                 MessageBox.WarningBox("Ошибка редактирования жанра").show();
@@ -769,7 +841,7 @@ public class MainController {
                             .filter(bookCopy -> bookCopy.getBook().getGenre().equals(genreForDelete))
                             .forEach(bookCopy -> bookCopy.getBook().setGenre(new Genre(-1, "Нет данных")));
                 }
-                booksView.refresh();
+                searchGenreComboBox.getItems().remove(genreForDelete);
 
                 MessageBox.OkBox("Удаление жанра выполнено успешно!").show();
             }
@@ -792,6 +864,7 @@ public class MainController {
             if (publisherController.isSave()) {
                 publishersView.getItems().add(publisherController.getPublisher());
                 publishersView.refresh();
+                searchPublisherComboBox.getItems().add(publisherController.getPublisher());
                 MessageBox.OkBox("Издатель успешно добавлен!").show();
             } else {
                 MessageBox.WarningBox("Ошибка добавления издателя").show();
@@ -825,6 +898,10 @@ public class MainController {
                         .forEach(book -> book.getPublisher().setTitle(selectedPublisher.getTitle()));
                 booksView.refresh();
 
+                searchPublisherComboBox.getItems().stream()
+                        .filter(publisher -> publisher.getId() == selectedPublisher.getId())
+                        .forEach(publisher -> publisher.setTitle(selectedPublisher.getTitle()));
+
                 MessageBox.OkBox("Издатель успешно обновлен!").show();
             } else {
                 MessageBox.WarningBox("Ошибка редактирования издателя").show();
@@ -857,7 +934,7 @@ public class MainController {
                             .filter(bookCopy -> bookCopy.getBook().getPublisher().equals(publisherForDelete))
                             .forEach(bookCopy -> bookCopy.getBook().setPublisher(new Publisher(-1, "Нет данных")));
                 }
-                booksView.refresh();
+                searchPublisherComboBox.getItems().remove(publisherForDelete);
 
                 MessageBox.OkBox("Удаление издателя выполнено успешно!").show();
             }
@@ -948,5 +1025,74 @@ public class MainController {
                 MessageBox.OkBox("Удаление полки выполнено успешно!").show();
             }
         }
+    }
+
+    public void checkSearchTitle(ActionEvent actionEvent) {
+        searchTitleTextField.setDisable(!searchTitleCheckBox.isSelected());
+        checkSearchButton();
+    }
+
+    public void checkSearchAuthor(ActionEvent actionEvent) {
+        searchAuthorComboBox.setDisable(!searchAuthorCheckBox.isSelected());
+        checkSearchButton();
+    }
+
+    public void checkSearchPublisher(ActionEvent actionEvent) {
+        searchPublisherComboBox.setDisable(!searchPublisherCheckBox.isSelected());
+        checkSearchButton();
+    }
+
+    public void checkSearchGenre(ActionEvent actionEvent) {
+        searchGenreComboBox.setDisable(!searchGenreCheckBox.isSelected());
+        checkSearchButton();
+    }
+
+    private void checkSearchButton() {
+        searchButton.setDisable(!(searchTitleCheckBox.isSelected() ||
+                searchAuthorCheckBox.isSelected() ||
+                searchPublisherCheckBox.isSelected() ||
+                searchGenreCheckBox.isSelected())
+        );
+    }
+
+    public void searchBooks(ActionEvent actionEvent) {
+        booksView.setItems(FXCollections.observableArrayList(bookService.findAll()));
+        String title = "";
+        Author author = null;
+        Publisher publisher = null;
+        Genre genre = null;
+
+        if (searchTitleCheckBox.isSelected()) {
+            title = searchTitleTextField.getText();
+        }
+
+        if (searchAuthorCheckBox.isSelected()) {
+            author = searchAuthorComboBox.getValue();
+        }
+
+        if (searchPublisherCheckBox.isSelected()) {
+            publisher = searchPublisherComboBox.getValue();
+        }
+
+        if (searchGenreCheckBox.isSelected()) {
+            genre = searchGenreComboBox.getValue();
+        }
+
+        booksView.setItems(FXCollections.observableArrayList(bookService.findByParams(title, author, genre, publisher)));
+    }
+
+    public void refreshBooks() {
+        searchTitleCheckBox.setSelected(false);
+        searchAuthorCheckBox.setSelected(false);
+        searchGenreCheckBox.setSelected(false);
+        searchPublisherCheckBox.setSelected(false);
+
+        searchTitleTextField.clear();
+        searchTitleTextField.setDisable(true);
+        searchAuthorComboBox.setDisable(true);
+        searchGenreComboBox.setDisable(true);
+        searchPublisherComboBox.setDisable(true);
+
+        booksView.setItems(FXCollections.observableArrayList(bookService.findAll()));
     }
 }
