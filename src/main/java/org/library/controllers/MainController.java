@@ -24,6 +24,10 @@ import org.library.utils.Utils;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -111,6 +115,7 @@ public class MainController {
     public ComboBox<Genre> searchGenreComboBox;
     public Button searchButton;
     public Button refreshButton;
+    public CheckBox debtorsCheckBox;
 
     public MainController() {
     }
@@ -1094,5 +1099,26 @@ public class MainController {
         searchPublisherComboBox.setDisable(true);
 
         booksView.setItems(FXCollections.observableArrayList(bookService.findAll()));
+    }
+
+    public void showDebtors(ActionEvent actionEvent) {
+        if (debtorsCheckBox.isSelected()) {
+            List<Reader> forDelete = new ArrayList<>();
+            for (Reader reader : readerView.getItems()) {
+                Map<BookCopy, Period> rentBookCopies = reader.getRentBookCopies();
+                boolean isDebt = rentBookCopies.values().stream()
+                        .allMatch(period -> ChronoUnit.DAYS.between(period.getEndDate(), LocalDate.now()) <= 0);
+                if (isDebt) {
+                    forDelete.add(reader);
+                }
+            }
+            readerView.getItems().removeAll(forDelete);
+        } else {
+            ObservableList<Reader> readers = FXCollections.observableList(readerService.findAll());
+            for (Reader reader : readers) {
+                reader.setRentBookCopies(bookRentService.getRentBookCopiesByReaderId(reader.getId()));
+            }
+            readerView.setItems(readers);
+        }
     }
 }
