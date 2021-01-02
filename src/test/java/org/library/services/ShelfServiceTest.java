@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.Shelf;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.ShelfNotFoundByInventNumException;
 import org.library.interfaces.ShelfRepository;
 import org.library.repositories.ShelfRepositoryImpl;
 
@@ -33,6 +34,7 @@ class ShelfServiceTest {
         when(repository.save(shelfList.get(0))).thenReturn(true);
         when(repository.count()).thenReturn(3L);
         when(repository.update(shelfList.get(0))).thenReturn(true);
+        when(repository.findByInventNum("Z1")).thenReturn(Optional.of(shelfList.get(0)));
     }
 
     @Test
@@ -93,5 +95,15 @@ class ShelfServiceTest {
     void update() {
         assertTrue(shelfService.update(shelfList.get(0)));
         verify(repository).update(shelfList.get(0));
+    }
+
+    @Test
+    void findByInventNum() throws ShelfNotFoundByInventNumException {
+        assertEquals(shelfList.get(0), shelfService.findByInventNum("Z1"));
+        verify(repository).findByInventNum("Z1");
+
+        Throwable throwable = assertThrows(ShelfNotFoundByInventNumException.class, () -> shelfService.findByInventNum("Z300"));
+        assertNotNull(throwable.getMessage());
+        assertNotEquals("", throwable.getMessage());
     }
 }
