@@ -10,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import static org.library.utils.statements.ReaderSQLStatements.*;
 
@@ -32,6 +33,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
                     .phone(phone)
                     .passport(passport)
                     .gender(gender)
+                    .rentBookCopies(new TreeMap<>())
                     .DOB(date)
                     .build();
         } catch (SQLException e) {
@@ -55,24 +57,6 @@ public class ReaderRepositoryImpl implements ReaderRepository {
             throw new SQLExceptionWrapper(e);
         }
         return isExists;
-    }
-
-    @Override
-    public List<Reader> findByFioLike(String fio) {
-        List<Reader> readers = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_FIO_LIKE)) {
-            statement.setString(1, "%" + fio + "%");
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    readers.add(getReaderFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return readers;
     }
 
     @Override
@@ -216,5 +200,35 @@ public class ReaderRepositoryImpl implements ReaderRepository {
         }
 
         return result;
+    }
+
+    @Override
+    public List<Reader> findByParams(String fio, String phone, String passport) {
+        List<String> whereQuery = new ArrayList<>();
+
+        if (!fio.equals("")) {
+            whereQuery.add("r.fio like '%" + fio + "%'");
+        }
+
+        if (!phone.equals("")) {
+            whereQuery.add("r.phone like '%" + phone + "%'");
+        }
+
+        if (!passport.equals("")) {
+            whereQuery.add("r.passport like '%" + passport + "%'");
+        }
+
+        List<Reader> readerList = new ArrayList<>();
+
+        try (Connection connection = ConnectionUtils.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL + " WHERE " + String.join(" AND ", whereQuery));
+             ResultSet set = statement.executeQuery()) {
+            while (set.next()) {
+                readerList.add(getReaderFromResultSet(set));
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return readerList;
     }
 }

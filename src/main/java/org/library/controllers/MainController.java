@@ -113,9 +113,17 @@ public class MainController {
     public ComboBox<Author> searchAuthorComboBox;
     public ComboBox<Publisher> searchPublisherComboBox;
     public ComboBox<Genre> searchGenreComboBox;
-    public Button searchButton;
+    public Button searchBooksButton;
     public Button refreshButton;
     public CheckBox debtorsCheckBox;
+    public CheckBox searchPhoneCheckBox;
+    public CheckBox searchFioCheckBox;
+    public CheckBox searchPassportCheckBox;
+    public TextField searchFioTextField;
+    public TextField searchPhoneTextField;
+    public TextField searchPassportTextField;
+    public Button searchReadersButton;
+    public Button refreshSearchReadersButton;
 
     public MainController() {
     }
@@ -134,15 +142,10 @@ public class MainController {
         addBookCopyToShelfMenuItem.setDisable(true);
         initListeners();
 
-        ObservableList<Book> booksList = FXCollections.observableList(bookService.findAll());
-        booksView.setItems(booksList);
+        booksView.setItems(FXCollections.observableList(bookService.findAll()));
         booksView.getSelectionModel().selectFirst();
 
-        ObservableList<Reader> readers = FXCollections.observableList(readerService.findAll());
-        for (Reader reader : readers) {
-            reader.setRentBookCopies(bookRentService.getRentBookCopiesByReaderId(reader.getId()));
-        }
-        readerView.setItems(readers);
+        fillReaderView();
         readerView.getSelectionModel().selectFirst();
 
         authorsView.setItems(FXCollections.observableArrayList(authorService.findAll()));
@@ -151,6 +154,14 @@ public class MainController {
         shelfEditDataView.setItems(FXCollections.observableArrayList(shelfService.findAll()));
 
         tabPane.getSelectionModel().select(booksTab);
+    }
+
+    private void fillReaderView() {
+        ObservableList<Reader> readers = FXCollections.observableList(readerService.findAll());
+        for (Reader reader : readers) {
+            reader.setRentBookCopies(bookRentService.getRentBookCopiesByReaderId(reader.getId()));
+        }
+        readerView.setItems(readers);
     }
 
     private void initSearchComboBoxes() {
@@ -1034,26 +1045,26 @@ public class MainController {
 
     public void checkSearchTitle(ActionEvent actionEvent) {
         searchTitleTextField.setDisable(!searchTitleCheckBox.isSelected());
-        checkSearchButton();
+        checkSearchBooksButton();
     }
 
     public void checkSearchAuthor(ActionEvent actionEvent) {
         searchAuthorComboBox.setDisable(!searchAuthorCheckBox.isSelected());
-        checkSearchButton();
+        checkSearchBooksButton();
     }
 
     public void checkSearchPublisher(ActionEvent actionEvent) {
         searchPublisherComboBox.setDisable(!searchPublisherCheckBox.isSelected());
-        checkSearchButton();
+        checkSearchBooksButton();
     }
 
     public void checkSearchGenre(ActionEvent actionEvent) {
         searchGenreComboBox.setDisable(!searchGenreCheckBox.isSelected());
-        checkSearchButton();
+        checkSearchBooksButton();
     }
 
-    private void checkSearchButton() {
-        searchButton.setDisable(!(searchTitleCheckBox.isSelected() ||
+    private void checkSearchBooksButton() {
+        searchBooksButton.setDisable(!(searchTitleCheckBox.isSelected() ||
                 searchAuthorCheckBox.isSelected() ||
                 searchPublisherCheckBox.isSelected() ||
                 searchGenreCheckBox.isSelected())
@@ -1114,11 +1125,76 @@ public class MainController {
             }
             readerView.getItems().removeAll(forDelete);
         } else {
-            ObservableList<Reader> readers = FXCollections.observableList(readerService.findAll());
-            for (Reader reader : readers) {
-                reader.setRentBookCopies(bookRentService.getRentBookCopiesByReaderId(reader.getId()));
-            }
-            readerView.setItems(readers);
+            fillReaderView();
         }
+    }
+
+    private void checkSearchReadersButton() {
+        searchReadersButton.setDisable(!(searchFioCheckBox.isSelected() ||
+                searchPassportCheckBox.isSelected() ||
+                searchPhoneCheckBox.isSelected()));
+    }
+
+    public void checkSearchPhone(ActionEvent actionEvent) {
+        searchPhoneTextField.setDisable(!searchPhoneCheckBox.isSelected());
+        checkSearchReadersButton();
+    }
+
+    public void checkSearchFio(ActionEvent actionEvent) {
+        searchFioTextField.setDisable(!searchFioCheckBox.isSelected());
+        checkSearchReadersButton();
+    }
+
+    public void checkSearchPassport(ActionEvent actionEvent) {
+        searchPassportTextField.setDisable(!searchPassportCheckBox.isSelected());
+        checkSearchReadersButton();
+    }
+
+    public void searchReaders(ActionEvent actionEvent) {
+        fillReaderView();
+
+        String fio = "";
+        String phone = "";
+        String passport = "";
+
+        if (searchFioCheckBox.isSelected()) {
+            fio = searchFioTextField.getText();
+        }
+
+        if (searchPhoneCheckBox.isSelected()) {
+            phone = searchPhoneTextField.getText();
+        }
+
+        if (searchPassportCheckBox.isSelected()) {
+            passport = searchPassportTextField.getText();
+        }
+
+        ObservableList<Reader> serviceByParams = FXCollections.observableArrayList(readerService.findByParams(fio, phone, passport));
+        for (Reader reader : serviceByParams) {
+            reader.setRentBookCopies(bookRentService.getRentBookCopiesByReaderId(reader.getId()));
+        }
+        readerView.setItems(serviceByParams);
+    }
+
+    public void refreshSearchReaders(ActionEvent actionEvent) {
+        searchFioTextField.setText("");
+        searchPhoneTextField.setText("");
+        searchPassportTextField.setText("");
+
+        searchFioCheckBox.setSelected(false);
+        searchPhoneCheckBox.setSelected(false);
+        searchPassportCheckBox.setSelected(false);
+
+        searchFioTextField.setDisable(true);
+        searchPhoneTextField.setDisable(true);
+        searchPassportTextField.setDisable(true);
+
+        searchReadersButton.setDisable(true);
+
+        fillReaderView();
+    }
+
+    public void closeApp(ActionEvent actionEvent) {
+        Utils.getStage(searchBooksButton).close();
     }
 }
