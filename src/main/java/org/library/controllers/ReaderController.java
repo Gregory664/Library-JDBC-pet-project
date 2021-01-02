@@ -1,6 +1,5 @@
 package org.library.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import lombok.Getter;
@@ -40,7 +39,8 @@ public class ReaderController {
         Arrays.stream(Gender.values()).forEach(gender -> genderComboBox.getItems().add(gender.name()));
     }
 
-    public void save(ActionEvent actionEvent) {
+    @FXML
+    public void save() {
         if (reader == null) {
             reader = Reader.builder()
                     .fio(fioTextField.getText())
@@ -68,7 +68,8 @@ public class ReaderController {
         Utils.getStage(saveButton).close();
     }
 
-    public void close(ActionEvent actionEvent) {
+    @FXML
+    public void close() {
         close = true;
         Utils.getStage(saveButton).close();
     }
@@ -88,7 +89,8 @@ public class ReaderController {
         dobDatePicker.setValue(LocalDate.from(reader.getDOB().toLocalDate()));
     }
 
-    public void calcAge(ActionEvent actionEvent) {
+    @FXML
+    public void calcAge() {
         ageTextField.setText("" + ChronoUnit.YEARS.between(dobDatePicker.getValue(), LocalDate.now()));
     }
 }

@@ -1,6 +1,5 @@
 package org.library.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -32,7 +31,8 @@ public class AuthorController {
     void initialize() {
     }
 
-    public void save(ActionEvent actionEvent) {
+    @FXML
+    public void save() {
         if (author == null) {
             author = new Author(authorFioTextField.getText());
             save = service.save(author);
@@ -44,7 +44,8 @@ public class AuthorController {
         Utils.getStage(cancelButton).close();
     }
 
-    public void cancel(ActionEvent actionEvent) {
+    @FXML
+    public void cancel() {
         close = true;
         Utils.getStage(cancelButton).close();
     }

@@ -1,6 +1,6 @@
 package org.library.controllers;
 
-import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import lombok.Getter;
@@ -27,7 +27,8 @@ public class EditShelfDataController {
         shelfNumberTextField.setText(shelf.getInventNum());
     }
 
-    public void save(ActionEvent actionEvent) {
+    @FXML
+    public void save() {
         if (shelf == null) {
             shelf = new Shelf(shelfNumberTextField.getText());
             save = service.save(shelf);
@@ -39,7 +40,8 @@ public class EditShelfDataController {
         Utils.getStage(cancelButton).close();
     }
 
-    public void cancel(ActionEvent actionEvent) {
+    @FXML
+    public void cancel() {
         close = true;
         Utils.getStage(cancelButton).close();
     }

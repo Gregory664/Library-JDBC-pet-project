@@ -1,6 +1,6 @@
 package org.library.controllers;
 
-import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import lombok.Getter;
@@ -27,7 +27,8 @@ public class GenreController {
         genreTitleTextField.setText(genre.getTitle());
     }
 
-    public void save(ActionEvent actionEvent) {
+    @FXML
+    public void save() {
         if (genre == null) {
             genre = new Genre(genreTitleTextField.getText());
             save = service.save(genre);
@@ -39,7 +40,8 @@ public class GenreController {
         Utils.getStage(cancelButton).close();
     }
 
-    public void cancel(ActionEvent actionEvent) {
+    @FXML
+    public void cancel() {
         close = true;
         Utils.getStage(cancelButton).close();
     }

@@ -1,7 +1,6 @@
 package org.library.controllers;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -13,7 +12,6 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import org.library.entity.Period;
 import org.library.entity.Reader;
-import org.library.exceptions.ReaderNotFoundByPassportException;
 import org.library.repositories.BookRentRepositoryImpl;
 import org.library.repositories.ReaderRepositoryImpl;
 import org.library.services.ReaderService;
@@ -47,7 +45,7 @@ public class RentController {
     }
 
     @FXML
-    public void saveRentBook(ActionEvent actionEvent) {
+    public void saveRentBook() {
         if (selectedReader.isEmpty()) {
             MessageBox.WarningBox("Читатель не найден!").show();
             return;
@@ -77,7 +75,7 @@ public class RentController {
     }
 
     @FXML
-    public void cancel(ActionEvent actionEvent) {
+    public void cancel() {
         close = true;
         Stage stage = (Stage) timeCountText.getScene().getWindow();
         stage.close();

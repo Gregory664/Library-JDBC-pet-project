@@ -1,7 +1,6 @@
 package org.library.controllers;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -70,7 +69,7 @@ public class BookController {
     }
 
     @FXML
-    public void save(ActionEvent actionEvent) {
+    public void save() {
         Author author;
         String authorName = authorComboBox.getEditor().getText();
         if (!authorComboBox.getItems().contains(authorName)) {
@@ -126,7 +125,7 @@ public class BookController {
     }
 
     @FXML
-    public void cancel(ActionEvent actionEvent) {
+    public void cancel() {
         close = true;
         Utils.getStage(saveButton).close();
     }

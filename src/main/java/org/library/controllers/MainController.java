@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -82,26 +81,25 @@ public class MainController {
     public MenuItem addReaderMenuItem;
     public MenuItem updateReaderMenuItem;
     public MenuItem deleteReaderMenuItem;
-    public MenuItem editShelfInBookCopyMenuItem;
 
+    public MenuItem editShelfInBookCopyMenuItem;
     public TabPane tabPane;
     public Tab booksTab;
     public Tab readersTab;
     public Tab editDataTab;
-    public Tab statisticsTab;
 
     public TableView<Author> authorsView;
     public TableColumn<Author, Integer> authorViewId;
-    public TableColumn<Author, String> authorViewFIO;
 
+    public TableColumn<Author, String> authorViewFIO;
     public TableView<Genre> genresView;
     public TableColumn<Genre, Integer> genresViewId;
-    public TableColumn<Genre, String> genresViewTitle;
 
+    public TableColumn<Genre, String> genresViewTitle;
     public TableView<Publisher> publishersView;
     public TableColumn<Publisher, Integer> publishersViewId;
-    public TableColumn<Publisher, String> publishersViewTitle;
 
+    public TableColumn<Publisher, String> publishersViewTitle;
     public TableView<Shelf> shelfEditDataView;
     public TableColumn<Shelf, Integer> shelfEditDataViewId;
     public TableColumn<Shelf, String> shelfEditDataViewNumber;
@@ -123,6 +121,7 @@ public class MainController {
     public TextField searchPhoneTextField;
     public TextField searchPassportTextField;
     public Button searchReadersButton;
+
     public Button refreshSearchReadersButton;
 
     public MainController() {
@@ -333,8 +332,37 @@ public class MainController {
         rentBookView.setItems(rentBooks);
     }
 
+    public void refreshBooks() {
+        searchTitleCheckBox.setSelected(false);
+        searchAuthorCheckBox.setSelected(false);
+        searchGenreCheckBox.setSelected(false);
+        searchPublisherCheckBox.setSelected(false);
+
+        searchTitleTextField.clear();
+        searchTitleTextField.setDisable(true);
+        searchAuthorComboBox.setDisable(true);
+        searchGenreComboBox.setDisable(true);
+        searchPublisherComboBox.setDisable(true);
+
+        booksView.setItems(FXCollections.observableArrayList(bookService.findAll()));
+    }
+
+    private void checkSearchBooksButton() {
+        searchBooksButton.setDisable(!(searchTitleCheckBox.isSelected() ||
+                searchAuthorCheckBox.isSelected() ||
+                searchPublisherCheckBox.isSelected() ||
+                searchGenreCheckBox.isSelected())
+        );
+    }
+
+    private void checkSearchReadersButton() {
+        searchReadersButton.setDisable(!(searchFioCheckBox.isSelected() ||
+                searchPassportCheckBox.isSelected() ||
+                searchPhoneCheckBox.isSelected()));
+    }
+
     @FXML
-    public void rentBook(ActionEvent actionEvent) {
+    public void rentBook() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("rent.fxml"));
             Stage stage = new Stage();
@@ -382,7 +410,7 @@ public class MainController {
     }
 
     @FXML
-    public void returnBook(ActionEvent actionEvent) {
+    public void returnBook() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("shelf.fxml"));
             Stage stage = new Stage();
@@ -428,7 +456,7 @@ public class MainController {
     }
 
     @FXML
-    public void addBook(ActionEvent actionEvent) {
+    public void addBook() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("book.fxml"));
             Stage stage = new Stage();
@@ -450,7 +478,8 @@ public class MainController {
         }
     }
 
-    public void deleteBook(ActionEvent actionEvent) {
+    @FXML
+    public void deleteBook() {
         Book selectedBook = booksView.getSelectionModel().getSelectedItem();
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -472,7 +501,8 @@ public class MainController {
         }
     }
 
-    public void addBookCopy(ActionEvent actionEvent) {
+    @FXML
+    public void addBookCopy() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("shelf.fxml"));
             Stage stage = new Stage();
@@ -501,7 +531,8 @@ public class MainController {
         }
     }
 
-    public void editBookCopyShelf(ActionEvent actionEvent) {
+    @FXML
+    public void editBookCopyShelf() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("shelf.fxml"));
             Stage stage = new Stage();
@@ -535,7 +566,8 @@ public class MainController {
         }
     }
 
-    public void deleteBookCopy(ActionEvent actionEvent) {
+    @FXML
+    public void deleteBookCopy() {
         Map.Entry<Integer, Shelf> entry = shelfView.getSelectionModel().getSelectedItem();
         Book selectedItem = booksView.getSelectionModel().getSelectedItem();
 
@@ -550,7 +582,8 @@ public class MainController {
         }
     }
 
-    public void updateBook(ActionEvent actionEvent) {
+    @FXML
+    public void updateBook() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("book.fxml"));
             Stage stage = new Stage();
@@ -585,7 +618,8 @@ public class MainController {
         }
     }
 
-    public void addReader(ActionEvent actionEvent) {
+    @FXML
+    public void addReader() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("reader.fxml"));
             Stage stage = new Stage();
@@ -610,7 +644,8 @@ public class MainController {
         }
     }
 
-    public void updateReader(ActionEvent actionEvent) {
+    @FXML
+    public void updateReader() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("reader.fxml"));
             Stage stage = new Stage();
@@ -636,7 +671,8 @@ public class MainController {
         }
     }
 
-    public void deleteReader(ActionEvent actionEvent) {
+    @FXML
+    public void deleteReader() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Внимание");
         alert.setHeaderText("Вы действительно хотите удалить читателя?  \nВсе упоминания о читателе будут удалены!");
@@ -654,24 +690,22 @@ public class MainController {
     }
 
     @FXML
-    public void showBooksTab(ActionEvent actionEvent) {
+    public void showBooksTab() {
         tabPane.getSelectionModel().select(booksTab);
     }
 
     @FXML
-    public void showReadersTab(ActionEvent actionEvent) {
+    public void showReadersTab() {
         tabPane.getSelectionModel().select(readersTab);
     }
 
-    public void showEditData(ActionEvent actionEvent) {
+    @FXML
+    public void showEditData() {
         tabPane.getSelectionModel().select(editDataTab);
     }
 
-    public void showStatistics(ActionEvent actionEvent) {
-        tabPane.getSelectionModel().select(statisticsTab);
-    }
-
-    public void addAuthor(ActionEvent actionEvent) {
+    @FXML
+    public void addAuthor() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("author.fxml"));
             Stage stage = new Stage();
@@ -698,7 +732,8 @@ public class MainController {
         }
     }
 
-    public void editAuthor(ActionEvent actionEvent) {
+    @FXML
+    public void editAuthor() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("author.fxml"));
             Stage stage = new Stage();
@@ -742,7 +777,8 @@ public class MainController {
         }
     }
 
-    public void deleteAuthor(ActionEvent actionEvent) {
+    @FXML
+    public void deleteAuthor() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Внимание");
         alert.setHeaderText("Вы действительно хотите удалить автора?  \nВсе упоминания о авторе будут удалены!");
@@ -771,7 +807,8 @@ public class MainController {
         }
     }
 
-    public void addGenre(ActionEvent actionEvent) {
+    @FXML
+    public void addGenre() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("genre.fxml"));
             Stage stage = new Stage();
@@ -798,7 +835,8 @@ public class MainController {
         }
     }
 
-    public void editGenre(ActionEvent actionEvent) {
+    @FXML
+    public void editGenre() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("genre.fxml"));
             Stage stage = new Stage();
@@ -835,7 +873,8 @@ public class MainController {
         }
     }
 
-    public void deleteGenre(ActionEvent actionEvent) {
+    @FXML
+    public void deleteGenre() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Внимание");
         alert.setHeaderText("Вы действительно хотите удалить жанр?  \nВсе упоминания о жанре будут удалены!");
@@ -864,7 +903,8 @@ public class MainController {
         }
     }
 
-    public void addPublisher(ActionEvent actionEvent) {
+    @FXML
+    public void addPublisher() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("publisher.fxml"));
             Stage stage = new Stage();
@@ -891,7 +931,8 @@ public class MainController {
         }
     }
 
-    public void editPublisher(ActionEvent actionEvent) {
+    @FXML
+    public void editPublisher() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("publisher.fxml"));
             Stage stage = new Stage();
@@ -928,7 +969,8 @@ public class MainController {
         }
     }
 
-    public void deletePublisher(ActionEvent actionEvent) {
+    @FXML
+    public void deletePublisher() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Внимание");
         alert.setHeaderText("Вы действительно хотите удалить издателя?  \nВсе упоминания о издателе будут удалены!");
@@ -957,7 +999,8 @@ public class MainController {
         }
     }
 
-    public void addShelf(ActionEvent actionEvent) {
+    @FXML
+    public void addShelf() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("editShelfData.fxml"));
             Stage stage = new Stage();
@@ -983,7 +1026,8 @@ public class MainController {
         }
     }
 
-    public void editShelf(ActionEvent actionEvent) {
+    @FXML
+    public void editShelf() {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("editShelfData.fxml"));
             Stage stage = new Stage();
@@ -1019,7 +1063,8 @@ public class MainController {
         }
     }
 
-    public void deleteShelf(ActionEvent actionEvent) {
+    @FXML
+    public void deleteShelf() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Внимание");
         alert.setHeaderText("Вы действительно хотите удалить полку?  \nВсе упоминания о полке будут удалены!");
@@ -1043,35 +1088,32 @@ public class MainController {
         }
     }
 
-    public void checkSearchTitle(ActionEvent actionEvent) {
+    @FXML
+    public void checkSearchTitle() {
         searchTitleTextField.setDisable(!searchTitleCheckBox.isSelected());
         checkSearchBooksButton();
     }
 
-    public void checkSearchAuthor(ActionEvent actionEvent) {
+    @FXML
+    public void checkSearchAuthor() {
         searchAuthorComboBox.setDisable(!searchAuthorCheckBox.isSelected());
         checkSearchBooksButton();
     }
 
-    public void checkSearchPublisher(ActionEvent actionEvent) {
+    @FXML
+    public void checkSearchPublisher() {
         searchPublisherComboBox.setDisable(!searchPublisherCheckBox.isSelected());
         checkSearchBooksButton();
     }
 
-    public void checkSearchGenre(ActionEvent actionEvent) {
+    @FXML
+    public void checkSearchGenre() {
         searchGenreComboBox.setDisable(!searchGenreCheckBox.isSelected());
         checkSearchBooksButton();
     }
 
-    private void checkSearchBooksButton() {
-        searchBooksButton.setDisable(!(searchTitleCheckBox.isSelected() ||
-                searchAuthorCheckBox.isSelected() ||
-                searchPublisherCheckBox.isSelected() ||
-                searchGenreCheckBox.isSelected())
-        );
-    }
-
-    public void searchBooks(ActionEvent actionEvent) {
+    @FXML
+    public void searchBooks() {
         booksView.setItems(FXCollections.observableArrayList(bookService.findAll()));
         String title = "";
         Author author = null;
@@ -1097,22 +1139,8 @@ public class MainController {
         booksView.setItems(FXCollections.observableArrayList(bookService.findByParams(title, author, genre, publisher)));
     }
 
-    public void refreshBooks() {
-        searchTitleCheckBox.setSelected(false);
-        searchAuthorCheckBox.setSelected(false);
-        searchGenreCheckBox.setSelected(false);
-        searchPublisherCheckBox.setSelected(false);
-
-        searchTitleTextField.clear();
-        searchTitleTextField.setDisable(true);
-        searchAuthorComboBox.setDisable(true);
-        searchGenreComboBox.setDisable(true);
-        searchPublisherComboBox.setDisable(true);
-
-        booksView.setItems(FXCollections.observableArrayList(bookService.findAll()));
-    }
-
-    public void showDebtors(ActionEvent actionEvent) {
+    @FXML
+    public void showDebtors() {
         if (debtorsCheckBox.isSelected()) {
             List<Reader> forDelete = new ArrayList<>();
             for (Reader reader : readerView.getItems()) {
@@ -1129,28 +1157,26 @@ public class MainController {
         }
     }
 
-    private void checkSearchReadersButton() {
-        searchReadersButton.setDisable(!(searchFioCheckBox.isSelected() ||
-                searchPassportCheckBox.isSelected() ||
-                searchPhoneCheckBox.isSelected()));
-    }
-
-    public void checkSearchPhone(ActionEvent actionEvent) {
+    @FXML
+    public void checkSearchPhone() {
         searchPhoneTextField.setDisable(!searchPhoneCheckBox.isSelected());
         checkSearchReadersButton();
     }
 
-    public void checkSearchFio(ActionEvent actionEvent) {
+    @FXML
+    public void checkSearchFio() {
         searchFioTextField.setDisable(!searchFioCheckBox.isSelected());
         checkSearchReadersButton();
     }
 
-    public void checkSearchPassport(ActionEvent actionEvent) {
+    @FXML
+    public void checkSearchPassport() {
         searchPassportTextField.setDisable(!searchPassportCheckBox.isSelected());
         checkSearchReadersButton();
     }
 
-    public void searchReaders(ActionEvent actionEvent) {
+    @FXML
+    public void searchReaders() {
         fillReaderView();
 
         String fio = "";
@@ -1176,7 +1202,8 @@ public class MainController {
         readerView.setItems(serviceByParams);
     }
 
-    public void refreshSearchReaders(ActionEvent actionEvent) {
+    @FXML
+    public void refreshSearchReaders() {
         searchFioTextField.setText("");
         searchPhoneTextField.setText("");
         searchPassportTextField.setText("");
@@ -1194,7 +1221,8 @@ public class MainController {
         fillReaderView();
     }
 
-    public void closeApp(ActionEvent actionEvent) {
+    @FXML
+    public void closeApp() {
         Utils.getStage(searchBooksButton).close();
     }
 }

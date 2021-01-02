@@ -1,6 +1,6 @@
 package org.library.controllers;
 
-import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import lombok.Getter;
@@ -27,7 +27,8 @@ public class PublisherController {
         publisherTitleTextField.setText(publisher.getTitle());
     }
 
-    public void save(ActionEvent actionEvent) {
+    @FXML
+    public void save() {
         if (publisher == null) {
             publisher = new Publisher(publisherTitleTextField.getText());
             save = service.save(publisher);
@@ -39,7 +40,8 @@ public class PublisherController {
         Utils.getStage(cancelButton).close();
     }
 
-    public void cancel(ActionEvent actionEvent) {
+    @FXML
+    public void cancel() {
         close = true;
         Utils.getStage(cancelButton).close();
     }

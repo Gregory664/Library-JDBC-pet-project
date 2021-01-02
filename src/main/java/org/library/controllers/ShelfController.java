@@ -1,7 +1,6 @@
 package org.library.controllers;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -42,7 +41,7 @@ public class ShelfController {
     }
 
     @FXML
-    public void save(ActionEvent actionEvent) {
+    public void save() {
         try {
             String selectedShelfNumber = shelfComboBox.getSelectionModel().getSelectedItem();
 
@@ -60,7 +59,7 @@ public class ShelfController {
     }
 
     @FXML
-    public void cancel(ActionEvent actionEvent) {
+    public void cancel() {
         close = true;
         Utils.getStage(saveButton).close();
     }
