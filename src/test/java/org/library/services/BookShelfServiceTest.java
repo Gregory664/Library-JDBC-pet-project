@@ -23,7 +23,6 @@ class BookShelfServiceTest {
     @BeforeAll
     static void initialize() {
         shelf = new Shelf(1, "Z1");
-        Shelf shelf2 = new Shelf(2, "Z2");
 
         map.put(1, shelf);
         map.put(2, shelf);

@@ -97,6 +97,7 @@ class ReaderServiceTest {
         when(readerRepository.save(readerList.get(0))).thenReturn(true);
         when(readerRepository.count()).thenReturn(2L);
         when(readerRepository.update(readerList.get(0))).thenReturn(true);
+        when(readerRepository.findByParams(anyString(), anyString(), anyString())).thenReturn(readerList);
     }
 
     @Test
@@ -161,5 +162,12 @@ class ReaderServiceTest {
     void update() {
         assertTrue(readerService.update(readerList.get(0)));
         verify(readerRepository).update(readerList.get(0));
+    }
+
+    @Test
+    void findByParams() {
+        assertEquals(readerList, readerService.findByParams("test", "test", "test"));
+        verify(readerRepository).findByParams(anyString(), anyString(), anyString());
+        verify(bookRentRepository, atLeast(readerList.size())).getRentBookCopiesByReaderId(anyInt());
     }
 }

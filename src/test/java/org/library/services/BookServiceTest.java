@@ -66,6 +66,10 @@ class BookServiceTest {
         when(bookRepository.save(books.get(0))).thenReturn(true);
         when(bookRepository.count()).thenReturn(2L);
         when(bookRepository.update(books.get(0))).thenReturn(true);
+        when(bookRepository.findByParams("book 1",
+                books.get(0).getAuthor(),
+                books.get(0).getGenre(),
+                books.get(0).getPublisher())).thenReturn(List.of(books.get(0)));
     }
 
     @Test
@@ -120,5 +124,15 @@ class BookServiceTest {
     void update() {
         assertTrue(bookService.update(books.get(0)));
         verify(bookRepository).update(books.get(0));
+    }
+
+    @Test
+    void findByParams() {
+        assertEquals(List.of(books.get(0)), bookService.findByParams("book 1",
+                books.get(0).getAuthor(),
+                books.get(0).getGenre(),
+                books.get(0).getPublisher()));
+        verify(bookRepository, atLeast(1)).findByParams(anyString(), any(Author.class), any(Genre.class), any(Publisher.class));
+        verify(bookShelfRepository, atLeast(1)).getBookCopyIdAndShelf(anyInt());
     }
 }
