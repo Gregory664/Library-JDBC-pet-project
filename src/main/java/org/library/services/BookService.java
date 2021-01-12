@@ -5,7 +5,6 @@ import org.library.entity.Book;
 import org.library.entity.Genre;
 import org.library.entity.Publisher;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
-import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.BookRepository;
 import org.library.interfaces.BookShelfRepository;
 
@@ -18,30 +17,6 @@ public class BookService {
     public BookService(BookShelfRepository bookShelfRepository, BookRepository bookRepository) {
         this.bookShelfRepository = bookShelfRepository;
         this.bookRepository = bookRepository;
-    }
-
-    public List<Book> findByAuthor(Author author) {
-        List<Book> byAuthor = bookRepository.findByAuthor(author);
-        byAuthor.forEach(book -> book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId())));
-        return byAuthor;
-    }
-
-    public List<Book> findByPublisher(Publisher publisher) {
-        List<Book> byPublisher = bookRepository.findByPublisher(publisher);
-        byPublisher.forEach(book -> book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId())));
-        return byPublisher;
-    }
-
-    public List<Book> findByGenre(Genre genre) {
-        List<Book> byGenre = bookRepository.findByGenre(genre);
-        byGenre.forEach(book -> book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId())));
-        return byGenre;
-    }
-
-    public Book findByTitle(String title) throws EntityNotFoundByTitleException {
-        Book book = bookRepository.findByTitle(title).orElseThrow(() -> new EntityNotFoundByTitleException(Book.class, title));
-        book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
-        return book;
     }
 
     public List<Book> findAll() {
@@ -74,5 +49,15 @@ public class BookService {
 
     public long count() {
         return bookRepository.count();
+    }
+
+    public boolean update(Book book) {
+        return bookRepository.update(book);
+    }
+
+    public List<Book> findByParams(String title, Author author, Genre genre, Publisher publisher) {
+        List<Book> booksByParams = bookRepository.findByParams(title, author, genre, publisher);
+        booksByParams.forEach(book -> book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId())));
+        return booksByParams;
     }
 }

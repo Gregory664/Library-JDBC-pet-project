@@ -20,14 +20,6 @@ public class ReaderService {
         return readerRepository.existsByPassport(passport);
     }
 
-    public List<Reader> findByFioLike(String searchFio) {
-        List<Reader> byFioLike = readerRepository.findByFioLike(searchFio);
-        for (Reader reader : byFioLike) {
-            reader.setRentBookCopies(bookRentRepository.getRentBookCopiesByReaderId(reader.getId()));
-        }
-        return byFioLike;
-    }
-
     public List<Reader> findAll() {
         List<Reader> all = readerRepository.findAll();
         for (Reader reader : all) {
@@ -58,5 +50,17 @@ public class ReaderService {
 
     public long count() {
         return readerRepository.count();
+    }
+
+    public boolean update(Reader reader) {
+        return readerRepository.update(reader);
+    }
+
+    public List<Reader> findByParams(String fio, String phone, String passport) {
+        List<Reader> readers = readerRepository.findByParams(fio, phone, passport);
+        for (Reader reader : readers) {
+            reader.setRentBookCopies(bookRentRepository.getRentBookCopiesByReaderId(reader.getId()));
+        }
+        return readers;
     }
 }

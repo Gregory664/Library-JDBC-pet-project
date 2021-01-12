@@ -84,7 +84,7 @@ public class BookRentService {
         bookCopyIdAndShelf.remove(bookCopy.getId());
         reader.getRentBookCopies().put(bookCopy, period);
 
-        bookShelfRepository.deleteBookCopyFromShelf(bookCopy, shelf);
+        bookShelfRepository.deleteBookCopyFromShelf(bookCopy.getId(), shelf.getId());
         return bookRentRepository.addRentBookCopiesToReader(reader, bookCopy, period, shelf);
     }
 }

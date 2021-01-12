@@ -45,4 +45,8 @@ public class PublisherService {
     public Publisher findByTitle(String title) throws EntityNotFoundByTitleException {
         return repository.findByTitle(title).orElseThrow(() -> new EntityNotFoundByTitleException(Publisher.class, title));
     }
+
+    public boolean update(Publisher publisher) {
+        return repository.update(publisher);
+    }
 }

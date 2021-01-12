@@ -45,4 +45,8 @@ public class AuthorService {
     public boolean save(Author author) {
         return authorRepository.save(author);
     }
+
+    public boolean update(Author author) {
+        return authorRepository.update(author);
+    }
 }

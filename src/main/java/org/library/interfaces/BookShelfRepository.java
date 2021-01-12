@@ -9,7 +9,9 @@ import java.util.Map;
 public interface BookShelfRepository {
     Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId);
 
-    boolean deleteBookCopyFromShelf(BookCopy bookCopy, Shelf shelf);
+    boolean deleteBookCopyFromShelf(int bookId, int shelfId);
 
     boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) throws BookCopyIsExistsInShelfException;
+
+    boolean updateShelf(int shelfId, int bookCopyId, int newShelfId);
 }

@@ -3,15 +3,14 @@ package org.library.repositories;
 import org.library.entity.Reader;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.ReaderRepository;
-import org.library.utils.ConnectionUtils;
+import org.library.utils.MySQLConnection;
+import org.library.utils.Gender;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import static org.library.utils.statements.ReaderSQLStatements.*;
 
@@ -24,6 +23,8 @@ public class ReaderRepositoryImpl implements ReaderRepository {
             String address = resultSet.getString(4);
             String phone = resultSet.getString(5);
             String passport = resultSet.getString(6);
+            Gender gender = Gender.valueOf(resultSet.getString(7));
+            Date date = resultSet.getDate(8);
             return Reader.builder()
                     .id(id)
                     .fio(fio)
@@ -31,6 +32,9 @@ public class ReaderRepositoryImpl implements ReaderRepository {
                     .address(address)
                     .phone(phone)
                     .passport(passport)
+                    .gender(gender)
+                    .rentBookCopies(new TreeMap<>())
+                    .DOB(date)
                     .build();
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -41,7 +45,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     public boolean existsByPassport(String passport) {
         boolean isExists = false;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_PASSPORT)) {
             statement.setString(1, passport);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -56,28 +60,10 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     }
 
     @Override
-    public List<Reader> findByFioLike(String fio) {
-        List<Reader> readers = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_FIO_LIKE)) {
-            statement.setString(1, "%" + fio + "%");
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    readers.add(getReaderFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return readers;
-    }
-
-    @Override
     public List<Reader> findAll() {
         List<Reader> readers = new ArrayList<>();
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -93,7 +79,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     public Optional<Reader> findById(Integer id) {
         Reader reader = null;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -111,7 +97,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     public boolean existsById(Integer id) {
         boolean isExists = false;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -127,7 +113,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
 
     @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_ALL)) {
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -139,7 +125,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     public boolean deleteById(Integer id) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
             result = statement.executeUpdate() == 1;
@@ -153,14 +139,25 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     public boolean save(Reader reader) {
         boolean isSave;
 
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, reader.getFio());
             statement.setInt(2, reader.getAge());
             statement.setString(3, reader.getAddress());
             statement.setString(4, reader.getPhone());
             statement.setString(5, reader.getPassport());
+            statement.setString(6, reader.getGender().name());
+            statement.setDate(7, reader.getDOB());
+
             isSave = statement.executeUpdate() == 1;
+
+            if (isSave) {
+                try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                    while (resultSet.next()) {
+                        reader.setId(resultSet.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -171,7 +168,7 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     public long count() {
         long result = 0;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(COUNT);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -181,5 +178,57 @@ public class ReaderRepositoryImpl implements ReaderRepository {
             throw new SQLExceptionWrapper(e);
         }
         return result;
+    }
+
+    @Override
+    public boolean update(Reader reader) {
+        boolean result;
+
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
+            statement.setString(1, reader.getFio());
+            statement.setInt(2, reader.getAge());
+            statement.setString(3, reader.getAddress());
+            statement.setString(4, reader.getPhone());
+            statement.setString(5, reader.getPassport());
+            statement.setString(6, reader.getGender().name());
+            statement.setDate(7, reader.getDOB());
+            statement.setInt(8, reader.getId());
+            result = statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Reader> findByParams(String fio, String phone, String passport) {
+        List<String> whereQuery = new ArrayList<>();
+
+        if (!fio.equals("")) {
+            whereQuery.add("r.fio like '%" + fio + "%'");
+        }
+
+        if (!phone.equals("")) {
+            whereQuery.add("r.phone like '%" + phone + "%'");
+        }
+
+        if (!passport.equals("")) {
+            whereQuery.add("r.passport like '%" + passport + "%'");
+        }
+
+        List<Reader> readerList = new ArrayList<>();
+
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL + " WHERE " + String.join(" AND ", whereQuery));
+             ResultSet set = statement.executeQuery()) {
+            while (set.next()) {
+                readerList.add(getReaderFromResultSet(set));
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return readerList;
     }
 }

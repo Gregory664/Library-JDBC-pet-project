@@ -2,6 +2,7 @@ package org.library.services;
 
 import org.library.entity.Shelf;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.ShelfNotFoundByInventNumException;
 import org.library.interfaces.ShelfRepository;
 
 import java.util.List;
@@ -19,6 +20,10 @@ public class ShelfService {
 
     public Shelf findById(Integer id) throws EntityNotFoundByIdException {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Shelf.class, id));
+    }
+
+    public Shelf findByInventNum(String inventNum) throws ShelfNotFoundByInventNumException {
+        return repository.findByInventNum(inventNum).orElseThrow(() -> new ShelfNotFoundByInventNumException(inventNum));
     }
 
     public boolean existsById(Integer id) {
@@ -39,5 +44,9 @@ public class ShelfService {
 
     public long count() {
         return repository.count();
+    }
+
+    public boolean update(Shelf shelf) {
+        return repository.update(shelf);
     }
 }
