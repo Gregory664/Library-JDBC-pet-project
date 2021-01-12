@@ -17,7 +17,7 @@ public class EditShelfDataController {
     @Getter
     private boolean save;
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
 
     @Getter
     private Shelf shelf;
@@ -36,13 +36,12 @@ public class EditShelfDataController {
             shelf.setInventNum(shelfNumberTextField.getText());
             save = service.update(shelf);
         }
-
+        actionOnForm = true;
         Utils.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        close = true;
         Utils.getStage(cancelButton).close();
     }
 }

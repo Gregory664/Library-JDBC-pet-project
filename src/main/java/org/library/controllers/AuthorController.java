@@ -17,7 +17,7 @@ public class AuthorController {
     @Getter
     private boolean save;
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
 
     @Getter
     private Author author;
@@ -40,13 +40,12 @@ public class AuthorController {
             author.setName(authorFioTextField.getText());
             save = service.update(author);
         }
-
+        actionOnForm = true;
         Utils.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        close = true;
         Utils.getStage(cancelButton).close();
     }
 }

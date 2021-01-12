@@ -17,7 +17,7 @@ public class PublisherController {
     @Getter
     private boolean save;
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
 
     @Getter
     private Publisher publisher;
@@ -36,13 +36,12 @@ public class PublisherController {
             publisher.setTitle(publisherTitleTextField.getText());
             save = service.update(publisher);
         }
-
+        actionOnForm = true;
         Utils.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        close = true;
         Utils.getStage(cancelButton).close();
     }
 }

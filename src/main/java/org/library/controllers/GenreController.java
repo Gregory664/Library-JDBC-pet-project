@@ -17,7 +17,7 @@ public class GenreController {
     @Getter
     private boolean save;
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
 
     @Getter
     private Genre genre;
@@ -36,13 +36,12 @@ public class GenreController {
             genre.setTitle(genreTitleTextField.getText());
             save = service.update(genre);
         }
-
+        actionOnForm = true;
         Utils.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        close = true;
         Utils.getStage(cancelButton).close();
     }
 }

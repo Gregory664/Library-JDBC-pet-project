@@ -371,27 +371,25 @@ public class MainController {
             RentController rentController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if (rentController.isClose()) {
+            if (!rentController.isActionOnForm()) {
                 return;
             }
 
-            Optional<Reader> optionalReader = rentController.getSelectedReader();
-            if (optionalReader.isPresent()) {
+            if (rentController.isSave()) {
                 int selectedBookCopyId = shelfView.getSelectionModel().getSelectedItem().getKey();
 
                 BookCopy bookCopy = bookCopyService.findById(selectedBookCopyId);
                 Shelf shelf = shelfView.getSelectionModel().getSelectedItem().getValue();
-                Reader reader = optionalReader.get();
+                Reader reader = rentController.getSelectedReader();
                 Period period = rentController.getPeriod();
                 bookRentService.addRentBookCopiesToReader(reader, bookCopy, period, shelf);
 
                 booksView.getSelectionModel().getSelectedItem().getBookCopyIdAndShelf().remove(selectedBookCopyId);
 
-                Reader changedReader = readerView.getItems().stream()
+                readerView.getItems().stream()
                         .filter(reader1 -> reader1.getId() == reader.getId())
                         .findFirst()
-                        .orElseThrow(RuntimeException::new);
-                changedReader.getRentBookCopies().put(bookCopy, period);
+                        .ifPresent(reader1 -> reader1.getRentBookCopies().put(bookCopy, period));
 
                 fillShelfView();
                 fillRentBookView();
@@ -419,7 +417,7 @@ public class MainController {
             ShelfController shelfController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if (shelfController.isClose()) {
+            if (!shelfController.isActionOnForm()) {
                 return;
             }
 
@@ -465,13 +463,15 @@ public class MainController {
             BookController bookController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if (bookController.isClose()) {
+            if (!bookController.isActionOnForm()) {
                 return;
             }
 
             if (bookController.isSave()) {
                 booksView.getItems().add(bookController.getBook());
                 MessageBox.OkBox("Книга успешно добавлена!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка добавления книги").show();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -511,7 +511,7 @@ public class MainController {
             ShelfController shelfController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if (shelfController.isClose()) {
+            if (!shelfController.isActionOnForm()) {
                 return;
             }
 
@@ -523,6 +523,8 @@ public class MainController {
                 booksView.refresh();
                 fillShelfView();
                 MessageBox.OkBox("Копия книги успешно добавлена!").show();
+            } else {
+                MessageBox.WarningBox("Ошибка добавления копии книги!").show();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -547,7 +549,7 @@ public class MainController {
             shelfController.setSelectedShelf(currentShelf);
 
             stage.showAndWait();
-            if (shelfController.isClose()) {
+            if (!shelfController.isActionOnForm()) {
                 return;
             }
 
@@ -559,7 +561,6 @@ public class MainController {
                 } else {
                     MessageBox.WarningBox("Ошибка обновления номера полки!").show();
                 }
-
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -595,7 +596,7 @@ public class MainController {
             bookController.setBook(selectedBook);
 
             stage.showAndWait();
-            if (bookController.isClose()) {
+            if (!bookController.isActionOnForm()) {
                 return;
             }
 
@@ -628,7 +629,7 @@ public class MainController {
             ReaderController readerController = fxmlLoader.getController();
 
             stage.showAndWait();
-            if (readerController.isClose()) {
+            if (!readerController.isActionOnForm()) {
                 return;
             }
 
@@ -655,7 +656,7 @@ public class MainController {
             readerController.setReader(readerView.getSelectionModel().getSelectedItem());
 
             stage.showAndWait();
-            if (readerController.isClose()) {
+            if (!readerController.isActionOnForm()) {
                 return;
             }
 
@@ -714,7 +715,7 @@ public class MainController {
             AuthorController authorController = loader.getController();
 
             stage.showAndWait();
-            if (authorController.isClose()) {
+            if (!authorController.isActionOnForm()) {
                 return;
             }
 
@@ -744,7 +745,7 @@ public class MainController {
             authorController.setAuthor(selectedAuthor);
 
             stage.showAndWait();
-            if (authorController.isClose()) {
+            if (!authorController.isActionOnForm()) {
                 return;
             }
 
@@ -817,7 +818,7 @@ public class MainController {
             GenreController genreController = loader.getController();
 
             stage.showAndWait();
-            if (genreController.isClose()) {
+            if (!genreController.isActionOnForm()) {
                 return;
             }
 
@@ -847,7 +848,7 @@ public class MainController {
             genreController.setGenre(selectedGenre);
 
             stage.showAndWait();
-            if (genreController.isClose()) {
+            if (!genreController.isActionOnForm()) {
                 return;
             }
 
@@ -913,7 +914,7 @@ public class MainController {
             PublisherController publisherController = loader.getController();
 
             stage.showAndWait();
-            if (publisherController.isClose()) {
+            if (!publisherController.isActionOnForm()) {
                 return;
             }
 
@@ -943,7 +944,7 @@ public class MainController {
             publisherController.setPublisher(selectedPublisher);
 
             stage.showAndWait();
-            if (publisherController.isClose()) {
+            if (!publisherController.isActionOnForm()) {
                 return;
             }
 
@@ -1009,7 +1010,7 @@ public class MainController {
             EditShelfDataController editShelfDataController = loader.getController();
 
             stage.showAndWait();
-            if (editShelfDataController.isClose()) {
+            if (!editShelfDataController.isActionOnForm()) {
                 return;
             }
 
@@ -1038,7 +1039,7 @@ public class MainController {
             editShelfDataController.setShelf(selectedShelf);
 
             stage.showAndWait();
-            if (editShelfDataController.isClose()) {
+            if (!editShelfDataController.isActionOnForm()) {
                 return;
             }
 

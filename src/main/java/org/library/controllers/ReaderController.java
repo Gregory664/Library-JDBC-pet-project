@@ -28,7 +28,7 @@ public class ReaderController {
     public ComboBox<String> genderComboBox;
     public DatePicker dobDatePicker;
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
     @Getter
     private boolean save;
     @Getter
@@ -65,12 +65,12 @@ public class ReaderController {
 
             save = readerService.update(reader);
         }
+        actionOnForm = true;
         Utils.getStage(saveButton).close();
     }
 
     @FXML
     public void close() {
-        close = true;
         Utils.getStage(saveButton).close();
     }
 

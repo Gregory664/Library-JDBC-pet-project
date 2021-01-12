@@ -23,7 +23,7 @@ public class ShelfController {
     @Getter
     private Shelf selectedShelf;
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
     @Getter
     private boolean save;
 
@@ -50,7 +50,7 @@ public class ShelfController {
             } else {
                 Utils.updateShelf(selectedShelf, shelfService.findByInventNum(selectedShelfNumber));
             }
-
+            actionOnForm = true;
             save = true;
             Utils.getStage(saveButton).close();
         } catch (ShelfNotFoundByInventNumException e) {
@@ -60,7 +60,6 @@ public class ShelfController {
 
     @FXML
     public void cancel() {
-        close = true;
         Utils.getStage(saveButton).close();
     }
 }
