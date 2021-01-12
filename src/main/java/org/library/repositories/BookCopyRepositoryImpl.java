@@ -4,7 +4,7 @@ import org.library.entity.Book;
 import org.library.entity.BookCopy;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.BookCopyRepository;
-import org.library.utils.ConnectionUtils;
+import org.library.utils.MySQLConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     public List<BookCopy> findAll() {
         List<BookCopy> bookCopies = new ArrayList<>();
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -38,7 +38,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     public Optional<BookCopy> findById(Integer id) {
         BookCopy bookCopy = null;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -57,7 +57,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     @Override
     public boolean existsById(Integer id) {
         boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -71,7 +71,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
 
     @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate(DELETE_ALL);
         } catch (SQLException e) {
@@ -82,7 +82,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     @Override
     public boolean deleteById(Integer id) {
         boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
             result = statement.executeUpdate() == 1;
@@ -95,7 +95,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     @Override
     public boolean save(BookCopy bookCopy) {
         boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, bookCopy.getBook().getId());
             result = statement.executeUpdate() == 1;
@@ -117,7 +117,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     public long count() {
         long result = 0;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(COUNT)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -134,7 +134,7 @@ public class BookCopyRepositoryImpl implements BookCopyRepository {
     public boolean update(BookCopy bookCopy) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE)) {
             statement.setInt(1, bookCopy.getBook().getId());
             statement.setInt(2, bookCopy.getId());

@@ -6,7 +6,7 @@ import org.library.entity.Reader;
 import org.library.entity.Shelf;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.BookRentRepository;
-import org.library.utils.ConnectionUtils;
+import org.library.utils.MySQLConnection;
 
 import java.sql.*;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class BookRentRepositoryImpl implements BookRentRepository {
     public Map<BookCopy, Period> getRentBookCopiesByReaderId(int readerId) {
         Map<BookCopy, Period> rentBooksByReaderIdMap = new TreeMap<>();
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(GET_RENT_BOOK_COPY_BY_READER_ID)) {
             statement.setInt(1, readerId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -41,7 +41,7 @@ public class BookRentRepositoryImpl implements BookRentRepository {
     public boolean deleteRentBookCopiesFromReader(Reader reader, BookCopy bookCopy) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_RENT_BOOK_COPY)) {
             statement.setInt(1, reader.getId());
             statement.setInt(2, bookCopy.getId());
@@ -56,7 +56,7 @@ public class BookRentRepositoryImpl implements BookRentRepository {
     public boolean addRentBookCopiesToReader(Reader reader, BookCopy bookCopy, Period period, Shelf shelf) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(ADD_RENT_BOOK_COPY_TO_READER)) {
             statement.setInt(1, reader.getId());
             statement.setInt(2, bookCopy.getId());

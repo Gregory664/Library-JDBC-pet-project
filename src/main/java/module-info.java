@@ -4,6 +4,7 @@ module org.library {
     requires javafx.graphics;
     requires java.sql;
     requires lombok;
+    requires commons.cli;
 
     opens org.library.controllers to javafx.fxml;
     exports org.library;

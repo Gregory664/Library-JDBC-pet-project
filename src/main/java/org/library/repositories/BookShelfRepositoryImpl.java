@@ -4,7 +4,7 @@ import org.library.entity.BookCopy;
 import org.library.entity.Shelf;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.BookShelfRepository;
-import org.library.utils.ConnectionUtils;
+import org.library.utils.MySQLConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +20,7 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
     public Map<Integer, Shelf> getBookCopyIdAndShelf(int bookId) {
         Map<Integer, Shelf> bookCopyIdAndShelf = new TreeMap<>();
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(BOOK_COPY_AND_SHELF)) {
             statement.setInt(1, bookId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -41,7 +41,7 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
     public boolean deleteBookCopyFromShelf(int bookId, int shelfId) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_FROM_BOOK_SHELF)) {
             statement.setInt(1, shelfId);
             statement.setInt(2, bookId);
@@ -56,7 +56,7 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
     public boolean addBookCopyToShelf(BookCopy bookCopy, Shelf shelf) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(ADD_BOOK_COPY_TO_SHELF)) {
             statement.setInt(1, bookCopy.getId());
             statement.setInt(2, shelf.getId());
@@ -71,7 +71,7 @@ public class BookShelfRepositoryImpl implements BookShelfRepository {
     public boolean updateShelf(int shelfId, int bookCopyId, int newShelfId) {
         boolean result = false;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_BOOK_COPY)) {
             statement.setInt(1, newShelfId);
             statement.setInt(2, shelfId);
