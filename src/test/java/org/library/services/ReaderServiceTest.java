@@ -91,29 +91,19 @@ class ReaderServiceTest {
         when(bookRentRepository.getRentBookCopiesByReaderId(2)).thenReturn(rentBookCopies2);
         when(readerRepository.findAll()).thenReturn(readerList);
         when(readerRepository.existsByPassport("2000111222")).thenReturn(true);
-        when(readerRepository.findByFioLike("test fio")).thenReturn(List.of(readerList.get(0)));
         when(readerRepository.findById(1)).thenReturn(Optional.of(readerList.get(0)));
         when(readerRepository.existsById(1)).thenReturn(true);
         when(readerRepository.deleteById(1)).thenReturn(true);
         when(readerRepository.save(readerList.get(0))).thenReturn(true);
         when(readerRepository.count()).thenReturn(2L);
         when(readerRepository.update(readerList.get(0))).thenReturn(true);
+        when(readerRepository.findByParams(anyString(), anyString(), anyString())).thenReturn(readerList);
     }
 
     @Test
     void existsByPassport() {
         assertTrue(readerService.existsByPassport("2000111222"));
         verify(readerRepository, times(1)).existsByPassport(anyString());
-    }
-
-    @Test
-    void findByFioLike() {
-        List<Reader> test_fio = readerService.findByFioLike("test fio");
-        assertNotNull(test_fio);
-        assertEquals(List.of(readerList.get(0)), test_fio);
-
-        verify(readerRepository, atLeast(1)).findByFioLike("test fio");
-        verify(bookRentRepository, atLeast(1)).getRentBookCopiesByReaderId(anyInt());
     }
 
     @Test
@@ -172,5 +162,12 @@ class ReaderServiceTest {
     void update() {
         assertTrue(readerService.update(readerList.get(0)));
         verify(readerRepository).update(readerList.get(0));
+    }
+
+    @Test
+    void findByParams() {
+        assertEquals(readerList, readerService.findByParams("test", "test", "test"));
+        verify(readerRepository).findByParams(anyString(), anyString(), anyString());
+        verify(bookRentRepository, atLeast(readerList.size())).getRentBookCopiesByReaderId(anyInt());
     }
 }

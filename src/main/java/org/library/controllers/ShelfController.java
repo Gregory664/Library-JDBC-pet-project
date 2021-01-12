@@ -1,18 +1,18 @@
 package org.library.controllers;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.stage.Stage;
 import lombok.Getter;
 import org.library.entity.Shelf;
+import org.library.exceptions.newExc.ShelfNotFoundByInventNumException;
 import org.library.repositories.ShelfRepositoryImpl;
 import org.library.services.ShelfService;
+import org.library.utils.MessageBox;
+import org.library.utils.Utils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ShelfController {
@@ -21,9 +21,16 @@ public class ShelfController {
     public Button saveButton = new Button();
     public Button cancelButton = new Button();
     @Getter
-    private Optional<Shelf> selectedShelf = Optional.empty();
+    private Shelf selectedShelf;
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
+    @Getter
+    private boolean save;
+
+    public void setSelectedShelf(Shelf selectedShelf) {
+        this.selectedShelf = selectedShelf;
+        shelfComboBox.getSelectionModel().select(selectedShelf.getInventNum());
+    }
 
     @FXML
     public void initialize() {
@@ -34,23 +41,25 @@ public class ShelfController {
     }
 
     @FXML
-    public void selectShelf(ActionEvent actionEvent) {
-        String selectedShelfNumber = shelfComboBox.getSelectionModel().getSelectedItem();
-        selectedShelf = shelfService.findAll().stream()
-                .filter(shelf -> shelf.getInventNum().equals(selectedShelfNumber))
-                .findFirst();
+    public void save() {
+        try {
+            String selectedShelfNumber = shelfComboBox.getSelectionModel().getSelectedItem();
+
+            if (selectedShelf == null) {
+                selectedShelf = shelfService.findByInventNum(selectedShelfNumber);
+            } else {
+                Utils.updateShelf(selectedShelf, shelfService.findByInventNum(selectedShelfNumber));
+            }
+            actionOnForm = true;
+            save = true;
+            Utils.getStage(saveButton).close();
+        } catch (ShelfNotFoundByInventNumException e) {
+            MessageBox.WarningBox(e.getMessage()).show();
+        }
     }
 
     @FXML
-    public void save(ActionEvent actionEvent) {
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
-    }
-
-    @FXML
-    public void cancel(ActionEvent actionEvent) {
-        close = true;
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
+    public void cancel() {
+        Utils.getStage(saveButton).close();
     }
 }

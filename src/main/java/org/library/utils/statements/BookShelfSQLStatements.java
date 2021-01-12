@@ -15,4 +15,9 @@ public class BookShelfSQLStatements {
     public static final String ADD_BOOK_COPY_TO_SHELF = "" +
             "INSERT INTO bookshelf (bookCopy_id, shelf_id) " +
             "VALUES (?, ?);";
+
+    public static final String UPDATE_BOOK_COPY = "" +
+            "update bookshelf " +
+            "set shelf_id = ? " +
+            "where shelf_id = ? AND bookCopy_id = ?";
 }

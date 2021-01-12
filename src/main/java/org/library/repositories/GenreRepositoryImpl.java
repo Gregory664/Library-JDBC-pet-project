@@ -3,7 +3,7 @@ package org.library.repositories;
 import org.library.entity.Genre;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.GenreRepository;
-import org.library.utils.ConnectionUtils;
+import org.library.utils.MySQLConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public Optional<Genre> findByTitle(String title) {
         Genre genre = null;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
             statement.setString(1, title);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -37,7 +37,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public List<Genre> findAll() {
         List<Genre> genres = new ArrayList<>();
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -55,7 +55,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public Optional<Genre> findById(Integer id) {
         Genre genre = null;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -75,7 +75,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public boolean existsById(Integer id) {
         boolean isExists = false;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -91,7 +91,7 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate(DELETE);
         } catch (SQLException e) {
@@ -103,7 +103,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public boolean deleteById(Integer id) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
             result = statement.executeUpdate() == 1;
@@ -117,10 +117,18 @@ public class GenreRepositoryImpl implements GenreRepository {
     public boolean save(Genre genre) {
         boolean isSave;
 
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, genre.getTitle());
             isSave = statement.executeUpdate() == 1;
+
+            if(isSave) {
+                try (ResultSet set =statement.getGeneratedKeys()){
+                    if(set.next()) {
+                        genre.setId(set.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -131,7 +139,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public long count() {
         long result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(COUNT)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 resultSet.next();
@@ -147,7 +155,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     public boolean update(Genre genre) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE)) {
             statement.setString(1, genre.getTitle());
             statement.setInt(2, genre.getId());

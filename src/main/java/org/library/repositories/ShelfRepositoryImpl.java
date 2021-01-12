@@ -3,12 +3,9 @@ package org.library.repositories;
 import org.library.entity.Shelf;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.ShelfRepository;
-import org.library.utils.ConnectionUtils;
+import org.library.utils.MySQLConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +17,7 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     public List<Shelf> findAll() {
         List<Shelf> shelves = new ArrayList<>();
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -39,7 +36,7 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     public Optional<Shelf> findById(Integer id) {
         Shelf shelf = null;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -55,10 +52,28 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     }
 
     @Override
+    public Optional<Shelf> findByInventNum(String inventNum) {
+        Shelf shelf = null;
+
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_INVENT_NUM)) {
+            statement.setString(1, inventNum);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    shelf = new Shelf(resultSet.getInt(1), resultSet.getString(2));
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return Optional.ofNullable(shelf);
+    }
+
+    @Override
     public boolean existsById(Integer id) {
         boolean result = false;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -74,7 +89,7 @@ public class ShelfRepositoryImpl implements ShelfRepository {
 
     @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE)) {
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -86,7 +101,7 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     public boolean deleteById(Integer id) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
             result = statement.executeUpdate() == 1;
@@ -100,10 +115,16 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     public boolean save(Shelf shelf) {
         boolean isSave;
 
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, shelf.getInventNum());
             isSave = statement.executeUpdate() == 1;
+
+            try (ResultSet set = statement.getGeneratedKeys()) {
+                if (set.next()) {
+                    shelf.setId(set.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -114,7 +135,7 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     public long count() {
         long result = 0;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(COUNT);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -130,7 +151,7 @@ public class ShelfRepositoryImpl implements ShelfRepository {
     public boolean update(Shelf shelf) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE)) {
             statement.setString(1, shelf.getInventNum());
             statement.setInt(2, shelf.getId());

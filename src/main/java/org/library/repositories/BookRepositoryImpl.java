@@ -6,12 +6,13 @@ import org.library.entity.Genre;
 import org.library.entity.Publisher;
 import org.library.exceptions.SQLExceptionWrapper;
 import org.library.interfaces.BookRepository;
-import org.library.utils.ConnectionUtils;
+import org.library.utils.MySQLConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import static org.library.utils.statements.BookSQLStatements.*;
 
@@ -41,6 +42,7 @@ public class BookRepositoryImpl implements BookRepository {
                     .author(author)
                     .publisher(publisher)
                     .genre(genre)
+                    .bookCopyIdAndShelf(new TreeMap<>())
                     .build();
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
@@ -48,82 +50,10 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public List<Book> findByAuthor(Author author) {
-        List<Book> books = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_AUTHOR)) {
-            statement.setInt(1, author.getId());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    books.add(getBookFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return books;
-    }
-
-    @Override
-    public List<Book> findByPublisher(Publisher publisher) {
-        List<Book> books = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_PUBLISHER)) {
-            statement.setInt(1, publisher.getId());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    books.add(getBookFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return books;
-    }
-
-    @Override
-    public List<Book> findByGenre(Genre genre) {
-        List<Book> books = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_GENRE)) {
-            statement.setInt(1, genre.getId());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    books.add(getBookFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return books;
-    }
-
-    @Override
-    public Optional<Book> findByTitle(String title) {
-        Book book = null;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
-            statement.setString(1, title);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    book = getBookFromResultSet(resultSet);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(book);
-    }
-
-    @Override
     public List<Book> findAll() {
         List<Book> books = new ArrayList<>();
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -139,7 +69,7 @@ public class BookRepositoryImpl implements BookRepository {
     public Optional<Book> findById(Integer id) {
         Book book = null;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -157,7 +87,7 @@ public class BookRepositoryImpl implements BookRepository {
     public boolean existsById(Integer id) {
         boolean isExists = false;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
             statement.setInt(1, id);
             try (ResultSet set = statement.executeQuery()) {
@@ -173,7 +103,7 @@ public class BookRepositoryImpl implements BookRepository {
 
     @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate(DELETE_ALL);
         } catch (SQLException e) {
@@ -184,7 +114,7 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public boolean deleteById(Integer id) {
         boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setInt(1, id);
             result = statement.executeUpdate() == 1;
@@ -198,7 +128,7 @@ public class BookRepositoryImpl implements BookRepository {
     public boolean save(Book book) {
         boolean isSave;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, book.getTitle());
             statement.setInt(2, book.getAuthor().getId());
@@ -224,7 +154,7 @@ public class BookRepositoryImpl implements BookRepository {
     public long count() {
         long result = 0;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(COUNT);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -240,7 +170,7 @@ public class BookRepositoryImpl implements BookRepository {
     public boolean update(Book book) {
         boolean result;
 
-        try (Connection connection = ConnectionUtils.getConnection();
+        try (Connection connection = MySQLConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE)) {
             statement.setString(1, book.getTitle());
             statement.setInt(2, book.getAuthor().getId());
@@ -254,5 +184,38 @@ public class BookRepositoryImpl implements BookRepository {
         }
 
         return result;
+    }
+
+    @Override
+    public List<Book> findByParams(String title, Author author, Genre genre, Publisher publisher) {
+        List<String> whereQuery = new ArrayList<>();
+
+        if (!title.equals("")) {
+            whereQuery.add("b.title like '%" + title + "%'");
+        }
+
+        if (author != null) {
+            whereQuery.add("a.id = " + author.getId());
+        }
+
+        if (genre != null) {
+            whereQuery.add("g.id = " + genre.getId());
+        }
+
+        if (publisher != null) {
+            whereQuery.add("p.id = " + publisher.getId());
+        }
+
+        List<Book> books = new ArrayList<>();
+        try (Connection connection = MySQLConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL + "WHERE " + String.join(" AND ", whereQuery));
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                books.add(getBookFromResultSet(resultSet));
+            }
+        } catch (SQLException e) {
+            throw new SQLExceptionWrapper(e);
+        }
+        return books;
     }
 }

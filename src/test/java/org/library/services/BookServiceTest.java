@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.*;
 import org.library.exceptions.newExc.EntityNotFoundByIdException;
-import org.library.exceptions.newExc.EntityNotFoundByTitleException;
 import org.library.interfaces.BookRepository;
 import org.library.interfaces.BookShelfRepository;
 import org.library.repositories.BookRepositoryImpl;
@@ -62,47 +61,15 @@ class BookServiceTest {
         when(bookShelfRepository.getBookCopyIdAndShelf(2)).thenReturn(bookCopyIdAndShelf2);
         when(bookRepository.findAll()).thenReturn(books);
         when(bookRepository.findById(1)).thenReturn(Optional.of(books.get(0)));
-        when(bookRepository.findByTitle("book 1")).thenReturn(Optional.of(books.get(0)));
-        when(bookRepository.findByAuthor(new Author(1, "test author"))).thenReturn(books);
-        when(bookRepository.findByPublisher(new Publisher(1, "test publisher"))).thenReturn(books);
-        when(bookRepository.findByGenre(new Genre(1, "test genre"))).thenReturn(books);
         when(bookRepository.existsById(1)).thenReturn(true);
         when(bookRepository.deleteById(2)).thenReturn(true);
         when(bookRepository.save(books.get(0))).thenReturn(true);
         when(bookRepository.count()).thenReturn(2L);
         when(bookRepository.update(books.get(0))).thenReturn(true);
-    }
-
-    @Test
-    void findByAuthor() {
-        List<Book> test_author = bookService.findByAuthor(new Author(1, "test author"));
-        assertNotNull(test_author);
-        assertEquals(BookServiceTest.books, test_author);
-    }
-
-    @Test
-    void findByPublisher() {
-        List<Book> test_publisher = bookService.findByPublisher(new Publisher(1, "test publisher"));
-        assertNotNull(test_publisher);
-        assertEquals(BookServiceTest.books, test_publisher);
-    }
-
-    @Test
-    void findByGenre() {
-        List<Book> test_genre = bookService.findByGenre(new Genre(1, "test genre"));
-        assertNotNull(test_genre);
-        assertEquals(BookServiceTest.books, test_genre);
-    }
-
-    @Test
-    void findByTitle() throws EntityNotFoundByTitleException {
-        Book byTitle = bookService.findByTitle("book 1");
-        assertNotNull(byTitle);
-        assertEquals(books.get(0), byTitle);
-
-        Throwable throwable = assertThrows(EntityNotFoundByTitleException.class, () -> bookService.findByTitle("book 3"));
-        assertNotNull(throwable);
-        assertNotEquals("", throwable.getMessage());
+        when(bookRepository.findByParams("book 1",
+                books.get(0).getAuthor(),
+                books.get(0).getGenre(),
+                books.get(0).getPublisher())).thenReturn(List.of(books.get(0)));
     }
 
     @Test
@@ -157,5 +124,15 @@ class BookServiceTest {
     void update() {
         assertTrue(bookService.update(books.get(0)));
         verify(bookRepository).update(books.get(0));
+    }
+
+    @Test
+    void findByParams() {
+        assertEquals(List.of(books.get(0)), bookService.findByParams("book 1",
+                books.get(0).getAuthor(),
+                books.get(0).getGenre(),
+                books.get(0).getPublisher()));
+        verify(bookRepository, atLeast(1)).findByParams(anyString(), any(Author.class), any(Genre.class), any(Publisher.class));
+        verify(bookShelfRepository, atLeast(1)).getBookCopyIdAndShelf(anyInt());
     }
 }

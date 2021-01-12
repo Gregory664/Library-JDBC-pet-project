@@ -6,14 +6,7 @@ import org.library.entity.Genre;
 import org.library.entity.Publisher;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BookRepository extends JDBCRepository<Book, Integer> {
-    List<Book> findByAuthor(Author author);
-
-    List<Book> findByPublisher(Publisher publisher);
-
-    List<Book> findByGenre(Genre genre);
-
-    Optional<Book> findByTitle(String title);
+    List<Book> findByParams(String title, Author author, Genre genre, Publisher publisher);
 }

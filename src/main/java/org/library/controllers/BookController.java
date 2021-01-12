@@ -1,7 +1,6 @@
 package org.library.controllers;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -37,7 +36,7 @@ public class BookController {
     public Button saveButton = new Button();
     public Button cancelButton = new Button();
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
     @Getter
     private boolean save;
     @Getter
@@ -70,7 +69,7 @@ public class BookController {
     }
 
     @FXML
-    public void save(ActionEvent actionEvent) {
+    public void save() {
         Author author;
         String authorName = authorComboBox.getEditor().getText();
         if (!authorComboBox.getItems().contains(authorName)) {
@@ -118,7 +117,7 @@ public class BookController {
 
                 save = bookService.update(book);
             }
-
+            actionOnForm = true;
             Utils.getStage(saveButton).close();
         } catch (AuthorNotFoundByNameException | EntityNotFoundByTitleException e) {
             MessageBox.WarningBox(e.getMessage()).show();
@@ -126,8 +125,7 @@ public class BookController {
     }
 
     @FXML
-    public void cancel(ActionEvent actionEvent) {
-        close = true;
+    public void cancel() {
         Utils.getStage(saveButton).close();
     }
 }

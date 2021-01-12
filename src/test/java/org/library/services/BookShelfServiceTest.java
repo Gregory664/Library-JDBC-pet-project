@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.library.entity.*;
 import org.library.exceptions.BookCopyIsExistsInShelfException;
-import org.library.exceptions.BookNotFoundOnShelfException;
 import org.library.interfaces.BookShelfRepository;
 import org.library.repositories.BookShelfRepositoryImpl;
 
@@ -24,7 +23,6 @@ class BookShelfServiceTest {
     @BeforeAll
     static void initialize() {
         shelf = new Shelf(1, "Z1");
-        Shelf shelf2 = new Shelf(2, "Z2");
 
         map.put(1, shelf);
         map.put(2, shelf);
@@ -69,5 +67,12 @@ class BookShelfServiceTest {
         Throwable throwable = assertThrows(BookCopyIsExistsInShelfException.class, () -> bookShelfService.addBookCopyToShelf(bookCopy, shelf));
         assertNotNull(throwable);
         assertNotEquals("", throwable.getMessage());
+    }
+
+    @Test
+    void updateShelf() {
+        when(bookShelfRepository.updateShelf(1, 1, 1)).thenReturn(true);
+        assertTrue(bookShelfService.updateShelf(1, 1, 1));
+        verify(bookShelfRepository).updateShelf(1, 1, 1);
     }
 }
