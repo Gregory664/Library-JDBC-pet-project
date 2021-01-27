@@ -7,20 +7,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.commons.cli.*;
 import org.library.utils.MySQLConnection;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 import java.io.IOException;
 
-/**
- * JavaFX App
- */
 public class App extends Application {
-
-    private static Scene scene;
-
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-    }
 
     public static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
@@ -38,13 +29,13 @@ public class App extends Application {
         String dbName;
         String dbUserName;
         String dbPassword;
-        
-        if(args.length == 0) {
-             host = "localhost";
-             port = "3306";
-             dbName = "library";
-             dbUserName = "lib";
-             dbPassword = "!Library777";
+
+        if (args.length == 0) {
+            host = UtilityClass.getProperty("host");
+            port = UtilityClass.getProperty("port");
+            dbName = UtilityClass.getProperty("dbName");
+            dbUserName = UtilityClass.getProperty("dbUserName");
+            dbPassword = UtilityClass.getProperty("dbPassword");
         } else {
             Options options = getOptions();
             CommandLineParser parser = new DefaultParser();
@@ -64,23 +55,23 @@ public class App extends Application {
             dbUserName = commandLine.getOptionValue("dbUserName");
             dbPassword = commandLine.getOptionValue("dbPassword");
         }
-       
+
         MySQLConnection.init(host, port, dbName, dbUserName, dbPassword);
     }
-    
+
     private static Options getOptions() {
         Options options = new Options();
-        Utils.addCLIOption(options, "h", "host", "sql server host");
-        Utils.addCLIOption(options, "p", "port", "sql server port");
-        Utils.addCLIOption(options, "dbN", "dbName", "database name");
-        Utils.addCLIOption(options, "dbUN", "dbUserName", "username");
-        Utils.addCLIOption(options, "dbP", "dbPassword", "username");
+        UtilityClass.addCLIOption(options, "h", "host", "sql server host");
+        UtilityClass.addCLIOption(options, "p", "port", "sql server port");
+        UtilityClass.addCLIOption(options, "dbN", "dbName", "database name");
+        UtilityClass.addCLIOption(options, "dbUN", "dbUserName", "username");
+        UtilityClass.addCLIOption(options, "dbP", "dbPassword", "username");
         return options;
     }
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("main"));
+        Scene scene = new Scene(loadFXML("main"));
         scene.getStylesheets().add(App.class.getResource("main.css").toExternalForm());
         stage.setScene(scene);
         stage.show();

@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.library.entity.Publisher;
 import org.library.repositories.PublisherRepositoryImpl;
 import org.library.services.PublisherService;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 public class PublisherController {
     private final PublisherService service = new PublisherService(new PublisherRepositoryImpl());
@@ -37,11 +37,11 @@ public class PublisherController {
             save = service.update(publisher);
         }
         actionOnForm = true;
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 }

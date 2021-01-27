@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.library.entity.Author;
 import org.library.repositories.AuthorRepositoryImpl;
 import org.library.services.AuthorService;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 public class AuthorController {
     private final AuthorService service = new AuthorService(new AuthorRepositoryImpl());
@@ -41,11 +41,11 @@ public class AuthorController {
             save = service.update(author);
         }
         actionOnForm = true;
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 }

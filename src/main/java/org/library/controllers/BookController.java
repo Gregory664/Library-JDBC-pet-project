@@ -18,7 +18,7 @@ import org.library.services.BookService;
 import org.library.services.GenreService;
 import org.library.services.PublisherService;
 import org.library.utils.MessageBox;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -118,7 +118,7 @@ public class BookController {
                 save = bookService.update(book);
             }
             actionOnForm = true;
-            Utils.getStage(saveButton).close();
+            UtilityClass.getStage(saveButton).close();
         } catch (AuthorNotFoundByNameException | EntityNotFoundByTitleException e) {
             MessageBox.WarningBox(e.getMessage()).show();
         }
@@ -126,6 +126,6 @@ public class BookController {
 
     @FXML
     public void cancel() {
-        Utils.getStage(saveButton).close();
+        UtilityClass.getStage(saveButton).close();
     }
 }

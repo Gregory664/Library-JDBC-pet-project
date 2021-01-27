@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.library.entity.Shelf;
 import org.library.repositories.ShelfRepositoryImpl;
 import org.library.services.ShelfService;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 public class EditShelfDataController {
     private final ShelfService service = new ShelfService(new ShelfRepositoryImpl());
@@ -37,11 +37,11 @@ public class EditShelfDataController {
             save = service.update(shelf);
         }
         actionOnForm = true;
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 }

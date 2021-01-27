@@ -15,7 +15,7 @@ import org.library.repositories.BookRentRepositoryImpl;
 import org.library.repositories.ReaderRepositoryImpl;
 import org.library.services.ReaderService;
 import org.library.utils.MessageBox;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -70,12 +70,12 @@ public class RentController {
         period = new Period(currentDate, finalDate);
         save = selectedReader != null;
         actionOnForm = true;
-        Utils.getStage(saveButton).close();
+        UtilityClass.getStage(saveButton).close();
     }
 
     @FXML
     public void cancel() {
-        Utils.getStage(saveButton).close();
+        UtilityClass.getStage(saveButton).close();
     }
 
     @FXML

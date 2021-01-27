@@ -7,7 +7,16 @@ import org.apache.commons.cli.Options;
 import org.library.entity.Book;
 import org.library.entity.Shelf;
 
-public class Utils {
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+public class UtilityClass {
+    private UtilityClass() {
+        throw new AssertionError();
+    }
+
     public static Stage getStage(ButtonBase buttonBase) {
         return (Stage) buttonBase.getScene().getWindow();
     }
@@ -18,6 +27,25 @@ public class Utils {
         forUpdate.setGenre(updated.getGenre());
         forUpdate.setPublisher(updated.getPublisher());
         forUpdate.setLength(updated.getLength());
+    }
+
+    public static String getProperty(String property) {
+        String result = "";
+        try {
+            String propertyPath = "connectionProperties.prop";
+            InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(propertyPath);
+            if (inputStream != null) {
+                Properties properties = new Properties();
+                properties.load(inputStream);
+                return properties.getProperty(property);
+            } else {
+                throw new FileNotFoundException(String.format("property file '%s' not found!", propertyPath));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     public static void resetShelf(Shelf shelf) {

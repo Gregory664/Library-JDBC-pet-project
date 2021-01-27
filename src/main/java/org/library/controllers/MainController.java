@@ -19,7 +19,7 @@ import org.library.exceptions.newExc.EntityNotFoundByIdException;
 import org.library.repositories.*;
 import org.library.services.*;
 import org.library.utils.MessageBox;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -606,7 +606,7 @@ public class MainController {
                 for (Reader reader : readerView.getItems()) {
                     reader.getRentBookCopies().keySet().stream()
                             .filter(bookCopy -> bookCopy.getBook().getId() == selectedBook.getId())
-                            .forEach(bookCopy -> Utils.updateBook(bookCopy.getBook(), selectedBook));
+                            .forEach(bookCopy -> UtilityClass.updateBook(bookCopy.getBook(), selectedBook));
                 }
                 readerView.refresh();
 
@@ -1080,7 +1080,7 @@ public class MainController {
                 for (Book book : booksView.getItems()) {
                     book.getBookCopyIdAndShelf().values().stream()
                             .filter(shelf -> shelf.getId() == shelfForDelete.getId())
-                            .forEach(Utils::resetShelf);
+                            .forEach(UtilityClass::resetShelf);
                 }
                 booksView.refresh();
 
@@ -1224,6 +1224,6 @@ public class MainController {
 
     @FXML
     public void closeApp() {
-        Utils.getStage(searchBooksButton).close();
+        UtilityClass.getStage(searchBooksButton).close();
     }
 }

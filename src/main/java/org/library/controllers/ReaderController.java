@@ -8,7 +8,7 @@ import org.library.repositories.BookRentRepositoryImpl;
 import org.library.repositories.ReaderRepositoryImpl;
 import org.library.services.ReaderService;
 import org.library.utils.Gender;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -66,12 +66,12 @@ public class ReaderController {
             save = readerService.update(reader);
         }
         actionOnForm = true;
-        Utils.getStage(saveButton).close();
+        UtilityClass.getStage(saveButton).close();
     }
 
     @FXML
     public void close() {
-        Utils.getStage(saveButton).close();
+        UtilityClass.getStage(saveButton).close();
     }
 
     public void setReader(Reader reader) {

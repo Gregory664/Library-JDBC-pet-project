@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.library.entity.Genre;
 import org.library.repositories.GenreRepositoryImpl;
 import org.library.services.GenreService;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 public class GenreController {
     private final GenreService service = new GenreService(new GenreRepositoryImpl());
@@ -37,11 +37,11 @@ public class GenreController {
             save = service.update(genre);
         }
         actionOnForm = true;
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 
     @FXML
     public void cancel() {
-        Utils.getStage(cancelButton).close();
+        UtilityClass.getStage(cancelButton).close();
     }
 }

@@ -10,7 +10,7 @@ import org.library.exceptions.newExc.ShelfNotFoundByInventNumException;
 import org.library.repositories.ShelfRepositoryImpl;
 import org.library.services.ShelfService;
 import org.library.utils.MessageBox;
-import org.library.utils.Utils;
+import org.library.utils.UtilityClass;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,11 +48,11 @@ public class ShelfController {
             if (selectedShelf == null) {
                 selectedShelf = shelfService.findByInventNum(selectedShelfNumber);
             } else {
-                Utils.updateShelf(selectedShelf, shelfService.findByInventNum(selectedShelfNumber));
+                UtilityClass.updateShelf(selectedShelf, shelfService.findByInventNum(selectedShelfNumber));
             }
             actionOnForm = true;
             save = true;
-            Utils.getStage(saveButton).close();
+            UtilityClass.getStage(saveButton).close();
         } catch (ShelfNotFoundByInventNumException e) {
             MessageBox.WarningBox(e.getMessage()).show();
         }
@@ -60,6 +60,6 @@ public class ShelfController {
 
     @FXML
     public void cancel() {
-        Utils.getStage(saveButton).close();
+        UtilityClass.getStage(saveButton).close();
     }
 }
