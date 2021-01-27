@@ -1,128 +1,52 @@
 package org.library.services;
 
 import org.library.entity.Shelf;
-import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IShelf;
-import org.library.utils.ConnectionUtils;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.ShelfNotFoundByInventNumException;
+import org.library.interfaces.ShelfRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.library.utils.statements.ShelfSQLStatements.*;
+public class ShelfService {
+    private final ShelfRepository repository;
 
-public class ShelfService implements IShelf {
-    @Override
+    public ShelfService(ShelfRepository repository) {
+        this.repository = repository;
+    }
+
     public List<Shelf> findAll() {
-        List<Shelf> shelves = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt(1);
-                    String inventNum = resultSet.getString(2);
-                    shelves.add(new Shelf(id, inventNum));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return shelves;
+        return repository.findAll();
     }
 
-    @Override
-    public Optional<Shelf> findById(Integer id) {
-        Shelf shelf = null;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    String inventNum = resultSet.getString(2);
-                    shelf = new Shelf(id, inventNum);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(shelf);
+    public Shelf findById(Integer id) throws EntityNotFoundByIdException {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Shelf.class, id));
     }
 
-    @Override
+    public Shelf findByInventNum(String inventNum) throws ShelfNotFoundByInventNumException {
+        return repository.findByInventNum(inventNum).orElseThrow(() -> new ShelfNotFoundByInventNumException(inventNum));
+    }
+
     public boolean existsById(Integer id) {
-        boolean result = false;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    result = resultSet.getInt(1) == 1;
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return repository.existsById(id);
     }
 
-    @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE)) {
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
+        repository.deleteAll();
     }
 
-    @Override
     public boolean deleteById(Integer id) {
-        boolean result;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
-            statement.setInt(1, id);
-            result = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return repository.deleteById(id);
     }
 
-    @Override
     public boolean save(Shelf shelf) {
-        boolean isSave;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setString(1, shelf.getInventNum());
-            isSave = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return isSave;
+        return repository.save(shelf);
     }
 
-    @Override
     public long count() {
-        long result = 0;
+        return repository.count();
+    }
 
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                result = resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+    public boolean update(Shelf shelf) {
+        return repository.update(shelf);
     }
 }

@@ -1,32 +1,33 @@
 package org.library.controllers;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import lombok.Getter;
 import org.library.entity.Author;
 import org.library.entity.Book;
 import org.library.entity.Genre;
 import org.library.entity.Publisher;
-import org.library.exceptions.SQLExceptionWrapper;
+import org.library.exceptions.newExc.AuthorNotFoundByNameException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
+import org.library.repositories.*;
 import org.library.services.AuthorService;
 import org.library.services.BookService;
 import org.library.services.GenreService;
 import org.library.services.PublisherService;
-import org.library.utils.Utils;
+import org.library.utils.MessageBox;
+import org.library.utils.UtilityClass;
 
-import java.sql.SQLException;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class BookController {
-    private final AuthorService authorService = new AuthorService();
-    private final GenreService genreService = new GenreService();
-    private final PublisherService publisherService = new PublisherService();
-    private final BookService bookService = new BookService();
+    private final AuthorService authorService = new AuthorService(new AuthorRepositoryImpl());
+    private final BookService bookService = new BookService(new BookShelfRepositoryImpl(), new BookRepositoryImpl());
+    private final GenreService genreService = new GenreService(new GenreRepositoryImpl());
+    private final PublisherService publisherService = new PublisherService(new PublisherRepositoryImpl());
     public TextField titleTextField = new TextField();
     public ComboBox<String> authorComboBox = new ComboBox<>();
     public ComboBox<String> publisherComboBox = new ComboBox<>();
@@ -35,11 +36,24 @@ public class BookController {
     public Button saveButton = new Button();
     public Button cancelButton = new Button();
     @Getter
-    private boolean close;
+    private boolean actionOnForm;
     @Getter
     private boolean save;
     @Getter
     private Book book;
+
+    public void setBook(Book book) {
+        this.book = book;
+        viewUpdateBook();
+    }
+
+    private void viewUpdateBook() {
+        titleTextField.setText(book.getTitle());
+        authorComboBox.getSelectionModel().select(book.getAuthor().getName());
+        publisherComboBox.getSelectionModel().select(book.getPublisher().getTitle());
+        genreComboBox.getSelectionModel().select(book.getGenre().getTitle());
+        lengthTextField.setText(String.valueOf(book.getLength()));
+    }
 
     @FXML
     public void initialize() {
@@ -55,7 +69,7 @@ public class BookController {
     }
 
     @FXML
-    public void save(ActionEvent actionEvent) {
+    public void save() {
         Author author;
         String authorName = authorComboBox.getEditor().getText();
         if (!authorComboBox.getItems().contains(authorName)) {
@@ -79,24 +93,39 @@ public class BookController {
 
         try {
             String title = titleTextField.getText();
-            author = authorService.findByName(authorComboBox.getSelectionModel().getSelectedItem()).orElseThrow(SQLException::new);
-            publisher = publisherService.findByTitle(publisherComboBox.getSelectionModel().getSelectedItem()).orElseThrow(SQLException::new);
-            genre = genreService.findByTitle(genreComboBox.getSelectionModel().getSelectedItem()).orElseThrow(SQLException::new);
+            author = authorService.findByName(authorComboBox.getSelectionModel().getSelectedItem());
+            publisher = publisherService.findByTitle(publisherComboBox.getSelectionModel().getSelectedItem());
+            genre = genreService.findByTitle(genreComboBox.getSelectionModel().getSelectedItem());
             int length = Integer.parseInt(lengthTextField.getText());
-            book = new Book(title, author, publisher, genre, length);
-            save = bookService.save(book);
-            Utils.getStage(saveButton).close();
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
+            if (book == null) {
+                book = Book.builder()
+                        .title(title)
+                        .author(author)
+                        .publisher(publisher)
+                        .genre(genre)
+                        .length(length)
+                        .bookCopyIdAndShelf(new TreeMap<>())
+                        .build();
 
-        Stage stage = (Stage) saveButton.getScene().getWindow();
-        stage.close();
+                save = bookService.save(book);
+            } else {
+                book.setTitle(title);
+                book.setAuthor(author);
+                book.setPublisher(publisher);
+                book.setGenre(genre);
+                book.setLength(length);
+
+                save = bookService.update(book);
+            }
+            actionOnForm = true;
+            UtilityClass.getStage(saveButton).close();
+        } catch (AuthorNotFoundByNameException | EntityNotFoundByTitleException e) {
+            MessageBox.WarningBox(e.getMessage()).show();
+        }
     }
 
     @FXML
-    public void cancel(ActionEvent actionEvent) {
-        close = true;
-        Utils.getStage(saveButton).close();
+    public void cancel() {
+        UtilityClass.getStage(saveButton).close();
     }
 }

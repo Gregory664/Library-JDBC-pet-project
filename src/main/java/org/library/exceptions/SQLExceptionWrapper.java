@@ -1,12 +1,17 @@
 package org.library.exceptions;
 
+import org.library.utils.MessageBox;
+
 import java.sql.SQLException;
 
 public class SQLExceptionWrapper extends RuntimeException {
     public SQLExceptionWrapper(SQLException e) {
-        System.err.println("Error code: " + e.getErrorCode());
-        System.err.println("State: " + e.getSQLState());
-        System.err.println("Massage: " + e.getMessage());
-        e.printStackTrace();
+        String warningText = String.format("" +
+                "Ошибка обработки запроса: \n " +
+                "Error code: %s \n " +
+                "State: %s \n " +
+                "Message: %s", e.getErrorCode(), e.getSQLState(), e.getMessage());
+        System.out.println(warningText);
+        MessageBox.WarningBox(warningText).show();
     }
 }

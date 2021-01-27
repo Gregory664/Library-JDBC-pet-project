@@ -1,125 +1,65 @@
 package org.library.services;
 
+import org.library.entity.Book;
 import org.library.entity.BookCopy;
-import org.library.exceptions.BookNotFound;
-import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IBookCopy;
-import org.library.utils.ConnectionUtils;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.interfaces.BookCopyRepository;
+import org.library.interfaces.BookRepository;
+import org.library.interfaces.BookShelfRepository;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.library.utils.statements.BookCopySQLStatements.*;
+public class BookCopyService {
+    private final BookRepository bookRepository;
+    private final BookCopyRepository bookCopyRepository;
+    private final BookShelfRepository bookShelfRepository;
 
-public class BookCopyService implements IBookCopy {
-    private final BookService bookService = new BookService();
+    public BookCopyService(BookRepository bookRepository, BookCopyRepository bookCopyRepository, BookShelfRepository bookShelfRepository) {
+        this.bookRepository = bookRepository;
+        this.bookCopyRepository = bookCopyRepository;
+        this.bookShelfRepository = bookShelfRepository;
+    }
 
-    @Override
-    public List<BookCopy> findAll() {
-        List<BookCopy> bookCopies = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    int bookId = resultSet.getInt("copyId");
-                    bookCopies.add(new BookCopy(id, bookService.findById(bookId).orElseThrow(BookNotFound::new)));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
+    public List<BookCopy> findAll() throws EntityNotFoundByIdException {
+        List<BookCopy> bookCopies = bookCopyRepository.findAll();
+        for (BookCopy bookCopy : bookCopies) {
+            int bookId = bookCopy.getId();
+            Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, bookId));
+            book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
+            bookCopy.setBook(book);
         }
         return bookCopies;
     }
 
-    @Override
-    public Optional<BookCopy> findById(Integer id) {
-        BookCopy bookCopy = null;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    int bookCopyId = resultSet.getInt("id");
-                    int bookId = resultSet.getInt("book_id");
-                    bookCopy = new BookCopy(bookCopyId, bookService.findById(bookId).orElseThrow(BookNotFound::new));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(bookCopy);
+    public BookCopy findById(Integer id) throws EntityNotFoundByIdException {
+        BookCopy bookCopy = bookCopyRepository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, id));
+        Book book = bookRepository.findById(bookCopy.getBook().getId()).orElseThrow(() -> new EntityNotFoundByIdException(BookCopy.class, id));
+        book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
+        bookCopy.setBook(book);
+        return bookCopy;
     }
 
-    @Override
     public boolean existsById(Integer id) {
-        boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                result = resultSet.getInt(1) == 1;
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return bookCopyRepository.existsById(id);
     }
 
-    @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(DELETE_ALL);
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
+        bookCopyRepository.deleteAll();
     }
 
-    @Override
     public boolean deleteById(Integer id) {
-        boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
-            statement.setInt(1, id);
-            result = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return bookCopyRepository.deleteById(id);
     }
 
-    @Override
     public boolean save(BookCopy bookCopy) {
-        boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setInt(1, bookCopy.getId());
-            result = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return bookCopyRepository.save(bookCopy);
     }
 
-    @Override
     public long count() {
-        long result = 0;
+        return bookCopyRepository.count();
+    }
 
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT)) {
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    result = resultSet.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+    public boolean update(BookCopy bookCopy) {
+        return bookCopyRepository.update(bookCopy);
     }
 }

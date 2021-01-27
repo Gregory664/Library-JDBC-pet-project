@@ -1,147 +1,52 @@
 package org.library.services;
 
 import org.library.entity.Publisher;
-import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IPublisher;
-import org.library.utils.ConnectionUtils;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.exceptions.newExc.EntityNotFoundByTitleException;
+import org.library.interfaces.PublisherRepository;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.library.utils.statements.PublisherSQLStatements.*;
+public class PublisherService {
+    private final PublisherRepository repository;
 
-public class PublisherService implements IPublisher {
-    @Override
+    public PublisherService(PublisherRepository repository) {
+        this.repository = repository;
+    }
+
     public List<Publisher> findAll() {
-        List<Publisher> publishers = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                int id = resultSet.getInt(1);
-                String title = resultSet.getString(2);
-                publishers.add(new Publisher(id, title));
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return publishers;
+        return repository.findAll();
     }
 
-    @Override
-    public Optional<Publisher> findById(Integer id) {
-        Publisher publisher = null;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    int newId = resultSet.getInt(1);
-                    String title = resultSet.getString(2);
-                    publisher = new Publisher(newId, title);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(publisher);
+    public Publisher findById(Integer id) throws EntityNotFoundByIdException {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Publisher.class, id));
     }
 
-    @Override
     public boolean existsById(Integer id) {
-        boolean isExists = false;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    isExists = resultSet.getInt(1) == 1;
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return isExists;
+        return repository.existsById(id);
     }
 
-    @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(DELETE);
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
+        repository.deleteAll();
     }
 
-    @Override
     public boolean deleteById(Integer id) {
-        boolean result;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
-            statement.setInt(1, id);
-            result = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return repository.deleteById(id);
     }
 
-    @Override
     public boolean save(Publisher publisher) {
-        boolean isSave;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setString(1, publisher.getTitle());
-            isSave = statement.executeUpdate() == 1;
-
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return isSave;
+        return repository.save(publisher);
     }
 
-    @Override
     public long count() {
-        long result = 0;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT)) {
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    result = resultSet.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return repository.count();
     }
 
-    @Override
-    public Optional<Publisher> findByTitle(String title) {
-        Publisher publisher = null;
+    public Publisher findByTitle(String title) throws EntityNotFoundByTitleException {
+        return repository.findByTitle(title).orElseThrow(() -> new EntityNotFoundByTitleException(Publisher.class, title));
+    }
 
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
-            statement.setString(1, title);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String fTitle = resultSet.getString("title");
-                    publisher = new Publisher(id, fTitle);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(publisher);
+    public boolean update(Publisher publisher) {
+        return repository.update(publisher);
     }
 }

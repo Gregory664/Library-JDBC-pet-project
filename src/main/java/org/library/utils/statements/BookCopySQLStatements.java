@@ -14,4 +14,9 @@ public class BookCopySQLStatements {
     public static final String SAVE = "INSERT INTO book_copy (book_id) VALUES (?);";
 
     public static final String COUNT = "SELECT COUNT(*) FROM book_copy;";
+
+    public static final String UPDATE = "" +
+            "UPDATE book_copy " +
+            "SET    book_id = ? " +
+            "WHERE  id = ?";
 }

@@ -16,4 +16,9 @@ public class AuthorSQLStatements {
     public static final String DELETE_BY_ID = DELETE + "WHERE id = ?;";
 
     public static final String SAVE = "INSERT INTO author (name) VALUES (?);";
+
+    public static final String UPDATE = "" +
+            "UPDATE author " +
+            "SET    name = ? " +
+            "WHERE  id    = ?";
 }

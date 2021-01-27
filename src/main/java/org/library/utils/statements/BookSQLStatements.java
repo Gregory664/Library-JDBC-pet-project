@@ -13,15 +13,6 @@ public class BookSQLStatements {
 
     public static final String FIND_BY_ID = FIND_ALL + "WHERE b.id = ?";
 
-    public static final String FIND_BY_AUTHOR = FIND_ALL + "WHERE a.id = ?";
-
-    public static final String FIND_BY_PUBLISHER = FIND_ALL + "WHERE p.id = ?";
-
-    public static final String FIND_BY_GENRE = " WHERE g.id = ?";
-
-    public static final String FIND_BY_TITLE = "WHERE b.title = ?";
-
-
     public static final String EXISTS_BY_ID = "SELECT COUNT(*) FROM book WHERE id = ?;";
 
     public static final String DELETE_ALL = "DELETE FROM book;";
@@ -33,4 +24,13 @@ public class BookSQLStatements {
             "VALUES (?, ?, ?, ?, ?);";
 
     public static final String COUNT = "SELECT COUNT(*) FROM book;";
+
+    public static final String UPDATE = "" +
+            "UPDATE book " +
+            "SET    title        = ?, " +
+            "       author_id    = ?, " +
+            "       publisher_id = ?, " +
+            "       genre_id     = ?, " +
+            "       length       = ? " +
+            "WHERE  id = ?";
 }

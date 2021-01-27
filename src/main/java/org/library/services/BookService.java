@@ -1,225 +1,63 @@
 package org.library.services;
 
-import org.library.entity.*;
-import org.library.exceptions.SQLExceptionWrapper;
-import org.library.repositories.IBook;
-import org.library.utils.ConnectionUtils;
+import org.library.entity.Author;
+import org.library.entity.Book;
+import org.library.entity.Genre;
+import org.library.entity.Publisher;
+import org.library.exceptions.newExc.EntityNotFoundByIdException;
+import org.library.interfaces.BookRepository;
+import org.library.interfaces.BookShelfRepository;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-import static org.library.utils.statements.BookSQLStatements.*;
+public class BookService {
+    private final BookShelfRepository bookShelfRepository;
+    private final BookRepository bookRepository;
 
-public class BookService implements IBook {
-    private final BookShelfService bookShelfService = new BookShelfService();
-
-    private Book getBookFromResultSet(ResultSet resultSet) {
-        try {
-            int id = resultSet.getInt("id");
-            String title = resultSet.getString("title");
-            int length = resultSet.getInt("length");
-
-            int authorId = resultSet.getInt("author_id");
-            String authorName = resultSet.getString("author_name");
-            Author author = new Author(authorId, authorName);
-
-            int publisherId = resultSet.getInt("publisher_id");
-            String publisherTitle = resultSet.getString("publisher_title");
-            Publisher publisher = new Publisher(publisherId, publisherTitle);
-
-            int genreId = resultSet.getInt("genre_id");
-            String genreTitle = resultSet.getString("genre_title");
-            Genre genre = new Genre(genreId, genreTitle);
-
-            Map<Integer, Shelf> bookCopyIdAndShelf = bookShelfService.getBookCopyIdAndShelf(id);
-
-            return new Book(id, title, author, publisher, genre, length, bookCopyIdAndShelf);
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
+    public BookService(BookShelfRepository bookShelfRepository, BookRepository bookRepository) {
+        this.bookShelfRepository = bookShelfRepository;
+        this.bookRepository = bookRepository;
     }
 
-    @Override
     public List<Book> findAll() {
-        List<Book> books = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                books.add(getBookFromResultSet(resultSet));
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return books;
+        List<Book> all = bookRepository.findAll();
+        all.forEach(book -> book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId())));
+        return all;
     }
 
-    @Override
-    public Optional<Book> findById(Integer id) {
-        Book book = null;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    book = getBookFromResultSet(resultSet);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(book);
+    public Book findById(Integer id) throws EntityNotFoundByIdException {
+        Book book = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundByIdException(Book.class, id));
+        book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId()));
+        return book;
     }
 
-    @Override
     public boolean existsById(Integer id) {
-        boolean isExists = false;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID)) {
-            statement.setInt(1, id);
-            try (ResultSet set = statement.executeQuery()) {
-                while (set.next()) {
-                    isExists = set.getInt(1) == 1;
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return isExists;
+        return bookRepository.existsById(id);
     }
 
-    @Override
     public void deleteAll() {
-        try (Connection connection = ConnectionUtils.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(DELETE_ALL);
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
+        bookRepository.deleteAll();
     }
 
-    @Override
     public boolean deleteById(Integer id) {
-        boolean result;
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
-            statement.setInt(1, id);
-            result = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return bookRepository.deleteById(id);
     }
 
-    @Override
     public boolean save(Book book) {
-        boolean isSave;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE)) {
-            statement.setString(1, book.getTitle());
-            statement.setInt(2, book.getAuthor().getId());
-            statement.setInt(3, book.getPublisher().getId());
-            statement.setInt(4, book.getGenre().getId());
-            statement.setInt(5, book.getLength());
-            isSave = statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return isSave;
+        return bookRepository.save(book);
     }
 
-    @Override
     public long count() {
-        long result = 0;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                result = resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return result;
+        return bookRepository.count();
     }
 
-    @Override
-    public List<Book> findByAuthor(Author author) {
-        List<Book> books = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_AUTHOR)) {
-            statement.setInt(1, author.getId());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    books.add(getBookFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return books;
+    public boolean update(Book book) {
+        return bookRepository.update(book);
     }
 
-    @Override
-    public List<Book> findByPublisher(Publisher publisher) {
-        List<Book> books = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_PUBLISHER)) {
-            statement.setInt(1, publisher.getId());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    books.add(getBookFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return books;
-    }
-
-    @Override
-    public List<Book> findByGenre(Genre genre) {
-        List<Book> books = new ArrayList<>();
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_GENRE)) {
-            statement.setInt(1, genre.getId());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    books.add(getBookFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return books;
-    }
-
-    @Override
-    public Optional<Book> findByTitle(String title) {
-        Book book = null;
-
-        try (Connection connection = ConnectionUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_BY_TITLE)) {
-            statement.setString(1, title);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    book = getBookFromResultSet(resultSet);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLExceptionWrapper(e);
-        }
-        return Optional.ofNullable(book);
+    public List<Book> findByParams(String title, Author author, Genre genre, Publisher publisher) {
+        List<Book> booksByParams = bookRepository.findByParams(title, author, genre, publisher);
+        booksByParams.forEach(book -> book.setBookCopyIdAndShelf(bookShelfRepository.getBookCopyIdAndShelf(book.getId())));
+        return booksByParams;
     }
 }
